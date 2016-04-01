@@ -34,27 +34,21 @@ use PSX\Sql\TableInterface;
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    http://phpsx.org
  */
-class SchemaTest extends DbTestCase
+class SchemaTest extends \PHPUnit_Extensions_Database_TestCase
 {
     public function getDataSet()
     {
-        $table = new Table($this->connection, 'psx_sql_table_test', array(
-            'id'    => TableInterface::TYPE_INT | 10 | TableInterface::PRIMARY_KEY | TableInterface::AUTO_INCREMENT,
-            'title' => TableInterface::TYPE_VARCHAR | 32,
-            'date'  => TableInterface::TYPE_DATETIME,
-        ));
+        return $this->createFlatXMLDataSet(__DIR__ . '/../../table_fixture.xml');
+    }
 
-        $dataSet = new TableDataSet();
-        $dataSet->addTable($table, array(
-            array('id' => null, 'title' => 'foo', 'date' => date(DateTime::SQL)),
-        ));
-
-        return $dataSet;
+    public function getConnection()
+    {
+        return $this->createDefaultDBConnection(getConnection()->getWrappedConnection(), '');
     }
 
     public function testGetTableDefinition()
     {
-        $reader = new Schema($this->connection);
+        $reader = new Schema(getConnection());
         $table  = $reader->getTableDefinition('psx_sql_table_test');
 
         $this->assertEquals('psx_sql_table_test', $table->getName());

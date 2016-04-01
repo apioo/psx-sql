@@ -31,16 +31,21 @@ use PSX\Sql\TableInterface;
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    http://phpsx.org
  */
-class TableTest extends DbTestCase
+class TableTest extends \PHPUnit_Extensions_Database_TestCase
 {
     public function getDataSet()
     {
         return $this->createFlatXMLDataSet(__DIR__ . '/table_fixture.xml');
     }
 
+    public function getConnection()
+    {
+        return $this->createDefaultDBConnection(getConnection()->getWrappedConnection(), '');
+    }
+
     public function testTable()
     {
-        $table = new Table($this->connection, 'foo_table', array('bar' => TableInterface::TYPE_INT), array());
+        $table = new Table(getConnection(), 'foo_table', array('bar' => TableInterface::TYPE_INT), array());
 
         $this->assertEquals('foo_table', $table->getName());
         $this->assertEquals(array('bar' => TableInterface::TYPE_INT), $table->getColumns());

@@ -22,6 +22,7 @@ namespace PSX\Sql\Tests;
 
 use PSX\Framework\Test\DbTestCase;
 use PSX\Framework\Test\Environment;
+use PSX\Sql\TableManager;
 
 /**
  * SerializeTest
@@ -30,17 +31,24 @@ use PSX\Framework\Test\Environment;
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    http://phpsx.org
  */
-class SerializeTest extends DbTestCase
+class SerializeTest extends \PHPUnit_Extensions_Database_TestCase
 {
     public function getDataSet()
     {
         return $this->createFlatXMLDataSet(__DIR__ . '/table_fixture.xml');
     }
 
+    public function getConnection()
+    {
+        return $this->createDefaultDBConnection(getConnection()->getWrappedConnection(), '');
+    }
+
     public function testSerialize()
     {
+        $tableManager = new TableManager(getConnection());
+
         /** @var \PSX\Sql\Tests\TestTableCommand $table */
-        $table = Environment::getService('table_manager')->getTable('PSX\Sql\Tests\TestTableCommand');
+        $table = $tableManager->getTable('PSX\Sql\Tests\TestTableCommand');
         $row   = $table->get(1);
 
         $this->assertInternalType('string', $row->col_bigint);

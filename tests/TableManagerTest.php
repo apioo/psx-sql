@@ -31,16 +31,21 @@ use PSX\Sql\TableManager;
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    http://phpsx.org
  */
-class TableManagerTest extends DbTestCase
+class TableManagerTest extends \PHPUnit_Extensions_Database_TestCase
 {
     public function getDataSet()
     {
         return $this->createFlatXMLDataSet(__DIR__ . '/table_fixture.xml');
     }
 
+    public function getConnection()
+    {
+        return $this->createDefaultDBConnection(getConnection()->getWrappedConnection(), '');
+    }
+
     public function testGetTable()
     {
-        $manager = new TableManager($this->connection);
+        $manager = new TableManager(getConnection());
 
         $table = $manager->getTable('PSX\Sql\Tests\TestTable');
 
@@ -51,7 +56,7 @@ class TableManagerTest extends DbTestCase
 
     public function testGetTableWithReader()
     {
-        $manager = new TableManager($this->connection, new Reader\Schema($this->connection));
+        $manager = new TableManager(getConnection(), new Reader\Schema(getConnection()));
 
         $table = $manager->getTable('psx_handler_comment');
 
@@ -65,13 +70,13 @@ class TableManagerTest extends DbTestCase
      */
     public function testGetTableInvalidTable()
     {
-        $manager = new TableManager($this->connection);
+        $manager = new TableManager(getConnection());
         $manager->getTable('PSX\Sql\FooTable');
     }
 
     public function testGetConnection()
     {
-        $manager = new TableManager($this->connection);
+        $manager = new TableManager(getConnection());
 
         $this->assertInstanceOf('Doctrine\DBAL\Connection', $manager->getConnection());
     }

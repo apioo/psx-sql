@@ -23,6 +23,7 @@ namespace PSX\Sql\Tests;
 use PSX\Framework\Test\DbTestCase;
 use PSX\Framework\Test\Environment;
 use PSX\Sql\TableInterface;
+use PSX\Sql\TableManager;
 
 /**
  * TableAbstractTest
@@ -31,14 +32,37 @@ use PSX\Sql\TableInterface;
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    http://phpsx.org
  */
-class TableAbstractTest extends DbTestCase
+class TableAbstractTest extends \PHPUnit_Extensions_Database_TestCase
 {
     use TableQueryTestTrait;
     use TableManipulationTestTrait;
 
+    /**
+     * @var \Doctrine\DBAL\Connection
+     */
+    protected $connection;
+
+    /**
+     * @var \PSX\Sql\TableManagerInterface
+     */
+    protected $manager;
+
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->connection = getConnection();
+        $this->manager    = new TableManager($this->connection);
+    }
+
     public function getDataSet()
     {
         return $this->createFlatXMLDataSet(__DIR__ . '/table_fixture.xml');
+    }
+
+    public function getConnection()
+    {
+        return $this->createDefaultDBConnection(getConnection()->getWrappedConnection(), '');
     }
 
     /**
@@ -71,7 +95,7 @@ class TableAbstractTest extends DbTestCase
      */
     protected function getTable()
     {
-        return Environment::getService('table_manager')->getTable('PSX\Sql\Tests\TestTable');
+        return $this->manager->getTable('PSX\Sql\Tests\TestTable');
     }
 
     public function testGetName()

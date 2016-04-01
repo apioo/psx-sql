@@ -20,6 +20,8 @@
 
 namespace PSX\Sql\Tests;
 
+use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Schema\Schema;
 use PSX\Framework\Test\DbTestCase;
 use PSX\Sql\Builder;
 
@@ -30,8 +32,30 @@ use PSX\Sql\Builder;
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    http://phpsx.org
  */
-abstract class ProviderTestCase extends DbTestCase
+abstract class ProviderTestCase extends \PHPUnit_Extensions_Database_TestCase
 {
+    /**
+     * @var \Doctrine\DBAL\Connection
+     */
+    protected $connection;
+
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->connection = getConnection();
+    }
+
+    public function getDataSet()
+    {
+        return $this->createFlatXMLDataSet(__DIR__ . '/provider_fixture.xml');
+    }
+
+    public function getConnection()
+    {
+        return $this->createDefaultDBConnection(getConnection()->getWrappedConnection(), '');
+    }
+
     public function testBuild()
     {
         $builder = new Builder();
@@ -64,8 +88,5 @@ JSON;
         $this->assertJsonStringEqualsJsonString($expect, $result, $result);
     }
 
-    public function getDataSet()
-    {
-        return $this->createFlatXMLDataSet(__DIR__ . '/provider_fixture.xml');
-    }
+    abstract protected function getDefinition();
 }
