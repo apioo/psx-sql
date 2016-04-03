@@ -20,7 +20,7 @@
 
 namespace PSX\Sql\Tests;
 
-use PSX\Data\Record;
+use PSX\Record\Record;
 use PSX\Sql\Condition;
 use PSX\Sql\Fields;
 use PSX\Sql\Sql;
@@ -639,7 +639,7 @@ trait TableQueryTestTrait
 
         $obj = $table->getRecord();
 
-        $this->assertInstanceOf('PSX\Data\RecordInterface', $obj);
+        $this->assertInstanceOf('PSX\Record\RecordInterface', $obj);
         $this->assertEquals('record', $obj->getDisplayName());
     }
 

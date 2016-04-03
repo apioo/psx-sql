@@ -53,7 +53,7 @@ interface TableQueryInterface
      * Returns an record by the condition
      *
      * @param \PSX\Sql\Condition $condition
-     * @return \PSX\Data\RecordInterface
+     * @return \PSX\Record\RecordInterface
      */
     public function getOneBy(Condition $condition, Fields $fields = null);
 
@@ -61,7 +61,7 @@ interface TableQueryInterface
      * Returns an record by the primary key
      *
      * @param string $id
-     * @return \PSX\Data\RecordInterface
+     * @return \PSX\Record\RecordInterface
      */
     public function get($id, Fields $fields = null);
 

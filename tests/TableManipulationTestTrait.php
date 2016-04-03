@@ -54,7 +54,7 @@ trait TableManipulationTestTrait
 
         $row = $table->getOneById(5);
 
-        $this->assertInstanceOf('PSX\Data\RecordInterface', $row);
+        $this->assertInstanceOf('PSX\Record\RecordInterface', $row);
         $this->assertEquals(5, $row->id);
         $this->assertEquals(2, $row->userId);
         $this->assertEquals('foobar', $row->title);

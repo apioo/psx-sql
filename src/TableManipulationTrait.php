@@ -21,7 +21,7 @@
 namespace PSX\Sql;
 
 use InvalidArgumentException;
-use PSX\Data\RecordInterface;
+use PSX\Record\RecordInterface;
 use RuntimeException;
 
 /**
@@ -124,7 +124,7 @@ trait TableManipulationTrait
         } elseif (is_array($record)) {
             return $record;
         } else {
-            throw new InvalidArgumentException('Record must bei either an PSX\Data\RecordInterface or array');
+            throw new InvalidArgumentException('Record must bei either an PSX\Record\RecordInterface or array');
         }
     }
 }

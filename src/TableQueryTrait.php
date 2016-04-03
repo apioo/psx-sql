@@ -22,7 +22,7 @@ namespace PSX\Sql;
 
 use BadMethodCallException;
 use InvalidArgumentException;
-use PSX\Data\Record;
+use PSX\Record\Record;
 
 /**
  * TableQueryTrait
