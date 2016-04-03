@@ -33,8 +33,6 @@ use PSX\Record\Record;
  */
 trait TableQueryTrait
 {
-    protected $restrictedFields = array();
-
     public function getAll($startIndex = null, $count = null, $sortBy = null, $sortOrder = null, Condition $condition = null, Fields $fields = null)
     {
         $startIndex = $startIndex !== null ? (int) $startIndex : 0;
@@ -56,8 +54,6 @@ trait TableQueryTrait
             $columns = array_intersect($columns, $fieldsWhitelist);
         } elseif (!empty($fieldsBlacklist)) {
             $columns = array_diff($columns, $fieldsBlacklist);
-        } else {
-            $columns = array_diff($columns, $this->getRestrictedFields());
         }
 
         if (!in_array($sortBy, $columns)) {
@@ -116,7 +112,7 @@ trait TableQueryTrait
 
     public function getSupportedFields()
     {
-        return array_diff(array_keys($this->getColumns()), $this->getRestrictedFields());
+        return array_keys($this->getColumns());
     }
 
     public function getRecord()
@@ -125,30 +121,6 @@ trait TableQueryTrait
         $fields    = array_combine($supported, array_fill(0, count($supported), null));
 
         return new Record('record', $fields);
-    }
-
-    /**
-     * Returns an array of fields wich can not be used from the handler even if
-     * the fields are available
-     *
-     * @deprecated
-     * @return array
-     */
-    public function getRestrictedFields()
-    {
-        return $this->restrictedFields;
-    }
-
-    /**
-     * Sets the restricted fields. Use the fields parameter to restrict the 
-     * result set
-     *
-     * @deprecated
-     * @param array $restrictedFields
-     */
-    public function setRestrictedFields(array $restrictedFields)
-    {
-        $this->restrictedFields = $restrictedFields;
     }
 
     /**

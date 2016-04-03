@@ -643,41 +643,6 @@ trait TableQueryTestTrait
         $this->assertEquals('record', $obj->getDisplayName());
     }
 
-    public function testRestrictedFields()
-    {
-        $table = $this->getTable();
-        $table->setRestrictedFields(array('id', 'userId'));
-
-        $result = $table->getAll();
-
-        $this->assertEquals(true, is_array($result));
-        $this->assertEquals(4, count($result));
-        $this->assertEquals(array(2 => 'title', 3 => 'date'), $table->getSupportedFields());
-
-        $table->setRestrictedFields(array());
-
-        $expect = array(
-            new Record('comment', array(
-                'title' => 'blub',
-                'date' => new \DateTime('2013-04-29 16:56:32'),
-            )),
-            new Record('comment', array(
-                'title' => 'test',
-                'date' => new \DateTime('2013-04-29 16:56:32'),
-            )),
-            new Record('comment', array(
-                'title' => 'bar',
-                'date' => new \DateTime('2013-04-29 16:56:32'),
-            )),
-            new Record('comment', array(
-                'title' => 'foo',
-                'date' => new \DateTime('2013-04-29 16:56:32'),
-            )),
-        );
-
-        $this->assertEquals($expect, $result);
-    }
-
     public function testNestedResult()
     {
         $result = $this->getTable()->getNestedResult();
