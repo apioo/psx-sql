@@ -194,7 +194,7 @@ trait TableQueryTrait
         return [$builder->getSQL(), $builder->getParameters()];
     }
 
-    protected function project($sql, array $params = array(), array $columns = null, NestRule $nestRule = null)
+    protected function project($sql, array $params = array(), array $columns = null)
     {
         $result  = array();
         $columns = $columns === null ? $this->getColumns() : $columns;
@@ -207,23 +207,7 @@ trait TableQueryTrait
                     $value = $this->unserializeType($value, $columns[$key]);
                 }
 
-                if ($nestRule !== null) {
-                    $parentKey = $nestRule->getParent($key);
-
-                    if ($parentKey !== null) {
-                        if (!isset($row[$parentKey])) {
-                            $row[$parentKey] = new \stdClass();
-                        }
-
-                        $row[$parentKey]->$key = $value;
-
-                        unset($row[$key]);
-                    } else {
-                        $row[$key] = $value;
-                    }
-                } else {
-                    $row[$key] = $value;
-                }
+                $row[$key] = $value;
             }
 
             $result[] = new Record($name, $row);

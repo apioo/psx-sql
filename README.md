@@ -120,3 +120,34 @@ There is also a table manager which can be used to obtain table instances. It
 simply passes the database connection to the table instance. You most likely
 want to register the table manager at your DI container so that you can easily
 use it in your app to obtain a table instance.
+
+### Custom query
+
+The above query could be easily embedded into a table class.
+
+```php
+public function getLatestNews()
+{
+    $definition = [
+        'totalEntries' => 2,
+        'entries' => $this->provider->newCollection('SELECT id, authorId, title, createDate FROM news ORDER BY createDate DESC', [], [
+            'id' => 'id',
+            'title' => new Field\Callback('title', function($title){
+                return ucfirst($title);
+            }),
+            'isNew' => new Field\Value(true),
+            'author' => $this->provider->newEntity('SELECT name, uri FROM author WHERE id = :id', ['id' => new Reference('authorId')], [
+                'displayName' => 'name',
+                'uri' => 'uri',
+            ]),
+            'date' => new Field\DateTime('createDate'),
+            'links' => [
+                'self' => new Field\Replace('http://foobar.com/news/{id}'),
+            ]
+        ])
+    ];
+    
+    return $this->builder->build($definition));
+}
+
+```

@@ -10,14 +10,14 @@
 
 namespace PSX\Sql;
 
+use PSX\Record\Record;
 use RuntimeException;
 use PSX\Sql\Provider\ProviderCollectionInterface;
 use PSX\Sql\Provider\ProviderEntityInterface;
 
 /**
- * Main class of structor. The build method resolves the definition through  
- * calling every provider and field objects. The result is an array in the 
- * format of the definition
+ * The build method resolves the definition through calling every provider and 
+ * field objects. The result is an array in the format of the definition
  *
  * @author Christoph Kappestein <christoph.kappestein@gmail.com>
  */
@@ -26,35 +26,37 @@ class Builder
     /**
      * Returns an array based on the resolved definition
      *
-     * @param array $definition
+     * @param mixed $definition
      * @param array $context
      * @return array
      */
-    public function build(array $definition, array $context = null)
+    public function build($definition, array $context = null, $name = null)
     {
-        $result = [];
-
-        foreach ($definition as $key => $value) {
-            if ($value instanceof FieldInterface) {
-                $result[$key] = $value->getResult($context);
-            } elseif ($value instanceof ProviderInterface) {
-                $result[$key] = $this->getProviderValue($value, $context);
-            } elseif (is_array($value)) {
+        if ($definition instanceof ProviderInterface) {
+            return $this->getProviderValue($definition, $context);
+        } elseif ($definition instanceof FieldInterface) {
+            return $definition->getResult($context);
+        } elseif (is_array($definition)) {
+            $result = [];
+            foreach ($definition as $key => $value) {
                 $result[$key] = $this->build($value, $context);
-            } else {
-                if ($context !== null) {
-                    if (isset($context[$value])) {
-                        $result[$key] = $context[$value];
-                    } else {
-                        throw new RuntimeException('Referenced unknown key "' . $value . '" in context');
-                    }
+            }
+
+            return new Record(
+                $name === null ? 'record' : $name, 
+                $result
+            );
+        } else {
+            if ($context !== null) {
+                if (isset($context[$definition])) {
+                    return $context[$definition];
                 } else {
-                    $result[$key] = $value;
+                    throw new RuntimeException('Referenced unknown key "' . $definition . '" in context');
                 }
+            } else {
+                return $definition;
             }
         }
-
-        return $result;
     }
 
     protected function getProviderValue(ProviderInterface $provider, array $context = null)

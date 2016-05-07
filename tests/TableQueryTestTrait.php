@@ -648,26 +648,38 @@ trait TableQueryTestTrait
         $result = $this->getTable()->getNestedResult();
 
         $expect = array(
-            new Record('comment', array(
+            Record::fromArray([
                 'id' => 4,
-                'author' => (object) array('userId' => 3, 'date' => new \DateTime('2013-04-29 16:56:32')),
-                'title' => 'blub',
-            )),
-            new Record('comment', array(
+                'author' => Record::fromArray([
+                    'id' => 'urn:profile:3', 
+                    'date' => '2013-04-29T16:56:32+00:00'
+                ]),
+                'title' => 'Blub',
+            ]),
+            Record::fromArray([
                 'id' => 3,
-                'author' => (object) array('userId' => 2, 'date' => new \DateTime('2013-04-29 16:56:32')),
-                'title' => 'test',
-            )),
-            new Record('comment', array(
+                'author' => Record::fromArray([
+                    'id' => 'urn:profile:2', 
+                    'date' => '2013-04-29T16:56:32+00:00'
+                ]),
+                'title' => 'Test',
+            ]),
+            Record::fromArray([
                 'id' => 2,
-                'author' => (object) array('userId' => 1, 'date' => new \DateTime('2013-04-29 16:56:32')),
-                'title' => 'bar',
-            )),
-            new Record('comment', array(
+                'author' => Record::fromArray([
+                    'id' => 'urn:profile:1', 
+                    'date' => '2013-04-29T16:56:32+00:00'
+                ]),
+                'title' => 'Bar',
+            ]),
+            Record::fromArray([
                 'id' => 1,
-                'author' => (object) array('userId' => 1, 'date' => new \DateTime('2013-04-29 16:56:32')),
-                'title' => 'foo',
-            )),
+                'author' => Record::fromArray([
+                    'id' => 'urn:profile:1', 
+                    'date' => '2013-04-29T16:56:32+00:00'
+                ]),
+                'title' => 'Foo',
+            ]),
         );
 
         $this->assertEquals($expect, $result);

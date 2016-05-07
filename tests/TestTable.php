@@ -20,9 +20,10 @@
 
 namespace PSX\Sql\Tests;
 
-use PSX\Sql\NestRule;
 use PSX\Sql\TableAbstract;
 use PSX\Sql\TableInterface;
+use PSX\Sql\Provider\DBAL;
+use PSX\Sql\Field;
 
 /**
  * TestTable
@@ -57,9 +58,17 @@ class TestTable extends TableAbstract
 				    FROM psx_handler_comment
 				ORDER BY id DESC';
 
-        $nest = new NestRule();
-        $nest->add('author', ['userId', 'date']);
-
-        return $this->project($sql, array(), null, $nest);
+        $definition = $this->provider->newCollection($sql, [], [
+            'id' => new Field\Integer('id'),
+            'title' => new Field\Callback('title', function($title){
+                return ucfirst($title);
+            }),
+            'author' => [
+                'id' => new Field\Replace('urn:profile:{userId}'),
+                'date' => new Field\DateTime('date'),
+            ],
+        ]);
+        
+        return $this->builder->build($definition);
     }
 }

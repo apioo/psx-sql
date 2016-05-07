@@ -20,6 +20,7 @@
 
 namespace PSX\Sql\Tests;
 
+use PSX\Record\Record;
 use PSX\Sql\Builder;
 use PSX\Sql\Provider\Map;
 use PSX\Sql\Field;
@@ -140,7 +141,7 @@ JSON;
         $builder = new Builder();
         $result  = $builder->build($definition);
 
-        $this->assertEquals($definition, $result);
+        $this->assertEquals(Record::fromArray($definition), $result);
     }
 
     /**

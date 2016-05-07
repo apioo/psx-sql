@@ -35,11 +35,26 @@ abstract class TableAbstract implements TableInterface
     use TableQueryTrait;
     use TableManipulationTrait;
 
+    /**
+     * @var \Doctrine\DBAL\Connection
+     */
     protected $connection;
+
+    /**
+     * @var \PSX\Sql\Builder
+     */
+    protected $builder;
+
+    /**
+     * @var \PSX\Sql\ProviderInterface
+     */
+    protected $provider;
 
     public function __construct(Connection $connection)
     {
         $this->connection = $connection;
+        $this->builder    = new Builder();
+        $this->provider   = new Provider\DBAL\Factory($this->connection);
     }
 
     public function getDisplayName()
