@@ -32,7 +32,12 @@ class DateTime extends TransformFieldAbstract
     protected function transform($value)
     {
         if (!$value instanceof \DateTime) {
-            $value = new \DateTime((string) $value);
+            $data = (string) $value;
+            if (empty($data) || $data === '0000-00-00 00:00:00') {
+                return null;
+            } else {
+                $value = new \DateTime($data);
+            }
         }
 
         return $value->format(\DateTime::RFC3339);
