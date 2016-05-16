@@ -62,7 +62,7 @@ abstract class TableAbstract implements TableInterface
         $name = $this->getName();
         $pos  = strrpos($name, '_');
 
-        return $pos !== false ? substr($name, strrpos($name, '_') + 1) : $name;
+        return $pos !== false ? substr($name, $pos + 1) : $name;
     }
 
     public function getPrimaryKey()
