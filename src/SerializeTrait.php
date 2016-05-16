@@ -81,4 +81,15 @@ trait SerializeTrait
             return TableInterface::TYPE_VARCHAR;
         }
     }
+
+    public static function getDoctrineTypeByType($type)
+    {
+        $type = (($type >> 20) & 0xFF) << 20;
+
+        if (isset(self::$mapping[$type])) {
+            return self::$mapping[$type];
+        } else {
+            return Type::STRING;
+        }
+    }
 }
