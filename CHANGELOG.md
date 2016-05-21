@@ -1,5 +1,7 @@
 
-### 1.0.1
+### 1.0.2
+
+### 1.0.1 (2016-05-21)
 
 * Added generate and migrate command
 
