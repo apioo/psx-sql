@@ -38,6 +38,7 @@ function getConnection()
     $table = $toSchema->createTable('psx_table_command_test');
     $table->addColumn('id', 'integer', array('length' => 10, 'autoincrement' => true));
     $table->addColumn('col_bigint', 'bigint');
+    $table->addColumn('col_binary', 'binary');
     $table->addColumn('col_blob', 'blob');
     $table->addColumn('col_boolean', 'boolean');
     $table->addColumn('col_datetime', 'datetime');
@@ -50,8 +51,10 @@ function getConnection()
     $table->addColumn('col_text', 'text');
     $table->addColumn('col_time', 'time');
     $table->addColumn('col_string', 'string');
-    $table->addColumn('col_array', 'text', array('notnull' => false));
-    $table->addColumn('col_object', 'text', array('notnull' => false));
+    $table->addColumn('col_array', 'array');
+    $table->addColumn('col_object', 'object');
+    $table->addColumn('col_json', 'json_array');
+    $table->addColumn('col_guid', 'guid');
     $table->setPrimaryKey(array('id'));
 
     $table = $toSchema->createTable('psx_sql_provider_news');

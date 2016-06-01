@@ -41,6 +41,7 @@ class TestTableCommand extends TableAbstract
         return array(
             'id' => self::TYPE_INT | self::AUTO_INCREMENT | self::PRIMARY_KEY,
             'col_bigint' => self::TYPE_BIGINT,
+            'col_binary' => self::TYPE_BINARY,
             'col_blob' => self::TYPE_BLOB,
             'col_boolean' => self::TYPE_BOOLEAN,
             'col_datetime' => self::TYPE_DATETIME,
@@ -53,8 +54,10 @@ class TestTableCommand extends TableAbstract
             'col_text' => self::TYPE_TEXT,
             'col_time' => self::TYPE_TIME,
             'col_string' => self::TYPE_VARCHAR,
-            'col_array' => self::TYPE_ARRAY | self::IS_NULL,
-            'col_object' => self::TYPE_OBJECT | self::IS_NULL,
+            'col_array' => self::TYPE_ARRAY,
+            'col_object' => self::TYPE_OBJECT,
+            'col_json' => self::TYPE_JSON,
+            'col_guid' => self::TYPE_GUID,
         );
     }
 }

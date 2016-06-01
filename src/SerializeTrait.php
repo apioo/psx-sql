@@ -45,8 +45,11 @@ trait SerializeTrait
         TableInterface::TYPE_VARCHAR  => Type::STRING,
         TableInterface::TYPE_TEXT     => Type::TEXT,
         TableInterface::TYPE_BLOB     => Type::BLOB,
+        TableInterface::TYPE_BINARY   => Type::BINARY,
         TableInterface::TYPE_ARRAY    => Type::TARRAY,
         TableInterface::TYPE_OBJECT   => Type::OBJECT,
+        TableInterface::TYPE_JSON     => Type::JSON_ARRAY,
+        TableInterface::TYPE_GUID     => Type::GUID,
     );
 
     protected function unserializeType($value, $type)

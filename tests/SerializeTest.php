@@ -53,6 +53,8 @@ class SerializeTest extends \PHPUnit_Extensions_Database_TestCase
 
         $this->assertInternalType('string', $row->col_bigint);
         $this->assertEquals('68719476735', $row->col_bigint);
+        $this->assertInternalType('resource', $row->col_binary);
+        $this->assertEquals('foo', stream_get_contents($row->col_binary));
         $this->assertInternalType('resource', $row->col_blob);
         $this->assertEquals('foobar', stream_get_contents($row->col_blob));
         $this->assertInternalType('boolean', $row->col_boolean);
@@ -62,8 +64,6 @@ class SerializeTest extends \PHPUnit_Extensions_Database_TestCase
         $this->assertEquals('UTC', $row->col_datetime->getTimezone()->getName());
         $this->assertInstanceOf('DateTime', $row->col_datetimetz);
         $this->assertEquals('2015-01-21 23:59:59', $row->col_datetimetz->format('Y-m-d H:i:s'));
-        // mysql does not support timezones
-        //$this->assertEquals('+01:00', $row->col_datetimetz())>getTimezone()->getName());
         $this->assertInstanceOf('DateTime', $row->col_date);
         $this->assertEquals('2015-01-21', $row->col_date->format('Y-m-d'));
         $this->assertInternalType('string', $row->col_decimal);
@@ -89,5 +89,10 @@ class SerializeTest extends \PHPUnit_Extensions_Database_TestCase
         $this->assertEquals($array, $row->col_array);
         $this->assertInstanceOf('stdClass', $row->col_object);
         $this->assertEquals($object, $row->col_object);
+        $this->assertInternalType('array', $row->col_json);
+        $this->assertEquals(['foo' => 'bar'], $row->col_json);
+        $this->assertInternalType('string', $row->col_guid);
+        $this->assertEquals('ebe865da-4982-4353-bc44-dcdf7239e386', $row->col_guid);
+
     }
 }

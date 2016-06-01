@@ -52,11 +52,16 @@ interface TableInterface extends TableQueryInterface, TableManipulationInterface
     // string
     const TYPE_VARCHAR    = 0xA00000;
     const TYPE_TEXT       = 0xB00000;
+
+    // binary
+    const TYPE_BINARY     = 0x2000000;
     const TYPE_BLOB       = 0xC00000;
 
     // formats
     const TYPE_ARRAY      = 0xD00000;
     const TYPE_OBJECT     = 0xE00000;
+    const TYPE_JSON       = 0xF00000;
+    const TYPE_GUID       = 0x1000000;
 
     /**
      * Returns the name of the table
