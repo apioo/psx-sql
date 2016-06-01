@@ -66,7 +66,7 @@ class Test extends \PSX\Sql\TableAbstract
     }
     public function getColumns()
     {
-        return array('id' => self::TYPE_INT | self::PRIMARY_KEY | self::AUTO_INCREMENT, 'col_bigint' => self::TYPE_BIGINT, 'col_blob' => self::TYPE_BLOB, 'col_boolean' => self::TYPE_BOOLEAN, 'col_datetime' => self::TYPE_DATETIME, 'col_datetimetz' => self::TYPE_DATETIME, 'col_date' => self::TYPE_DATE, 'col_decimal' => self::TYPE_DECIMAL, 'col_float' => self::TYPE_FLOAT, 'col_integer' => self::TYPE_INT, 'col_smallint' => self::TYPE_SMALLINT, 'col_text' => self::TYPE_TEXT, 'col_time' => self::TYPE_TIME, 'col_string' => self::TYPE_VARCHAR | 255, 'col_array' => self::TYPE_TEXT | self::IS_NULL, 'col_object' => self::TYPE_TEXT | self::IS_NULL);
+        return array('id' => self::TYPE_INT | self::PRIMARY_KEY | self::AUTO_INCREMENT, 'col_bigint' => self::TYPE_BIGINT, 'col_binary' => self::TYPE_BLOB, 'col_blob' => self::TYPE_BLOB, 'col_boolean' => self::TYPE_BOOLEAN, 'col_datetime' => self::TYPE_DATETIME, 'col_datetimetz' => self::TYPE_DATETIME, 'col_date' => self::TYPE_DATE, 'col_decimal' => self::TYPE_DECIMAL, 'col_float' => self::TYPE_FLOAT, 'col_integer' => self::TYPE_INT, 'col_smallint' => self::TYPE_SMALLINT, 'col_text' => self::TYPE_TEXT, 'col_time' => self::TYPE_TIME, 'col_string' => self::TYPE_VARCHAR | 255, 'col_array' => self::TYPE_TEXT, 'col_object' => self::TYPE_TEXT, 'col_json' => self::TYPE_TEXT, 'col_guid' => self::TYPE_VARCHAR | 36);
     }
 }
 
@@ -75,6 +75,6 @@ PHP;
         $expect = str_replace(["\r\n", "\n", "\r"], "\n", $expect);
         $actual = str_replace(["\r\n", "\n", "\r"], "\n", $actual);
 
-        $this->assertEquals($expect, $actual);
+        $this->assertEquals($expect, $actual, $actual);
     }
 }
