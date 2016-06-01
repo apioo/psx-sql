@@ -59,7 +59,7 @@ class TestTable extends TableAbstract
 				ORDER BY id DESC';
 
         $definition = $this->provider->newCollection($sql, [], [
-            'id' => new Field\Integer('id'),
+            'id' => new Field\Type('id', $this->connection, self::TYPE_INT),
             'title' => new Field\Callback('title', function($title){
                 return ucfirst($title);
             }),

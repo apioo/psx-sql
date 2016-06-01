@@ -682,7 +682,7 @@ trait TableQueryTestTrait
             ]),
         );
 
-        $this->assertEquals($expect, $result);
+        $this->assertJsonStringEqualsJsonString(json_encode($expect), json_encode($result));
     }
 
     /**
