@@ -31,4 +31,17 @@ use PSX\Sql\Provider\ProviderCollectionInterface;
  */
 class Collection extends MapAbstract implements ProviderCollectionInterface
 {
+    protected $key;
+
+    public function __construct(array $result, array $definition, $key = null)
+    {
+        parent::__construct($result, $definition);
+
+        $this->key = $key;
+    }
+
+    public function getKey()
+    {
+        return $this->key;
+    }
 }

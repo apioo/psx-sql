@@ -73,19 +73,20 @@ class TableManager implements TableManagerInterface
             return $this->_container[$tableName];
         } else {
             if ($this->reader === null) {
-                // we assume that $tableName is an class name of an
+                // we assume that $tableName is a class name of a
                 // TableInterface implementation
                 if (class_exists($tableName)) {
-                    $this->_container[$tableName] = new $tableName($this->connection);
+                    $this->_container[$tableName] = new $tableName($this);
                 } else {
                     throw new InvalidArgumentException('Table must be a class implementing the PSX\Sql\TableInterface');
                 }
             } else {
                 $definition = $this->reader->getTableDefinition($tableName);
 
-                $this->_container[$tableName] = new Table($this->connection,
+                $this->_container[$tableName] = new Table($this,
                     $definition->getName(),
-                    $definition->getColumns());
+                    $definition->getColumns()
+                );
             }
         }
 

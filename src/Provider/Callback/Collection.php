@@ -31,4 +31,17 @@ use PSX\Sql\Provider\ProviderCollectionInterface;
  */
 class Collection extends CallbackAbstract implements ProviderCollectionInterface
 {
+    protected $key;
+
+    public function __construct($callback, array $parameters, array $definition, $key = null)
+    {
+        parent::__construct($callback, $parameters, $definition);
+
+        $this->key = $key;
+    }
+
+    public function getKey()
+    {
+        return $this->key;
+    }
 }

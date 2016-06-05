@@ -147,7 +147,7 @@ trait TableManipulationTestTrait
      */
     public function testUpdateNoPrimaryKey()
     {
-        $table = new Table($this->connection, 'psx_handler_comment', array('foo' => TableInterface::TYPE_VARCHAR));
+        $table = new Table($this->manager, 'psx_handler_comment', array('foo' => TableInterface::TYPE_VARCHAR));
         $table->update(array('foo' => 'bar'));
     }
 
@@ -156,7 +156,7 @@ trait TableManipulationTestTrait
      */
     public function testDeleteNoPrimaryKey()
     {
-        $table = new Table($this->connection, 'psx_handler_comment', array('foo' => TableInterface::TYPE_VARCHAR));
+        $table = new Table($this->manager, 'psx_handler_comment', array('foo' => TableInterface::TYPE_VARCHAR));
         $table->delete(array('foo' => 'bar'));
     }
 
@@ -165,7 +165,7 @@ trait TableManipulationTestTrait
      */
     public function testCreateInvalidData()
     {
-        $table = new Table($this->connection, 'psx_handler_comment', array('foo' => TableInterface::TYPE_VARCHAR));
+        $table = new Table($this->manager, 'psx_handler_comment', array('foo' => TableInterface::TYPE_VARCHAR));
         $table->create('foo');
     }
 
@@ -174,7 +174,7 @@ trait TableManipulationTestTrait
      */
     public function testUpdateInvalidData()
     {
-        $table = new Table($this->connection, 'psx_handler_comment', array('foo' => TableInterface::TYPE_VARCHAR));
+        $table = new Table($this->manager, 'psx_handler_comment', array('foo' => TableInterface::TYPE_VARCHAR));
         $table->update('foo');
     }
 
@@ -183,7 +183,7 @@ trait TableManipulationTestTrait
      */
     public function testDeleteInvalidData()
     {
-        $table = new Table($this->connection, 'psx_handler_comment', array('foo' => TableInterface::TYPE_VARCHAR));
+        $table = new Table($this->manager, 'psx_handler_comment', array('foo' => TableInterface::TYPE_VARCHAR));
         $table->delete('foo');
     }
 }

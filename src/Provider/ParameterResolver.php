@@ -39,7 +39,7 @@ class ParameterResolver
      * @param array $context
      * @return array
      */
-    public static function resolve(array $parameters, array $context = null)
+    public static function resolve(array $parameters, $context = null)
     {
         $params = [];
         foreach ($parameters as $key => $value) {

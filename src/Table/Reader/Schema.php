@@ -79,7 +79,7 @@ class Schema implements ReaderInterface
             $type+= $column->getLength();
         }
 
-        $type = $type | SerializeTrait::getTypeByDoctrineType($column->getType());
+        $type = $type | Sql\TypeMapper::getTypeByDoctrineType($column->getType()->getName());
 
         if (!$column->getNotnull()) {
             $type = $type | TableInterface::IS_NULL;

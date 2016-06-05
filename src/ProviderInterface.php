@@ -18,12 +18,12 @@ namespace PSX\Sql;
 interface ProviderInterface
 {
     /**
-     * Returns the actual result
+     * Returns the actual result. Is either an array or ArrayAccess object
      *
-     * @param array $context
+     * @param array|\ArrayAccess $context
      * @return array
      */
-    public function getResult(array $context = null);
+    public function getResult($context = null);
 
     /**
      * Returns the definition of the result

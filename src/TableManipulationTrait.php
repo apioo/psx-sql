@@ -59,7 +59,7 @@ trait TableManipulationTrait
             $pk = $this->getPrimaryKey();
 
             if (isset($fields[$pk])) {
-                $condition = array($pk => $fields[$pk]);
+                $condition = [$pk => $fields[$pk]];
             } else {
                 throw new RuntimeException('No primary key set');
             }
@@ -78,7 +78,7 @@ trait TableManipulationTrait
             $pk = $this->getPrimaryKey();
 
             if (isset($fields[$pk])) {
-                $condition = array($pk => $fields[$pk]);
+                $condition = [$pk => $fields[$pk]];
             } else {
                 throw new RuntimeException('No primary key set');
             }
@@ -121,10 +121,12 @@ trait TableManipulationTrait
             return $record->getProperties();
         } elseif ($record instanceof \stdClass) {
             return (array) $record;
+        } elseif ($record instanceof \ArrayObject) {
+            return $record->getArrayCopy();
         } elseif (is_array($record)) {
             return $record;
         } else {
-            throw new InvalidArgumentException('Record must bei either an PSX\Record\RecordInterface or array');
+            throw new InvalidArgumentException('Record must bei either an PSX\Record\RecordInterface, stdClass or array');
         }
     }
 }

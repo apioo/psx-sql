@@ -25,14 +25,15 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
+use Doctrine\DBAL\Types\Type;
 use PhpParser\BuilderFactory;
 use PhpParser\PrettyPrinter;
 use PhpParser\Node;
 use PSX\Schema\Parser;
 use PSX\Schema\Generator;
-use PSX\Sql\SerializeTrait;
 use PSX\Sql\TableInterface;
 use PSX\Sql\TableManagerInterface;
+use PSX\Sql\TypeMapper;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -97,14 +98,14 @@ class MigrateCommand extends Command
         $pks     = [];
         
         foreach ($columns as $name => $value) {
-            $type    = SerializeTrait::getDoctrineTypeByType($value);
-            $options = $this->getOptionsByValue($value);
+            $typeName = TypeMapper::getDoctrineTypeByType($value);
+            $options  = $this->getOptionsByValue($value);
 
             if ($value & TableInterface::PRIMARY_KEY) {
                 $pks[] = $name;
             }
 
-            $table->addColumn($name, $type, $options);
+            $table->addColumn($name, $typeName, $options);
         }
 
         if (!empty($pks)) {

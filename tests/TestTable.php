@@ -20,6 +20,7 @@
 
 namespace PSX\Sql\Tests;
 
+use PSX\Sql\Reference;
 use PSX\Sql\TableAbstract;
 use PSX\Sql\TableInterface;
 use PSX\Sql\Provider\DBAL;
@@ -58,17 +59,21 @@ class TestTable extends TableAbstract
 				    FROM psx_handler_comment
 				ORDER BY id DESC';
 
-        $definition = $this->provider->newCollection($sql, [], [
-            'id' => new Field\Type('id', $this->connection, self::TYPE_INT),
-            'title' => new Field\Callback('title', function($title){
+        $definition = $this->doCollection($sql, [], [
+            'id' => $this->type('id', self::TYPE_INT),
+            'title' => $this->callback('title', function($title){
                 return ucfirst($title);
             }),
             'author' => [
-                'id' => new Field\Replace('urn:profile:{userId}'),
-                'date' => new Field\DateTime('date'),
+                'id' => $this->replace('urn:profile:{userId}'),
+                'date' => $this->dateTime('date'),
             ],
+            'note' => $this->doEntity([$this->getTable('PSX\Sql\Tests\TestTableCommand'), 'getOneById'], [new Reference('id')], [
+                'comments' => true,
+                'title' => 'col_text',
+            ])
         ]);
-        
-        return $this->builder->build($definition);
+
+        return $this->build($definition);
     }
 }

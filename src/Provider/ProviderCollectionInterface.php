@@ -31,4 +31,12 @@ use PSX\Sql\ProviderInterface;
  */
 interface ProviderCollectionInterface extends ProviderInterface
 {
+    /**
+     * Returns the name of the field which should be used as key. If the key is
+     * a callable the function can generate dynamic keys. Return null to build 
+     * an indexed array
+     *
+     * @return string|callable|null
+     */
+    public function getKey();
 }

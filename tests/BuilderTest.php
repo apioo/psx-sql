@@ -143,23 +143,4 @@ JSON;
 
         $this->assertEquals(Record::fromArray($definition), $result);
     }
-
-    /**
-     * @expectedException \RuntimeException
-     */
-    public function testBuildInvalidCollectionResult()
-    {
-        $data = [
-            'foo' => 'bar',
-        ];
-
-        $definition = [
-            'fields' => new Map\Collection($data, [
-                'test' => 'test'
-            ]),
-        ];
-
-        $builder = new Builder();
-        $builder->build($definition);
-    }
 }

@@ -11,6 +11,7 @@
 namespace PSX\Sql;
 
 use PSX\Record\Record;
+use PSX\Record\RecordInterface;
 use RuntimeException;
 use PSX\Sql\Provider\ProviderCollectionInterface;
 use PSX\Sql\Provider\ProviderEntityInterface;
@@ -30,7 +31,7 @@ class Builder
      * @param array $context
      * @return array
      */
-    public function build($definition, array $context = null, $name = null)
+    public function build($definition, $context = null, $name = null)
     {
         if ($definition instanceof ProviderInterface) {
             return $this->getProviderValue($definition, $context);
@@ -46,7 +47,7 @@ class Builder
                 $name === null ? 'record' : $name, 
                 $result
             );
-        } else {
+        } elseif (is_string($definition)) {
             if ($context !== null) {
                 if (isset($context[$definition])) {
                     return $context[$definition];
@@ -56,10 +57,12 @@ class Builder
             } else {
                 return $definition;
             }
+        } else {
+            return $definition;
         }
     }
 
-    protected function getProviderValue(ProviderInterface $provider, array $context = null)
+    protected function getProviderValue(ProviderInterface $provider, $context = null)
     {
         $data       = $provider->getResult($context);
         $definition = $provider->getDefinition();
@@ -71,19 +74,31 @@ class Builder
 
         if ($provider instanceof ProviderCollectionInterface) {
             $result = [];
-            foreach ($data as $row) {
-                if (is_array($row)) {
+            $key    = $provider->getKey();
+
+            if ($key === null) {
+                foreach ($data as $row) {
                     $result[] = $this->build($definition, $row);
-                } else {
-                    throw new RuntimeException('Collection must contain only array elements');
+                }
+            } elseif (is_string($key)) {
+                foreach ($data as $row) {
+                    $result[$row[$key]] = $this->build($definition, $row);
+                }
+            } elseif (is_callable($key)) {
+                foreach ($data as $row) {
+                    $return = call_user_func_array($key, [$row]);
+                    if ($return === false) {
+                        // skip row
+                    } elseif ($return === true) {
+                        $result[] = $this->build($definition, $row);
+                    } elseif ($return === null) {
+                    } else {
+                        $result[$return] = $this->build($definition, $row);
+                    }
                 }
             }
         } elseif ($provider instanceof ProviderEntityInterface) {
-            if (is_array($data)) {
-                $result = $this->build($definition, $data);
-            } else {
-                throw new RuntimeException('Entity must be an array');
-            }
+            $result = $this->build($definition, $data);
         }
 
         return $result;

@@ -32,7 +32,7 @@ use PSX\Sql\Provider\ParameterResolver;
  */
 class Entity extends DBALAbstract implements ProviderEntityInterface
 {
-    public function getResult(array $context = null)
+    public function getResult($context = null)
     {
         return $this->connection->fetchAssoc(
             $this->sql,

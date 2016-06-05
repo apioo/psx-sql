@@ -23,6 +23,7 @@ namespace PSX\Sql\Tests;
 use PSX\Framework\Test\DbTestCase;
 use PSX\Sql\Table;
 use PSX\Sql\TableInterface;
+use PSX\Sql\TableManager;
 
 /**
  * TableTest
@@ -45,7 +46,8 @@ class TableTest extends \PHPUnit_Extensions_Database_TestCase
 
     public function testTable()
     {
-        $table = new Table(getConnection(), 'foo_table', array('bar' => TableInterface::TYPE_INT), array());
+        $manager = new TableManager(getConnection());
+        $table   = new Table($manager, 'foo_table', array('bar' => TableInterface::TYPE_INT), array());
 
         $this->assertEquals('foo_table', $table->getName());
         $this->assertEquals(array('bar' => TableInterface::TYPE_INT), $table->getColumns());

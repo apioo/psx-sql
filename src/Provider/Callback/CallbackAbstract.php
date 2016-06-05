@@ -42,7 +42,7 @@ abstract class CallbackAbstract
         $this->definition = $definition;
     }
 
-    public function getResult(array $context = null)
+    public function getResult($context = null)
     {
         return call_user_func_array($this->callback, ParameterResolver::resolve($this->parameters, $context));
     }

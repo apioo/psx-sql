@@ -32,7 +32,21 @@ use PSX\Sql\Provider\ProviderCollectionInterface;
  */
 class Collection extends PDOAbstract implements ProviderCollectionInterface
 {
-    public function getResult(array $context = null)
+    protected $key;
+
+    public function __construct(PDO $pdo, $sql, array $parameters, array $definition, $key = null)
+    {
+        parent::__construct($pdo, $sql, $parameters, $definition);
+
+        $this->key = $key;
+    }
+
+    public function getKey()
+    {
+        return $this->key;
+    }
+
+    public function getResult($context = null)
     {
         return $this->getStatment($context)->fetchAll(PDO::FETCH_ASSOC);
     }

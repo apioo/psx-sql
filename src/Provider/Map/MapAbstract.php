@@ -38,7 +38,7 @@ abstract class MapAbstract
         $this->definition = $definition;
     }
 
-    public function getResult(array $context = null)
+    public function getResult($context = null)
     {
         return $this->result;
     }

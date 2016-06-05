@@ -51,7 +51,7 @@ abstract class PDOAbstract
         return $this->definition;
     }
 
-    protected function getStatment(array $context = null)
+    protected function getStatment($context = null)
     {
         if ($this->statment === null) {
             $this->statment = $this->pdo->prepare($this->sql);

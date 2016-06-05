@@ -20,17 +20,17 @@
 
 namespace PSX\Sql;
 
-use Doctrine\DBAL\Types;
 use Doctrine\DBAL\Types\Type;
 
 /**
- * SerializeTrait
+ * Maps doctrine to psx types
  *
+ * @internal
  * @author  Christoph Kappestein <k42b3.x@gmail.com>
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    http://phpsx.org
  */
-trait SerializeTrait
+class TypeMapper
 {
     protected static $mapping = array(
         TableInterface::TYPE_SMALLINT => Type::SMALLINT,
@@ -52,45 +52,29 @@ trait SerializeTrait
         TableInterface::TYPE_GUID     => Type::GUID,
     );
 
-    protected function unserializeType($value, $type)
-    {
-        $type = (($type >> 20) & 0xFF) << 20;
-
-        if (isset(self::$mapping[$type])) {
-            return $this->connection->convertToPHPValue($value, self::$mapping[$type]);
-        } else {
-            return $value;
-        }
-    }
-
-    protected function serializeType($value, $type)
-    {
-        $type = (($type >> 20) & 0xFF) << 20;
-
-        if (isset(self::$mapping[$type])) {
-            return $this->connection->convertToDatabaseValue($value, self::$mapping[$type]);
-        } else {
-            return $value;
-        }
-    }
-
-    public static function getTypeByDoctrineType(Type $type)
+    /**
+     * @param string $name
+     * @return integer
+     */
+    public static function getTypeByDoctrineType($name)
     {
         $mapping = array_flip(self::$mapping);
 
-        if (isset($mapping[$type->getName()])) {
-            return $mapping[$type->getName()];
+        if (isset($mapping[$name])) {
+            return $mapping[$name];
         } else {
             return TableInterface::TYPE_VARCHAR;
         }
     }
 
+    /**
+     * @param integer $type
+     * @return string
+     */
     public static function getDoctrineTypeByType($type)
     {
-        $type = (($type >> 20) & 0xFF) << 20;
-
-        if (isset(self::$mapping[$type])) {
-            return self::$mapping[$type];
+        if (isset(self::$mapping[$type & 0xFF00000])) {
+            return self::$mapping[$type & 0xFF00000];
         } else {
             return Type::STRING;
         }

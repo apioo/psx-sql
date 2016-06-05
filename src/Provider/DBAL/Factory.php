@@ -39,9 +39,9 @@ class Factory implements DatabaseFactoryInterface
         $this->connection = $connection;
     }
 
-    public function newCollection($sql, array $parameters, array $definition)
+    public function newCollection($sql, array $parameters, array $definition, $key = null)
     {
-        return new Collection($this->connection, $sql, $parameters, $definition);
+        return new Collection($this->connection, $sql, $parameters, $definition, $key);
     }
 
     public function newEntity($sql, array $parameters, array $definition)

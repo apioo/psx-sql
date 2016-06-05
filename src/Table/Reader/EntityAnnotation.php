@@ -88,9 +88,13 @@ class EntityAnnotation implements ReaderInterface
                 return TableInterface::TYPE_BIGINT;
 
             case 'text':
-            case 'array':
-            case 'object':
                 return TableInterface::TYPE_TEXT;
+
+            case 'array':
+                return TableInterface::TYPE_ARRAY;
+
+            case 'object':
+                return TableInterface::TYPE_OBJECT;
 
             case 'decimal':
                 return TableInterface::TYPE_DECIMAL;

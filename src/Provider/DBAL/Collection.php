@@ -20,6 +20,7 @@
 
 namespace PSX\Sql\Provider\DBAL;
 
+use Doctrine\DBAL\Connection;
 use PSX\Sql\Provider\ProviderCollectionInterface;
 use PSX\Sql\Provider\ParameterResolver;
 
@@ -32,7 +33,21 @@ use PSX\Sql\Provider\ParameterResolver;
  */
 class Collection extends DBALAbstract implements ProviderCollectionInterface
 {
-    public function getResult(array $context = null)
+    protected $key;
+
+    public function __construct(Connection $connection, $sql, array $parameters, array $definition, $key = null)
+    {
+        parent::__construct($connection, $sql, $parameters, $definition);
+
+        $this->key = $key;
+    }
+
+    public function getKey()
+    {
+        return $this->key;
+    }
+
+    public function getResult($context = null)
     {
         return $this->connection->fetchAll(
             $this->sql,

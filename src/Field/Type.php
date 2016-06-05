@@ -20,9 +20,9 @@
 
 namespace PSX\Sql\Field;
 
-use Doctrine\DBAL\Driver\Connection;
-use PSX\Sql\SerializeTrait;
+use Doctrine\DBAL\Connection;
 use PSX\Sql\TableInterface;
+use PSX\Sql\TypeMapper;
 
 /**
  * Type
@@ -33,9 +33,14 @@ use PSX\Sql\TableInterface;
  */
 class Type extends TransformFieldAbstract
 {
-    use SerializeTrait;
-
+    /**
+     * @var \Doctrine\DBAL\Connection
+     */
     protected $connection;
+
+    /**
+     * @var integer
+     */
     protected $type;
 
     public function __construct($field, Connection $connection, $type)
@@ -48,6 +53,9 @@ class Type extends TransformFieldAbstract
 
     protected function transform($value)
     {
-        return $this->unserializeType($value, $this->type);
+        $type = (($this->type >> 20) & 0xFF) << 20;
+        $type = TypeMapper::getDoctrineTypeByType($type);
+
+        return $this->connection->convertToPHPValue($value, $type);
     }
 }

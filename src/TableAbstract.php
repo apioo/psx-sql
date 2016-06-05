@@ -20,6 +20,7 @@
 
 namespace PSX\Sql;
 
+use InvalidArgumentException;
 use Doctrine\DBAL\Connection;
 
 /**
@@ -31,7 +32,6 @@ use Doctrine\DBAL\Connection;
  */
 abstract class TableAbstract implements TableInterface
 {
-    use SerializeTrait;
     use TableQueryTrait;
     use TableManipulationTrait;
 
@@ -41,20 +41,20 @@ abstract class TableAbstract implements TableInterface
     protected $connection;
 
     /**
-     * @var \PSX\Sql\Builder
+     * @var \PSX\Sql\TableManagerInterface
      */
-    protected $builder;
+    private $tableManager;
 
     /**
-     * @var \PSX\Sql\ProviderInterface
+     * @var \PSX\Sql\Builder
      */
-    protected $provider;
+    private $builder;
 
-    public function __construct(Connection $connection)
+    public function __construct(TableManager $tableManager)
     {
-        $this->connection = $connection;
-        $this->builder    = new Builder();
-        $this->provider   = new Provider\DBAL\Factory($this->connection);
+        $this->connection   = $tableManager->getConnection();
+        $this->tableManager = $tableManager;
+        $this->builder      = new Builder();
     }
 
     public function getDisplayName()
@@ -88,5 +88,82 @@ abstract class TableAbstract implements TableInterface
         }
 
         return null;
+    }
+
+    protected function unserializeType($value, $type)
+    {
+        return $this->connection->convertToPHPValue(
+            $value,
+            TypeMapper::getDoctrineTypeByType($type)
+        );
+    }
+
+    protected function serializeType($value, $type)
+    {
+        return $this->connection->convertToDatabaseValue(
+            $value,
+            TypeMapper::getDoctrineTypeByType($type)
+        );
+    }
+
+    protected function getTable($tableName)
+    {
+        return $this->tableManager->getTable($tableName);
+    }
+
+    protected function build($definition)
+    {
+        return $this->builder->build($definition);
+    }
+
+    protected function doCollection($source, array $arguments, array $definition, $key = null)
+    {
+        if (is_callable($source)) {
+            return new Provider\Callback\Collection($source, $arguments, $definition, $key);
+        } elseif (is_string($source)) {
+            return new Provider\DBAL\Collection($this->connection, $source, $arguments, $definition, $key);
+        } elseif (is_array($source)) {
+            return new Provider\Map\Collection($source, $definition, $key);
+        } else {
+            throw new InvalidArgumentException('Source must be either a callable, string or array');
+        }
+    }
+
+    protected function doEntity($source, array $arguments, array $definition)
+    {
+        if (is_callable($source)) {
+            return new Provider\Callback\Entity($source, $arguments, $definition);
+        } elseif (is_string($source)) {
+            return new Provider\DBAL\Entity($this->connection, $source, $arguments, $definition);
+        } elseif (is_array($source)) {
+            return new Provider\Map\Entity($source, $definition);
+        } else {
+            throw new InvalidArgumentException('Source must be either a callable, string or array');
+        }
+    }
+
+    protected function dateTime($value)
+    {
+        return new Field\DateTime($value);
+    }
+
+    protected function callback($key, \Closure $callback)
+    {
+        return new Field\Callback($key, $callback);
+    }
+
+    protected function replace($value)
+    {
+        return new Field\Replace($value);
+    }
+
+    protected function type($key, $type)
+    {
+        return new Field\Type($key, $this->connection, $type);
+    }
+
+    protected function value($value)
+    {
+        return new Field\Value($value);
     }
 }

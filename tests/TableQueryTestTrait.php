@@ -679,6 +679,10 @@ trait TableQueryTestTrait
                     'date' => '2013-04-29T16:56:32+00:00'
                 ]),
                 'title' => 'Foo',
+                'note' => Record::fromArray([
+                    'comments' => true,
+                    'title' => 'foobar',
+                ])
             ]),
         );
 

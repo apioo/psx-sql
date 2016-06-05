@@ -35,9 +35,9 @@ class Table extends TableAbstract
     protected $name;
     protected $columns = array();
 
-    public function __construct(Connection $connection, $name, array $columns)
+    public function __construct(TableManager $tableManager, $name, array $columns)
     {
-        parent::__construct($connection);
+        parent::__construct($tableManager);
 
         $this->name    = $name;
         $this->columns = $columns;

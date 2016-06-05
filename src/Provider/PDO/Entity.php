@@ -32,7 +32,7 @@ use PSX\Sql\Provider\ProviderEntityInterface;
  */
 class Entity extends PDOAbstract implements ProviderEntityInterface
 {
-    public function getResult(array $context = null)
+    public function getResult($context = null)
     {
         return $this->getStatment($context)->fetch(PDO::FETCH_ASSOC);
     }

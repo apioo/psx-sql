@@ -36,9 +36,9 @@ trait TableQueryTrait
     public function getAll($startIndex = null, $count = null, $sortBy = null, $sortOrder = null, Condition $condition = null, Fields $fields = null)
     {
         $startIndex = $startIndex !== null ? (int) $startIndex : 0;
-        $count      = !empty($count)       ? (int) $count      : 16;
-        $sortBy     = $sortBy     !== null ? $sortBy           : $this->getPrimaryKey();
-        $sortOrder  = $sortOrder  !== null ? (int) $sortOrder  : Sql::SORT_DESC;
+        $count      = !empty($count)       ? (int) $count      : $this->limit();
+        $sortBy     = $sortBy     !== null ? $sortBy           : $this->sortKey();
+        $sortOrder  = $sortOrder  !== null ? (int) $sortOrder  : $this->sortOrder();
 
         if ($fields !== null) {
             $fieldsWhitelist = $fields->getWhitelist();
@@ -172,6 +172,7 @@ trait TableQueryTrait
      * @param string $sortBy
      * @param string $sortOrder
      * @param \PSX\Sql\Condition $condition
+     * @return array
      */
     protected function getQuery($table, array $fields, $startIndex, $count, $sortBy, $sortOrder, Condition $condition = null)
     {
@@ -216,5 +217,25 @@ trait TableQueryTrait
         $stmt->closeCursor();
 
         return $result;
+    }
+
+    protected function projectRow($sql, array $params = array(), array $columns = null)
+    {
+        return reset($this->project($sql, $params, $columns));
+    }
+
+    protected function limit()
+    {
+        return 16;
+    }
+
+    protected function sortKey()
+    {
+        return $this->getPrimaryKey();
+    }
+
+    protected function sortOrder()
+    {
+        return Sql::SORT_DESC;
     }
 }

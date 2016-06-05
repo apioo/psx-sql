@@ -29,8 +29,8 @@ use PhpParser\PrettyPrinter;
 use PhpParser\Node;
 use PSX\Schema\Parser;
 use PSX\Schema\Generator;
-use PSX\Sql\SerializeTrait;
 use PSX\Sql\TableInterface;
+use PSX\Sql\TypeMapper;
 use RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -123,7 +123,7 @@ class GenerateCommand extends Command
 
     protected function getColumn(Table $table, Column $column)
     {
-        $type     = SerializeTrait::getTypeByDoctrineType($column->getType());
+        $type     = TypeMapper::getTypeByDoctrineType($column->getType()->getName());
         $constant = $this->getConstantNameByValue($type);
         
         if (empty($constant)) {

@@ -39,9 +39,9 @@ class Factory implements DatabaseFactoryInterface
         $this->pdo = $pdo;
     }
 
-    public function newCollection($sql, array $parameters, array $definition)
+    public function newCollection($sql, array $parameters, array $definition, $key = null)
     {
-        return new Collection($this->pdo, $sql, $parameters, $definition);
+        return new Collection($this->pdo, $sql, $parameters, $definition, $key);
     }
 
     public function newEntity($sql, array $parameters, array $definition)
