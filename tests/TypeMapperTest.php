@@ -18,21 +18,25 @@
  * limitations under the License.
  */
 
-namespace PSX\Sql;
+namespace PSX\Sql\Tests;
 
 use Doctrine\DBAL\Types\Type;
+use PSX\Sql\Builder;
+use PSX\Sql\Field;
+use PSX\Sql\Provider\Map;
+use PSX\Sql\TableInterface;
+use PSX\Sql\TypeMapper;
 
 /**
- * Maps doctrine to psx types
+ * TypeMapperTest
  *
- * @internal
  * @author  Christoph Kappestein <k42b3.x@gmail.com>
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    http://phpsx.org
  */
-class TypeMapper
+class TypeMapperTest extends \PHPUnit_Framework_TestCase
 {
-    protected static $mapping = array(
+    protected $types = array(
         TableInterface::TYPE_SMALLINT => Type::SMALLINT,
         TableInterface::TYPE_INT      => Type::INTEGER,
         TableInterface::TYPE_BIGINT   => Type::BIGINT,
@@ -52,35 +56,17 @@ class TypeMapper
         TableInterface::TYPE_GUID     => Type::GUID,
     );
 
-    /**
-     * @param string $name
-     * @return integer
-     */
-    public static function getTypeByDoctrineType($name)
+    public function testGetTypeByDoctrineType()
     {
-        static $mapping;
-
-        if ($mapping === null) {
-            $mapping = array_flip(self::$mapping);
-        }
-
-        if (isset($mapping[$name])) {
-            return $mapping[$name];
-        } else {
-            return TableInterface::TYPE_VARCHAR;
+        foreach ($this->types as $type => $name) {
+            $this->assertEquals($type, TypeMapper::getTypeByDoctrineType($name));
         }
     }
 
-    /**
-     * @param integer $type
-     * @return string
-     */
-    public static function getDoctrineTypeByType($type)
+    public function testGetDoctrineTypeByType()
     {
-        if (isset(self::$mapping[$type & 0xFF00000])) {
-            return self::$mapping[$type & 0xFF00000];
-        } else {
-            return Type::STRING;
+        foreach ($this->types as $type => $name) {
+            $this->assertEquals($name, TypeMapper::getDoctrineTypeByType($type));
         }
     }
 }
