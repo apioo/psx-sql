@@ -3,15 +3,154 @@ PSX Sql
 
 ## About
 
-The SQL library helps to manage data from relational databases. It contains a
-system to build complex data structures from flat SQL results and a simple
-table interface which can be used as an alternative to an ORM. Each table class
-represents a table on the database and offers standard methods to CRUD data to
-the table. It is also easy possible to add custom methods to a table.
+The SQL library helps to manage data from relational databases. It is designed 
+to use raw SQL queries and to build nested results. It has a simple table 
+concept where a table class represents a table on your database. You can simply 
+add custom methods to a table class which can use complex SQL queries.
+ 
+## Basic usage
 
-## Complex data structures
+The following are basic examples how you can work with a table class
 
-At first lets take a look how we can generate the following data structure:
+```php
+$connection   = null; // a doctrine DBAL connection
+$tableManager = new TableManager($connection);
+
+$table = $tableManager->getTable('Acme\Table\News');
+
+// returns by default 16 entries from the table ordered by the primary column 
+// descending. The default settings can be overriden in the table class
+$table->getAll();
+
+// returns 12 entries starting at index 0
+$table->getAll(0, 12);
+
+// orders the entries after the column "id" descending
+$table->getAll(0, 12, 'id', Sql::SORT_DESC);
+
+// adds a condition to select only the rows where the title contains "foo"
+$condition = new Condition();
+$condition->like('title', '%foo%');
+$table->getAll(0, 12, 'id', Sql::SORT_DESC, $condition);
+
+// adds a blacklist so that the column "password" gets not returned
+$table->getAll(0, 12, 'id', Sql::SORT_DESC, null, Fields::blacklist(['password']));
+
+// returns all columsn which match the provided condition
+$table->getBy(new Condition('userId', '=', 1));
+
+// it is also possible to use a magic method
+$table->getByUserId(1);
+
+// returns a single row matching the provided condition
+$table->getOneBy(new Condition('userId', '=', 1));
+
+// it is also possible to use a magic method
+$table->getOneByUserId(1);
+
+// returns a complete row by the primary key
+$table->get(1);
+
+// returns the count of entries in the table. It is also possible to provide a
+// condition
+$table->getCount();
+
+// creates a new row on the table
+$table->create([
+   'title' => 'foo'
+]);
+
+// updates a row. The array must contains the primary key column
+$table->update([
+    'id'    => 1,
+    'title' => 'bar',
+]);
+
+// deletes a row. The array must contains the primary key column
+$table->delete([
+   'id'    => 1,
+]);
+
+```
+
+## Table
+
+The following is an example of a table class.
+
+```php
+
+class AcmeTable extends TableAbstract
+{
+    public function getName()
+    {
+        return 'acme_table';
+    }
+
+    public function getColumns()
+    {
+        return array(
+            'id'     => TableInterface::TYPE_INT | 10 | TableInterface::PRIMARY_KEY | TableInterface::AUTO_INCREMENT,
+            'userId' => TableInterface::TYPE_INT | 10,
+            'title'  => TableInterface::TYPE_VARCHAR | 32,
+            'date'   => TableInterface::TYPE_DATETIME,
+        );
+    }
+
+    /**
+     * In this method we use a custom query and specify the types of the return
+     * columns
+     */
+    public function getCustomQuery($title = null)
+    {
+        $params = [];
+        $sql = '    SELECT acme_table.title,
+                           acme_table.insertDate
+                      FROM acme_table 
+                INNER JOIN acme_news 
+                        ON acme_table.newsId = acme_news.id 
+                     WHERE acme_table.insertDate > DATE_SUB(NOW(), INTERVAL 1 DAY)';
+
+        if (!empty($title)) {
+            $sql.= ' AND title LIKE :title';
+            $params['title'] = '%' . $title . '%';
+        }
+
+        return $this->project($sql, $params, [
+            self::TYPE_VARCHAR,
+            self::TYPE_DATETIME,
+        ]);
+    }
+
+    /**
+     * Example howto build a nested result based on different tables
+     */
+    public function getNestedResult()
+    {
+        $definition = [
+            'totalEntries' => $this->getCount(),
+            'entries' => $this->doCollection('SELECT id, authorId, title, createDate FROM news ORDER BY createDate DESC', [], [
+                'id' => $this->type('id', TableInterface::TYPE_INT),
+                'title' => $this->callback('title', function($title){
+                    return ucfirst($title);
+                }),
+                'isNew' => $this->value(true),
+                'author' => $this->doEntity('SELECT name, uri FROM author WHERE id = :id', ['id' => new Reference('authorId')], [
+                    'displayName' => 'name',
+                    'uri' => 'uri',
+                ]),
+                'date' => $this->dateTime('createDate'),
+                'links' => [
+                    'self' => $this->replace('http://foobar.com/news/{id}'),
+                ]
+            ])
+        ];
+
+        return $this->build($definition));
+    }
+}
+```
+
+The getNestedResult method could produce the following json response
 
 ```json
 {
@@ -47,107 +186,12 @@ At first lets take a look how we can generate the following data structure:
 }
 ```
 
-To produce such a result we first need to get the data from the database. Today
-most database libraries or ORMs are not designed to produce such nested results.
-They either return a simple array or model objects in case of an ORM. Turning
-these results into the desired format is mostly no easy task.
 
-The SQL library simplifies this process by providing a simple builder to create
-fully customizable responses. To produce the response above we could write the
-following code:
+## Generation
 
-```php
-use PSX\Sql\Field;
-use PSX\Sql\Provider\PDO;
-use PSX\Sql\Reference;
-
-$provider = new PDO\Factory($pdo);
-
-$definition = [
-    'totalEntries' => 2,
-    'entries' => $provider->newCollection('SELECT id, authorId, title, createDate FROM news ORDER BY createDate DESC', [], [
-        'id' => 'id',
-        'title' => new Field\Callback('title', function($title){
-            return ucfirst($title);
-        }),
-        'isNew' => new Field\Value(true),
-        'author' => $provider->newEntity('SELECT name, uri FROM author WHERE id = :id', ['id' => new Reference('authorId')], [
-            'displayName' => 'name',
-            'uri' => 'uri',
-        ]),
-        'date' => new Field\DateTime('createDate'),
-        'links' => [
-            'self' => new Field\Replace('http://foobar.com/news/{id}'),
-        ]
-    ])
-];
-
-$builder = new Builder();
-$result  = $builder->build($definition));
-
-// echo json_encode($result);
-```
-
-In this example it would be much more performant to simply join the author table
-but the example should show how to handle nested queries.
-
-## Table class
-
-The table class represents a table and provides methods to query and manipulate
-data on a table. It is similar to a repository in doctrine except that it works
-with plain SQL and does not return entities.
-
-It is recommended to put custom queries in a seperate method into the table
-class so that you can reuse such queries across your app. The following methods
-are available by default:
-
-```php
-// query
-$table->getAll();
-$table->getBy();
-$table->getOneBy();
-$table->get();
-$table->getCount();
-
-// manipulation
-$table->create();
-$table->update();
-$table->delete();
+The library contains also a Symfony-Command to generate a table class from an
+actual table.
 
 ```
-
-There is also a table manager which can be used to obtain table instances. It
-simply passes the database connection to the table instance. You most likely
-want to register the table manager at your DI container so that you can easily
-use it in your app to obtain a table instance.
-
-### Custom query
-
-The above query could be easily embedded into a table class.
-
-```php
-public function getLatestNews()
-{
-    $definition = [
-        'totalEntries' => 2,
-        'entries' => $this->provider->newCollection('SELECT id, authorId, title, createDate FROM news ORDER BY createDate DESC', [], [
-            'id' => 'id',
-            'title' => new Field\Callback('title', function($title){
-                return ucfirst($title);
-            }),
-            'isNew' => new Field\Value(true),
-            'author' => $this->provider->newEntity('SELECT name, uri FROM author WHERE id = :id', ['id' => new Reference('authorId')], [
-                'displayName' => 'name',
-                'uri' => 'uri',
-            ]),
-            'date' => new Field\DateTime('createDate'),
-            'links' => [
-                'self' => new Field\Replace('http://foobar.com/news/{id}'),
-            ]
-        ])
-    ];
-    
-    return $this->builder->build($definition));
-}
-
+sql:generate acme_news > AcmeTable.php
 ```
