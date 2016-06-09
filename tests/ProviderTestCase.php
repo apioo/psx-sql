@@ -22,7 +22,6 @@ namespace PSX\Sql\Tests;
 
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\Schema;
-use PSX\Framework\Test\DbTestCase;
 use PSX\Sql\Builder;
 
 /**

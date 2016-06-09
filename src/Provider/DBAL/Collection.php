@@ -21,8 +21,8 @@
 namespace PSX\Sql\Provider\DBAL;
 
 use Doctrine\DBAL\Connection;
-use PSX\Sql\Provider\ProviderCollectionInterface;
 use PSX\Sql\Provider\ParameterResolver;
+use PSX\Sql\Provider\ProviderCollectionInterface;
 
 /**
  * Collection

@@ -12,9 +12,9 @@ namespace PSX\Sql;
 
 use PSX\Record\Record;
 use PSX\Record\RecordInterface;
-use RuntimeException;
 use PSX\Sql\Provider\ProviderCollectionInterface;
 use PSX\Sql\Provider\ProviderEntityInterface;
+use RuntimeException;
 
 /**
  * The build method resolves the definition through calling every provider and 

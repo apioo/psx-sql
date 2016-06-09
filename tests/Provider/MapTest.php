@@ -20,8 +20,8 @@
 
 namespace PSX\Sql\Tests\Provider;
 
-use PSX\Sql\Tests\ProviderTestCase;
 use PSX\Sql\Provider\Map;
+use PSX\Sql\Tests\ProviderTestCase;
 
 /**
  * MapTest

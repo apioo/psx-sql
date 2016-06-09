@@ -20,8 +20,8 @@
 
 namespace PSX\Sql\Provider;
 
-use RuntimeException;
 use PSX\Sql\Reference;
+use RuntimeException;
 
 /**
  * ParameterResolver

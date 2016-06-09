@@ -20,8 +20,8 @@
 
 namespace PSX\Sql\Provider\DBAL;
 
-use PSX\Sql\Provider\ProviderEntityInterface;
 use PSX\Sql\Provider\ParameterResolver;
+use PSX\Sql\Provider\ProviderEntityInterface;
 
 /**
  * Entity

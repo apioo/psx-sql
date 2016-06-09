@@ -20,8 +20,8 @@
 
 namespace PSX\Sql;
 
-use InvalidArgumentException;
 use Doctrine\DBAL\Connection;
+use InvalidArgumentException;
 
 /**
  * TableAbstract

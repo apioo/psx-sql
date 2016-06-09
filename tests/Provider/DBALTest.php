@@ -20,9 +20,9 @@
 
 namespace PSX\Sql\Tests\Provider;
 
-use PSX\Sql\Tests\ProviderTestCase;
-use PSX\Sql\Reference;
 use PSX\Sql\Provider\DBAL;
+use PSX\Sql\Reference;
+use PSX\Sql\Tests\ProviderTestCase;
 
 /**
  * DBALTest

@@ -20,11 +20,11 @@
 
 namespace PSX\Sql\Tests;
 
+use PSX\Sql\Field;
+use PSX\Sql\Provider\DBAL;
 use PSX\Sql\Reference;
 use PSX\Sql\TableAbstract;
 use PSX\Sql\TableInterface;
-use PSX\Sql\Provider\DBAL;
-use PSX\Sql\Field;
 
 /**
  * TestTable

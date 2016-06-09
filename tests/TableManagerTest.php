@@ -20,7 +20,6 @@
 
 namespace PSX\Sql\Tests;
 
-use PSX\Framework\Test\DbTestCase;
 use PSX\Sql\Table\Reader;
 use PSX\Sql\TableManager;
 

@@ -23,7 +23,6 @@ namespace PSX\Sql\Table\Reader;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Column;
 use PSX\Sql;
-use PSX\Sql\SerializeTrait;
 use PSX\Sql\Table\Definition;
 use PSX\Sql\Table\ReaderInterface;
 use PSX\Sql\TableInterface;

@@ -21,8 +21,6 @@
 namespace PSX\Sql\Tests\Table\Reader;
 
 use PSX\DateTime\DateTime;
-use PSX\Framework\Test\DbTestCase;
-use PSX\Framework\Test\TableDataSet;
 use PSX\Sql\Table;
 use PSX\Sql\Table\Reader\Schema;
 use PSX\Sql\TableInterface;

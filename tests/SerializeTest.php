@@ -20,8 +20,6 @@
 
 namespace PSX\Sql\Tests;
 
-use PSX\Framework\Test\DbTestCase;
-use PSX\Framework\Test\Environment;
 use PSX\Sql\TableManager;
 
 /**

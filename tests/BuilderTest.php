@@ -22,8 +22,8 @@ namespace PSX\Sql\Tests;
 
 use PSX\Record\Record;
 use PSX\Sql\Builder;
-use PSX\Sql\Provider\Map;
 use PSX\Sql\Field;
+use PSX\Sql\Provider\Map;
 
 /**
  * BuilderTest
