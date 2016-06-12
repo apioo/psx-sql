@@ -35,6 +35,10 @@ trait TableManipulationTrait
 {
     protected $lastInsertId;
 
+    /**
+     * @param array|\stdClass|\PSX\Record\RecordInterface $record
+     * @return integer
+     */
     public function create($record)
     {
         $fields = $this->serializeFields($this->getArray($record));
@@ -51,6 +55,10 @@ trait TableManipulationTrait
         }
     }
 
+    /**
+     * @param array|\stdClass|\PSX\Record\RecordInterface $record
+     * @return integer
+     */
     public function update($record)
     {
         $fields = $this->serializeFields($this->getArray($record));
@@ -70,6 +78,10 @@ trait TableManipulationTrait
         }
     }
 
+    /**
+     * @param array|\stdClass|\PSX\Record\RecordInterface $record
+     * @return integer
+     */
     public function delete($record)
     {
         $fields = $this->serializeFields($this->getArray($record));
@@ -89,6 +101,9 @@ trait TableManipulationTrait
         }
     }
 
+    /**
+     * @return integer
+     */
     public function getLastInsertId()
     {
         return $this->lastInsertId;

@@ -34,17 +34,24 @@ use PSX\Sql\Provider\ProviderCollectionInterface;
 class Collection extends DBALAbstract implements ProviderCollectionInterface
 {
     protected $key;
+    protected $filter;
 
-    public function __construct(Connection $connection, $sql, array $parameters, array $definition, $key = null)
+    public function __construct(Connection $connection, $sql, array $parameters, array $definition, $key = null, \Closure $filter = null)
     {
         parent::__construct($connection, $sql, $parameters, $definition);
 
-        $this->key = $key;
+        $this->key    = $key;
+        $this->filter = $filter;
     }
 
     public function getKey()
     {
         return $this->key;
+    }
+
+    public function getFilter()
+    {
+        return $this->filter;
     }
 
     public function getResult($context = null)

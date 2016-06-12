@@ -39,4 +39,11 @@ interface ProviderCollectionInterface extends ProviderInterface
      * @return string|callable|null
      */
     public function getKey();
+
+    /**
+     * Returns a callback which can filter the complete result of a collection
+     *
+     * @return callable|null
+     */
+    public function getFilter();
 }

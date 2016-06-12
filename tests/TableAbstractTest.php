@@ -20,6 +20,7 @@
 
 namespace PSX\Sql\Tests;
 
+use PSX\Record\Record;
 use PSX\Sql\TableInterface;
 use PSX\Sql\TableManager;
 
@@ -127,5 +128,121 @@ class TableAbstractTest extends \PHPUnit_Extensions_Database_TestCase
     {
         $this->assertTrue($this->getTable()->hasColumn('title'));
         $this->assertFalse($this->getTable()->hasColumn('foobar'));
+    }
+
+    public function testGetNestedResult()
+    {
+        $result = $this->getTable()->getNestedResult();
+
+        $expect = array(
+            Record::fromArray([
+                'id' => 4,
+                'author' => Record::fromArray([
+                    'id' => 'urn:profile:3',
+                    'date' => '2013-04-29T16:56:32+00:00'
+                ]),
+                'title' => 'Blub',
+            ]),
+            Record::fromArray([
+                'id' => 3,
+                'author' => Record::fromArray([
+                    'id' => 'urn:profile:2',
+                    'date' => '2013-04-29T16:56:32+00:00'
+                ]),
+                'title' => 'Test',
+            ]),
+            Record::fromArray([
+                'id' => 2,
+                'author' => Record::fromArray([
+                    'id' => 'urn:profile:1',
+                    'date' => '2013-04-29T16:56:32+00:00'
+                ]),
+                'title' => 'Bar',
+            ]),
+            Record::fromArray([
+                'id' => 1,
+                'author' => Record::fromArray([
+                    'id' => 'urn:profile:1',
+                    'date' => '2013-04-29T16:56:32+00:00'
+                ]),
+                'title' => 'Foo',
+                'note' => Record::fromArray([
+                    'comments' => true,
+                    'title' => 'foobar',
+                ])
+            ]),
+        );
+
+        $this->assertJsonStringEqualsJsonString(json_encode($expect), json_encode($result));
+    }
+
+    public function testGetNestedResultKey()
+    {
+        $result = $this->getTable()->getNestedResultKey();
+        $actual = json_encode($result);
+
+        $expect = array(
+            'eccbc87e' => Record::fromArray([
+                'id' => 4,
+                'author' => Record::fromArray([
+                    'id' => 'urn:profile:3',
+                    'date' => '2013-04-29T16:56:32+00:00'
+                ]),
+                'title' => 'Blub',
+            ]),
+            'c81e728d' => Record::fromArray([
+                'id' => 3,
+                'author' => Record::fromArray([
+                    'id' => 'urn:profile:2',
+                    'date' => '2013-04-29T16:56:32+00:00'
+                ]),
+                'title' => 'Test',
+            ]),
+            'c4ca4238' => Record::fromArray([
+                'id' => 1,
+                'author' => Record::fromArray([
+                    'id' => 'urn:profile:1',
+                    'date' => '2013-04-29T16:56:32+00:00'
+                ]),
+                'title' => 'Foo',
+                'note' => Record::fromArray([
+                    'comments' => true,
+                    'title' => 'foobar',
+                ])
+            ]),
+        );
+
+        $this->assertJsonStringEqualsJsonString(json_encode($expect), $actual, $actual);
+    }
+
+    public function testGetNestedResultFilter()
+    {
+        $result = $this->getTable()->getNestedResultFilter();
+        $actual = json_encode($result);
+
+        $expect = array(
+            Record::fromArray([
+                'id' => 2,
+                'author' => Record::fromArray([
+                    'id' => 'urn:profile:1',
+                    'date' => '2013-04-29T16:56:32+00:00'
+                ]),
+                'title' => 'Bar',
+            ]),
+            Record::fromArray([
+                'id' => 1,
+                'author' => Record::fromArray([
+                    'id' => 'urn:profile:1',
+                    'date' => '2013-04-29T16:56:32+00:00'
+                ]),
+                'title' => 'Foo',
+                'note' => Record::fromArray([
+                    'comments' => true,
+                    'title' => 'foobar',
+                ])
+            ]),
+        );
+
+        $this->assertJsonStringEqualsJsonString(json_encode($expect), $actual, $actual);
     }
 }

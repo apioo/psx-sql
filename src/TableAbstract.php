@@ -77,6 +77,21 @@ abstract class TableAbstract implements TableInterface
         return isset($columns[$column]);
     }
 
+    public function beginTransaction()
+    {
+        $this->connection->beginTransaction();
+    }
+
+    public function commit()
+    {
+        $this->connection->commit();
+    }
+
+    public function rollBack()
+    {
+        $this->connection->rollBack();
+    }
+
     protected function getFirstColumnWithAttr($searchAttr)
     {
         $columns = $this->getColumns();
@@ -116,14 +131,14 @@ abstract class TableAbstract implements TableInterface
         return $this->builder->build($definition);
     }
 
-    protected function doCollection($source, array $arguments, array $definition, $key = null)
+    protected function doCollection($source, array $arguments, array $definition, $key = null, \Closure $filter = null)
     {
         if (is_callable($source)) {
-            return new Provider\Callback\Collection($source, $arguments, $definition, $key);
+            return new Provider\Callback\Collection($source, $arguments, $definition, $key, $filter);
         } elseif (is_string($source)) {
-            return new Provider\DBAL\Collection($this->connection, $source, $arguments, $definition, $key);
+            return new Provider\DBAL\Collection($this->connection, $source, $arguments, $definition, $key, $filter);
         } elseif (is_array($source)) {
-            return new Provider\Map\Collection($source, $definition, $key);
+            return new Provider\Map\Collection($source, $definition, $key, $filter);
         } else {
             throw new InvalidArgumentException('Source must be either a callable, string or array');
         }

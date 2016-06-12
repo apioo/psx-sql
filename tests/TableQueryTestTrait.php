@@ -643,52 +643,6 @@ trait TableQueryTestTrait
         $this->assertEquals('record', $obj->getDisplayName());
     }
 
-    public function testNestedResult()
-    {
-        $result = $this->getTable()->getNestedResult();
-
-        $expect = array(
-            Record::fromArray([
-                'id' => 4,
-                'author' => Record::fromArray([
-                    'id' => 'urn:profile:3', 
-                    'date' => '2013-04-29T16:56:32+00:00'
-                ]),
-                'title' => 'Blub',
-            ]),
-            Record::fromArray([
-                'id' => 3,
-                'author' => Record::fromArray([
-                    'id' => 'urn:profile:2', 
-                    'date' => '2013-04-29T16:56:32+00:00'
-                ]),
-                'title' => 'Test',
-            ]),
-            Record::fromArray([
-                'id' => 2,
-                'author' => Record::fromArray([
-                    'id' => 'urn:profile:1', 
-                    'date' => '2013-04-29T16:56:32+00:00'
-                ]),
-                'title' => 'Bar',
-            ]),
-            Record::fromArray([
-                'id' => 1,
-                'author' => Record::fromArray([
-                    'id' => 'urn:profile:1', 
-                    'date' => '2013-04-29T16:56:32+00:00'
-                ]),
-                'title' => 'Foo',
-                'note' => Record::fromArray([
-                    'comments' => true,
-                    'title' => 'foobar',
-                ])
-            ]),
-        );
-
-        $this->assertJsonStringEqualsJsonString(json_encode($expect), json_encode($result));
-    }
-
     /**
      * @expectedException \InvalidArgumentException
      */

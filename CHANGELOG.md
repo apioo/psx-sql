@@ -1,4 +1,10 @@
 
+### 1.0.4 (2016-06-12)
+
+* Added filter callback to collection
+* Added transaction methods to table
+* Added doc blocks
+
 ### 1.0.3 (2016-06-09)
 
 * Integrated builder into table abstract

@@ -33,6 +33,15 @@ use PSX\Record\Record;
  */
 trait TableQueryTrait
 {
+    /**
+     * @param integer $startIndex
+     * @param integer $count
+     * @param string $sortBy
+     * @param integer $sortOrder
+     * @param Condition|null $condition
+     * @param Fields|null $fields
+     * @return \PSX\Record\Record[]
+     */
     public function getAll($startIndex = null, $count = null, $sortBy = null, $sortOrder = null, Condition $condition = null, Fields $fields = null)
     {
         $startIndex = $startIndex !== null ? (int) $startIndex : 0;
@@ -73,11 +82,21 @@ trait TableQueryTrait
         return $this->project($sql, $parameters);
     }
 
+    /**
+     * @param Condition $condition
+     * @param Fields|null $fields
+     * @return \PSX\Record\Record[]
+     */
     public function getBy(Condition $condition, Fields $fields = null)
     {
         return $this->getAll(null, null, null, null, $condition, $fields);
     }
 
+    /**
+     * @param Condition $condition
+     * @param Fields|null $fields
+     * @return \PSX\Record\Record
+     */
     public function getOneBy(Condition $condition, Fields $fields = null)
     {
         $result = $this->getAll(0, 1, null, null, $condition, $fields);
@@ -85,6 +104,11 @@ trait TableQueryTrait
         return current($result);
     }
 
+    /**
+     * @param integer $id
+     * @param Fields|null $fields
+     * @return \PSX\Record\Record
+     */
     public function get($id, Fields $fields = null)
     {
         $condition = new Condition(array($this->getPrimaryKey(), '=', $id));
@@ -92,6 +116,10 @@ trait TableQueryTrait
         return $this->getOneBy($condition, $fields);
     }
 
+    /**
+     * @param Condition|null $condition
+     * @return integer
+     */
     public function getCount(Condition $condition = null)
     {
         $builder = $this->connection->createQueryBuilder()
@@ -110,11 +138,18 @@ trait TableQueryTrait
         return (int) $this->connection->fetchColumn($builder->getSQL(), $builder->getParameters());
     }
 
+    /**
+     * @return array
+     */
     public function getSupportedFields()
     {
         return array_keys($this->getColumns());
     }
 
+    /**
+     * @return \PSX\Record\Record
+     * @deprecated
+     */
     public function getRecord()
     {
         $supported = $this->getSupportedFields();

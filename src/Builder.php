@@ -75,6 +75,7 @@ class Builder
         if ($provider instanceof ProviderCollectionInterface) {
             $result = [];
             $key    = $provider->getKey();
+            $filter = $provider->getFilter();
 
             if ($key === null) {
                 foreach ($data as $row) {
@@ -87,15 +88,12 @@ class Builder
             } elseif (is_callable($key)) {
                 foreach ($data as $row) {
                     $return = call_user_func_array($key, [$row]);
-                    if ($return === false) {
-                        // skip row
-                    } elseif ($return === true) {
-                        $result[] = $this->build($definition, $row);
-                    } elseif ($return === null) {
-                    } else {
-                        $result[$return] = $this->build($definition, $row);
-                    }
+                    $result[$return] = $this->build($definition, $row);
                 }
+            }
+
+            if ($filter !== null) {
+                $result = call_user_func_array($filter, [$result]);
             }
         } elseif ($provider instanceof ProviderEntityInterface) {
             $result = $this->build($definition, $data);

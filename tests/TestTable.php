@@ -76,4 +76,64 @@ class TestTable extends TableAbstract
 
         return $this->build($definition);
     }
+
+    public function getNestedResultKey()
+    {
+        $sql = '  SELECT id,
+				         userId,
+				         title,
+				         date
+				    FROM psx_handler_comment
+				ORDER BY id DESC';
+
+        $definition = $this->doCollection($sql, [], [
+            'id' => $this->type('id', self::TYPE_INT),
+            'title' => $this->callback('title', function($title){
+                return ucfirst($title);
+            }),
+            'author' => [
+                'id' => $this->replace('urn:profile:{userId}'),
+                'date' => $this->dateTime('date'),
+            ],
+            'note' => $this->doEntity([$this->getTable('PSX\Sql\Tests\TestTableCommand'), 'getOneById'], [new Reference('id')], [
+                'comments' => true,
+                'title' => 'col_text',
+            ])
+        ], function($row){
+            return substr(md5($row['userId']), 0, 8);
+        });
+
+        return $this->build($definition);
+    }
+
+    public function getNestedResultFilter()
+    {
+        $sql = '  SELECT id,
+				         userId,
+				         title,
+				         date
+				    FROM psx_handler_comment
+				ORDER BY id DESC';
+
+        $definition = $this->doCollection($sql, [], [
+            'id' => $this->type('id', self::TYPE_INT),
+            'title' => $this->callback('title', function($title){
+                return ucfirst($title);
+            }),
+            'author' => [
+                'id' => $this->replace('urn:profile:{userId}'),
+                'date' => $this->dateTime('date'),
+            ],
+            'note' => $this->doEntity([$this->getTable('PSX\Sql\Tests\TestTableCommand'), 'getOneById'], [new Reference('id')], [
+                'comments' => true,
+                'title' => 'col_text',
+            ])
+        ], null, function(array $result){
+            return array_values(array_filter($result, function($row){
+                return $row['author']['id'] == 'urn:profile:1';
+            }));
+        });
+
+        return $this->build($definition);
+    }
 }
