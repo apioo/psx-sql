@@ -40,7 +40,7 @@ class CallbackTest extends ProviderTestCase
         $this->authorId = 0;
 
         return [
-            'totalEntries' => 2,
+            'totalEntries' => new Callback\Value([$this, 'dataTotal'], []),
             'entries' => new Callback\Collection([$this, 'dataNews'], [], [
                 'id' => 'id',
                 'title' => 'title',
@@ -77,5 +77,10 @@ class CallbackTest extends ProviderTestCase
             'name' => 'Foo Bar',
             'uri' => 'http://phpsx.org'
         ];
+    }
+
+    public function dataTotal()
+    {
+        return 2;
     }
 }

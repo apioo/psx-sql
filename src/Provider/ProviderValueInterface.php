@@ -18,33 +18,17 @@
  * limitations under the License.
  */
 
-namespace PSX\Sql\Provider\Map;
+namespace PSX\Sql\Provider;
+
+use PSX\Sql\ProviderInterface;
 
 /**
- * MapAbstract
+ * ProviderValueInterface
  *
  * @author  Christoph Kappestein <k42b3.x@gmail.com>
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    http://phpsx.org
  */
-abstract class MapAbstract
+interface ProviderValueInterface extends ProviderInterface
 {
-    protected $result;
-    protected $definition;
-
-    public function __construct($result, array $definition)
-    {
-        $this->result     = $result;
-        $this->definition = $definition;
-    }
-
-    public function getResult($context = null)
-    {
-        return $this->result;
-    }
-
-    public function getDefinition()
-    {
-        return $this->definition;
-    }
 }

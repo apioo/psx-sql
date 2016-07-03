@@ -157,6 +157,19 @@ abstract class TableAbstract implements TableInterface
         }
     }
 
+    protected function doValue($source, array $arguments, array $definition)
+    {
+        if (is_callable($source)) {
+            return new Provider\Callback\Value($source, $arguments, $definition);
+        } elseif (is_string($source)) {
+            return new Provider\DBAL\Value($this->connection, $source, $arguments, $definition);
+        } elseif (is_array($source)) {
+            return new Provider\Map\Value($source, $definition);
+        } else {
+            throw new InvalidArgumentException('Source must be either a callable, string or array');
+        }
+    }
+
     protected function dateTime($value)
     {
         return new Field\DateTime($value);

@@ -38,7 +38,7 @@ class PDOTest extends ProviderTestCase
         $provider = new PDO\Factory($this->connection->getWrappedConnection());
 
         return [
-            'totalEntries' => 2,
+            'totalEntries' => $provider->newValue('SELECT COUNT(*) FROM psx_sql_provider_news', []),
             'entries' => $provider->newCollection('SELECT id, authorId, title, createDate FROM psx_sql_provider_news ORDER BY id ASC', [], [
                 'id' => 'id',
                 'title' => 'title',

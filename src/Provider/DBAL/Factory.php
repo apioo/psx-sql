@@ -48,4 +48,9 @@ class Factory implements DatabaseFactoryInterface
     {
         return new Entity($this->connection, $sql, $parameters, $definition);
     }
+
+    public function newValue($sql, array $parameters)
+    {
+        return new Value($this->connection, $sql, $parameters);
+    }
 }

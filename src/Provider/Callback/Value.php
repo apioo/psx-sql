@@ -18,33 +18,21 @@
  * limitations under the License.
  */
 
-namespace PSX\Sql\Provider\Map;
+namespace PSX\Sql\Provider\Callback;
+
+use PSX\Sql\Provider\ProviderValueInterface;
 
 /**
- * MapAbstract
+ * Value
  *
  * @author  Christoph Kappestein <k42b3.x@gmail.com>
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    http://phpsx.org
  */
-abstract class MapAbstract
+class Value extends CallbackAbstract implements ProviderValueInterface
 {
-    protected $result;
-    protected $definition;
-
-    public function __construct($result, array $definition)
+    public function __construct($callback, array $parameters)
     {
-        $this->result     = $result;
-        $this->definition = $definition;
-    }
-
-    public function getResult($context = null)
-    {
-        return $this->result;
-    }
-
-    public function getDefinition()
-    {
-        return $this->definition;
+        parent::__construct($callback, $parameters, []);
     }
 }

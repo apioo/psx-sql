@@ -18,33 +18,32 @@
  * limitations under the License.
  */
 
-namespace PSX\Sql\Provider\Map;
+namespace PSX\Sql\Provider\DBAL;
+
+use Doctrine\DBAL\Connection;
+use PSX\Sql\Provider\ParameterResolver;
+use PSX\Sql\Provider\ProviderEntityInterface;
+use PSX\Sql\Provider\ProviderValueInterface;
 
 /**
- * MapAbstract
+ * Value
  *
  * @author  Christoph Kappestein <k42b3.x@gmail.com>
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    http://phpsx.org
  */
-abstract class MapAbstract
+class Value extends DBALAbstract implements ProviderValueInterface
 {
-    protected $result;
-    protected $definition;
-
-    public function __construct($result, array $definition)
+    public function __construct(Connection $connection, $sql, array $parameters)
     {
-        $this->result     = $result;
-        $this->definition = $definition;
+        parent::__construct($connection, $sql, $parameters, []);
     }
 
     public function getResult($context = null)
     {
-        return $this->result;
-    }
-
-    public function getDefinition()
-    {
-        return $this->definition;
+        return $this->connection->fetchColumn(
+            $this->sql,
+            ParameterResolver::resolve($this->parameters, $context)
+        );
     }
 }

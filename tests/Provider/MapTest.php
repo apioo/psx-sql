@@ -52,7 +52,7 @@ class MapTest extends ProviderTestCase
         ];
 
         return [
-            'totalEntries' => 2,
+            'totalEntries' => new Map\Value(2),
             'entries' => new Map\Collection($news, [
                 'id' => 'id',
                 'title' => 'title',
