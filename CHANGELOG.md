@@ -1,4 +1,8 @@
 
+### 1.0.5 (2016-07-04)
+
+* Added value provider
+
 ### 1.0.4 (2016-06-12)
 
 * Added filter callback to collection
