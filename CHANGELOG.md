@@ -1,5 +1,5 @@
 
-### 1.0.6
+### 1.0.6 (2016-10-13)
 
 * Add json field to decode columns containing json data
 * PDO and Doctrine provider bind type of provided parameters
