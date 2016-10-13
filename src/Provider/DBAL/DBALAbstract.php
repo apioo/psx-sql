@@ -21,6 +21,7 @@
 namespace PSX\Sql\Provider\DBAL;
 
 use Doctrine\DBAL\Connection;
+use PSX\Sql\Provider\PDO\PDOAbstract;
 
 /**
  * DBALAbstract
@@ -48,5 +49,20 @@ abstract class DBALAbstract
     public function getDefinition()
     {
         return $this->definition;
+    }
+
+    /**
+     * Returns an array of PDO type corresponding to the parameter array
+     * @internal
+     * @param array $parameters
+     * @return array
+     */
+    public static function getTypes(array $parameters)
+    {
+        $types = [];
+        foreach ($parameters as $parameter) {
+            $types[] = PDOAbstract::getType($parameter);
+        }
+        return $types;
     }
 }

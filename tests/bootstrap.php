@@ -13,10 +13,31 @@ function getConnection()
         return $connection;
     }
 
-    $params = array(
-        'driver' => 'pdo_sqlite',
-        'memory' => true
-    );
+    switch (getenv('DB')) {
+        case 'mysql':
+            $params = [
+                'dbname'   => 'psx',
+                'user'     => 'root',
+                'password' => '',
+                'host'     => 'localhost',
+                'driver'   => 'pdo_mysql',
+            ];
+
+            $params['charset'] = 'utf8';
+            $params['driverOptions'] = [
+                \PDO::ATTR_EMULATE_PREPARES => false,
+            ];
+            break;
+
+        default:
+        case 'memory':
+        case 'sqlite':
+            $params = [
+                'memory' => true,
+                'driver' => 'pdo_sqlite',
+            ];
+            break;
+    }
 
     $connection = \Doctrine\DBAL\DriverManager::getConnection($params);
     $fromSchema = $connection->getSchemaManager()->createSchema();

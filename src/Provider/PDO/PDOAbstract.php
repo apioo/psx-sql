@@ -57,8 +57,34 @@ abstract class PDOAbstract
             $this->statment = $this->pdo->prepare($this->sql);
         }
 
-        $this->statment->execute(ParameterResolver::resolve($this->parameters, $context));
+        $parameters = ParameterResolver::resolve($this->parameters, $context);
+
+        foreach ($parameters as $name => $parameter) {
+            $this->statment->bindValue($name, $parameter, self::getType($parameter));
+        }
+
+        $this->statment->execute();
 
         return $this->statment;
+    }
+
+    /**
+     * Returns the fitting PDO type for the parameter
+     * 
+     * @internal
+     * @param mixed $parameter
+     * @return int
+     */
+    public static function getType($parameter)
+    {
+        if (is_bool($parameter)) {
+            return \PDO::PARAM_BOOL;
+        } elseif ($parameter === null) {
+            return \PDO::PARAM_NULL;
+        } elseif (is_int($parameter)) {
+            return \PDO::PARAM_INT;
+        } else {
+            return \PDO::PARAM_STR;
+        }
     }
 }

@@ -21,6 +21,7 @@
 namespace PSX\Sql\Provider\DBAL;
 
 use PSX\Sql\Provider\ParameterResolver;
+use PSX\Sql\Provider\PDO\PDOAbstract;
 use PSX\Sql\Provider\ProviderEntityInterface;
 
 /**
@@ -34,9 +35,13 @@ class Entity extends DBALAbstract implements ProviderEntityInterface
 {
     public function getResult($context = null)
     {
+        $parameters = ParameterResolver::resolve($this->parameters, $context);
+        $types      = self::getTypes($parameters);
+
         return $this->connection->fetchAssoc(
             $this->sql,
-            ParameterResolver::resolve($this->parameters, $context)
+            $parameters,
+            $types
         );
     }
 }

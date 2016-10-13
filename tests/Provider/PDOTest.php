@@ -39,7 +39,7 @@ class PDOTest extends ProviderTestCase
 
         return [
             'totalEntries' => $provider->newValue('SELECT COUNT(*) FROM psx_sql_provider_news', []),
-            'entries' => $provider->newCollection('SELECT id, authorId, title, createDate FROM psx_sql_provider_news ORDER BY id ASC', [], [
+            'entries' => $provider->newCollection('SELECT id, authorId, title, createDate FROM psx_sql_provider_news ORDER BY id ASC LIMIT :startIndex, 8', ['startIndex' => 0], [
                 'id' => 'id',
                 'title' => 'title',
                 'author' => $provider->newEntity('SELECT id, name, uri FROM psx_sql_provider_author WHERE id = :id', ['id' => new Reference('authorId')], [
