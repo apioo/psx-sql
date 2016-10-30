@@ -1,4 +1,8 @@
 
+### 1.0.7 (2016-10-30)
+
+* Allow symfony 3.0 components
+
 ### 1.0.6 (2016-10-13)
 
 * Add json field to decode columns containing json data
