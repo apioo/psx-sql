@@ -42,13 +42,14 @@ class GenerateCommandTest extends \PHPUnit_Extensions_Database_TestCase
         return $this->createDefaultDBConnection(getConnection()->getWrappedConnection(), '');
     }
 
-    public function testCommand()
+    public function testCommandPhp()
     {
         $command = new GenerateCommand(getConnection());
 
         $commandTester = new CommandTester($command);
         $commandTester->execute(array(
-            'table_name' => 'psx_table_command_test'
+            'table'  => 'psx_table_command_test',
+            'format' => 'php',
         ));
 
         $actual = $commandTester->getDisplay();
@@ -75,12 +76,99 @@ class Test extends \PSX\Sql\TableAbstract
         return {$columns};
     }
 }
-
 PHP;
 
         $expect = str_replace(["\r\n", "\n", "\r"], "\n", $expect);
         $actual = str_replace(["\r\n", "\n", "\r"], "\n", $actual);
 
         $this->assertEquals($expect, $actual, $actual);
+    }
+
+
+    public function testCommandJsonSchema()
+    {
+        $command = new GenerateCommand(getConnection());
+
+        $commandTester = new CommandTester($command);
+        $commandTester->execute(array(
+            'table'  => 'psx_table_command_test',
+            'format' => 'jsonschema',
+        ));
+
+        $actual = $commandTester->getDisplay();
+        $expect = <<<'JSON'
+{
+    "$schema": "http:\/\/json-schema.org\/draft-04\/schema#",
+    "title": "psx_table_command_test",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer"
+        },
+        "col_bigint": {
+            "type": "integer"
+        },
+        "col_binary": {
+            "type": "string"
+        },
+        "col_blob": {
+            "type": "string"
+        },
+        "col_boolean": {
+            "type": "boolean"
+        },
+        "col_datetime": {
+            "type": "string",
+            "format": "date-time"
+        },
+        "col_datetimetz": {
+            "type": "string",
+            "format": "date-time"
+        },
+        "col_date": {
+            "type": "string",
+            "format": "date"
+        },
+        "col_decimal": {
+            "type": "number"
+        },
+        "col_float": {
+            "type": "number"
+        },
+        "col_integer": {
+            "type": "integer"
+        },
+        "col_smallint": {
+            "type": "integer"
+        },
+        "col_text": {
+            "type": "string"
+        },
+        "col_time": {
+            "type": "string",
+            "format": "time"
+        },
+        "col_string": {
+            "type": "string",
+            "maxLength": 255
+        },
+        "col_array": {
+            "type": "string"
+        },
+        "col_object": {
+            "type": "string"
+        },
+        "col_json": {
+            "type": "string"
+        },
+        "col_guid": {
+            "type": "string",
+            "maxLength": 36
+        }
+    }
+}
+JSON;
+
+        $this->assertJsonStringEqualsJsonString($expect, $actual, $actual);
     }
 }
