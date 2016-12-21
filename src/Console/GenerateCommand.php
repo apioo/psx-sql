@@ -20,18 +20,12 @@
 
 namespace PSX\Sql\Console;
 
-use Doctrine\Common\Annotations\Reader;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\Table;
-use PhpParser\BuilderFactory;
-use PhpParser\Node;
-use PhpParser\PrettyPrinter;
-use PSX\Schema\Generator;
-use PSX\Schema\Parser;
+use PSX\Sql\Generator;
 use PSX\Sql\TableInterface;
 use PSX\Sql\TypeMapper;
-use RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -52,143 +46,46 @@ class GenerateCommand extends Command
     protected $connection;
 
     /**
-     * @var \PhpParser\BuilderFactory
-     */
-    protected $factory;
-
-    /**
      * @var string
      */
     protected $namespace;
-
-    /**
-     * @var \PhpParser\PrettyPrinter\Standard
-     */
-    protected $printer;
 
     public function __construct(Connection $connection, $namespace = null)
     {
         parent::__construct();
 
         $this->connection = $connection;
-        $this->factory   = new BuilderFactory();
-        $this->namespace = $namespace === null ? 'PSX\Generation' : $namespace;
-        $this->printer   = new PrettyPrinter\Standard();
+        $this->namespace  = $namespace;
     }
 
     protected function configure()
     {
         $this
             ->setName('sql:generate')
-            ->setDescription('Generates a table class based on a table schema')
-            ->addArgument('table_name', InputArgument::REQUIRED, 'Name of the database table');
+            ->setDescription('Generates a representation of a table')
+            ->addArgument('table', InputArgument::REQUIRED, 'Name of the database table')
+            ->addArgument('format', InputArgument::OPTIONAL, 'Optional the output format possible values are: php, jsonschema');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $tableName = $input->getArgument('table_name');
-
         $table = $this->connection
             ->getSchemaManager()
-            ->listTableDetails($tableName);
+            ->listTableDetails($input->getArgument('table'));
 
-        $root = $this->factory->namespace($this->namespace);
-        $class = $this->factory->class($this->getClassNameByTable($tableName))
-            ->extend('\PSX\Sql\TableAbstract');
+        switch ($input->getArgument('format')) {
+            case 'php':
+                $generator = new Generator\Php($this->namespace);
+                $response  = $generator->generate($table);
+                break;
 
-        $class->addStmt($this->factory->method('getName')
-            ->makePublic()
-            ->addStmt(new Node\Stmt\Return_(new Node\Scalar\String_($table->getName())))
-        );
-
-        $items = [];
-        foreach ($table->getColumns() as $column) {
-            $items[] = new Node\Expr\ArrayItem(
-                $this->getColumn($table, $column),
-                new Node\Scalar\String_($column->getName())
-            );
+            default:
+            case 'jsonschema':
+                $generator = new Generator\JsonSchema();
+                $response  = $generator->generate($table);
+                break;
         }
 
-        $class->addStmt($this->factory->method('getColumns')
-            ->makePublic()
-            ->addStmt(new Node\Stmt\Return_(new Node\Expr\Array_($items)))
-        );
-
-        $root->addStmt($class);
-
-        $source = $this->printer->prettyPrintFile([$root->getNode()]);
-
-        $output->writeln($source);
-    }
-
-    protected function getColumn(Table $table, Column $column)
-    {
-        $type     = TypeMapper::getTypeByDoctrineType($column->getType()->getName());
-        $constant = $this->getConstantNameByValue($type);
-        
-        if (empty($constant)) {
-            throw new RuntimeException('Could not determine type for column ' . $column->getName());
-        }
-        
-        $value = new Node\Expr\ClassConstFetch(new Node\Name('self'), $constant);
-
-        if ($column->getLength() > 0) {
-            $value = new Node\Expr\BinaryOp\BitwiseOr(
-                $value,
-                new Node\Scalar\LNumber($column->getLength())
-            );
-        }
-
-        if (in_array($column->getName(), $table->getPrimaryKeyColumns())) {
-            $value = new Node\Expr\BinaryOp\BitwiseOr(
-                $value,
-                new Node\Expr\ClassConstFetch(new Node\Name('self'), 'PRIMARY_KEY')
-            );
-        }
-
-        if (!$column->getNotnull()) {
-            $value = new Node\Expr\BinaryOp\BitwiseOr(
-                $value,
-                new Node\Expr\ClassConstFetch(new Node\Name('self'), 'IS_NULL')
-            );
-        }
-
-        if ($column->getAutoincrement()) {
-            $value = new Node\Expr\BinaryOp\BitwiseOr(
-                $value,
-                new Node\Expr\ClassConstFetch(new Node\Name('self'), 'AUTO_INCREMENT')
-            );
-        }
-
-        if ($column->getUnsigned()) {
-            $value = new Node\Expr\BinaryOp\BitwiseOr(
-                $value,
-                new Node\Expr\ClassConstFetch(new Node\Name('self'), 'UNSIGNED')
-            );
-        }
-
-        return $value;
-    }
-    
-    protected function getConstantNameByValue($type)
-    {
-        $reflection = new \ReflectionClass('PSX\\Sql\\TableInterface');
-        $constants  = $reflection->getConstants();
-
-        foreach ($constants as $constant => $value) {
-            if ($type === $value) {
-                return $constant;
-            }
-        }
-        
-        return null;
-    }
-    
-    protected function getClassNameByTable($tableName)
-    {
-        $pos       = strrpos($tableName, '_');
-        $className = $pos !== false ? substr($tableName, $pos + 1) : $tableName;
-
-        return ucfirst($className);
+        $output->write($response);
     }
 }
