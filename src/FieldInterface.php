@@ -13,7 +13,9 @@ namespace PSX\Sql;
 /**
  * FieldInterface
  *
- * @author Christoph Kappestein <christoph.kappestein@gmail.com>
+ * @author  Christoph Kappestein <k42b3.x@gmail.com>
+ * @license http://www.apache.org/licenses/LICENSE-2.0
+ * @link    http://phpsx.org
  */
 interface FieldInterface
 {

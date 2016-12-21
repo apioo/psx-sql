@@ -13,7 +13,9 @@ namespace PSX\Sql;
 /**
  * Represents a reference to another value inside the context
  *
- * @author Christoph Kappestein <christoph.kappestein@gmail.com>
+ * @author  Christoph Kappestein <k42b3.x@gmail.com>
+ * @license http://www.apache.org/licenses/LICENSE-2.0
+ * @link    http://phpsx.org
  */
 class Reference
 {

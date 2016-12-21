@@ -21,7 +21,9 @@ use RuntimeException;
  * The build method resolves the definition through calling every provider and 
  * field objects. The result is an array in the format of the definition
  *
- * @author Christoph Kappestein <christoph.kappestein@gmail.com>
+ * @author  Christoph Kappestein <k42b3.x@gmail.com>
+ * @license http://www.apache.org/licenses/LICENSE-2.0
+ * @link    http://phpsx.org
  */
 class Builder
 {
