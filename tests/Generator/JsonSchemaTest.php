@@ -50,7 +50,83 @@ class JsonSchemaTest extends \PHPUnit_Extensions_Database_TestCase
         $generator = new Generator\JsonSchema();
 
         $actual = $generator->generate($table);
-        $expect = <<<'JSON'
+
+        if (getenv('DB') == 'mysql') {
+            $expect = <<<'JSON'
+{
+    "$schema": "http:\/\/json-schema.org\/draft-04\/schema#",
+    "title": "psx_table_command_test",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer"
+        },
+        "col_bigint": {
+            "type": "integer"
+        },
+        "col_binary": {
+            "type": "string",
+            "maxLength": 255
+        },
+        "col_blob": {
+            "type": "string"
+        },
+        "col_boolean": {
+            "type": "boolean"
+        },
+        "col_datetime": {
+            "type": "string",
+            "format": "date-time"
+        },
+        "col_datetimetz": {
+            "type": "string",
+            "format": "date-time"
+        },
+        "col_date": {
+            "type": "string",
+            "format": "date"
+        },
+        "col_decimal": {
+            "type": "number"
+        },
+        "col_float": {
+            "type": "number"
+        },
+        "col_integer": {
+            "type": "integer"
+        },
+        "col_smallint": {
+            "type": "integer"
+        },
+        "col_text": {
+            "type": "string"
+        },
+        "col_time": {
+            "type": "string",
+            "format": "time"
+        },
+        "col_string": {
+            "type": "string",
+            "maxLength": 255
+        },
+        "col_array": {
+            "type": "string"
+        },
+        "col_object": {
+            "type": "string"
+        },
+        "col_json": {
+            "type": "string"
+        },
+        "col_guid": {
+            "type": "string",
+            "maxLength": 36
+        }
+    }
+}
+JSON;
+        } else {
+            $expect = <<<'JSON'
 {
     "$schema": "http:\/\/json-schema.org\/draft-04\/schema#",
     "title": "psx_table_command_test",
@@ -122,6 +198,7 @@ class JsonSchemaTest extends \PHPUnit_Extensions_Database_TestCase
     }
 }
 JSON;
+        }
 
         $this->assertJsonStringEqualsJsonString($expect, $actual, $actual);
     }
