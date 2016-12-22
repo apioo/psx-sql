@@ -55,12 +55,7 @@ class GenerateCommandTest extends \PHPUnit_Extensions_Database_TestCase
         $actual = $commandTester->getDisplay();
 
         if (getenv('DB') == 'mysql') {
-            $columns = 'array(\'id\' => self::TYPE_INT | self::PRIMARY_KEY | self::AUTO_INCREMENT, \'col_bigint\' => self::TYPE_BIGINT, \'col_binary\' => self::TYPE_BINARY | 255, \'col_blob\' => self::TYPE_BLOB, \'col_boolean\' => self::TYPE_BOOLEAN, \'col_datetime\' => self::TYPE_DATETIME, \'col_datetimetz\' => self::TYPE_DATETIME, \'col_date\' => self::TYPE_DATE, \'col_decimal\' => self::TYPE_DECIMAL, \'col_float\' => self::TYPE_FLOAT, \'col_integer\' => self::TYPE_INT, \'col_smallint\' => self::TYPE_SMALLINT, \'col_text\' => self::TYPE_TEXT, \'col_time\' => self::TYPE_TIME, \'col_string\' => self::TYPE_VARCHAR | 255, \'col_array\' => self::TYPE_ARRAY, \'col_object\' => self::TYPE_OBJECT, \'col_json\' => self::TYPE_JSON, \'col_guid\' => self::TYPE_GUID | 36)';
-        } else {
-            $columns = 'array(\'id\' => self::TYPE_INT | self::PRIMARY_KEY | self::AUTO_INCREMENT, \'col_bigint\' => self::TYPE_BIGINT, \'col_binary\' => self::TYPE_BLOB, \'col_blob\' => self::TYPE_BLOB, \'col_boolean\' => self::TYPE_BOOLEAN, \'col_datetime\' => self::TYPE_DATETIME, \'col_datetimetz\' => self::TYPE_DATETIME, \'col_date\' => self::TYPE_DATE, \'col_decimal\' => self::TYPE_DECIMAL, \'col_float\' => self::TYPE_FLOAT, \'col_integer\' => self::TYPE_INT, \'col_smallint\' => self::TYPE_SMALLINT, \'col_text\' => self::TYPE_TEXT, \'col_time\' => self::TYPE_TIME, \'col_string\' => self::TYPE_VARCHAR | 255, \'col_array\' => self::TYPE_TEXT, \'col_object\' => self::TYPE_TEXT, \'col_json\' => self::TYPE_TEXT, \'col_guid\' => self::TYPE_VARCHAR | 36)';
-        }
-
-        $expect = <<<PHP
+            $expect = <<<PHP
 <?php
 
 namespace PSX\Generation;
@@ -73,10 +68,29 @@ class Test extends \PSX\Sql\TableAbstract
     }
     public function getColumns()
     {
-        return {$columns};
+        return array('id' => self::TYPE_INT | self::PRIMARY_KEY | self::AUTO_INCREMENT, 'col_bigint' => self::TYPE_BIGINT, 'col_binary' => self::TYPE_BINARY | 255, 'col_blob' => self::TYPE_BLOB, 'col_boolean' => self::TYPE_BOOLEAN, 'col_datetime' => self::TYPE_DATETIME, 'col_datetimetz' => self::TYPE_DATETIME, 'col_date' => self::TYPE_DATE, 'col_decimal' => self::TYPE_DECIMAL, 'col_float' => self::TYPE_FLOAT, 'col_integer' => self::TYPE_INT, 'col_smallint' => self::TYPE_SMALLINT, 'col_text' => self::TYPE_TEXT, 'col_time' => self::TYPE_TIME, 'col_string' => self::TYPE_VARCHAR | 255, 'col_array' => self::TYPE_ARRAY, 'col_object' => self::TYPE_OBJECT, 'col_json' => self::TYPE_JSON, 'col_guid' => self::TYPE_GUID | 36);
     }
 }
 PHP;
+        } else {
+            $expect = <<<PHP
+<?php
+
+namespace PSX\Generation;
+
+class Test extends \PSX\Sql\TableAbstract
+{
+    public function getName()
+    {
+        return 'psx_table_command_test';
+    }
+    public function getColumns()
+    {
+        return array('id' => self::TYPE_INT | self::PRIMARY_KEY | self::AUTO_INCREMENT, 'col_bigint' => self::TYPE_BIGINT, 'col_binary' => self::TYPE_BLOB, 'col_blob' => self::TYPE_BLOB, 'col_boolean' => self::TYPE_BOOLEAN, 'col_datetime' => self::TYPE_DATETIME, 'col_datetimetz' => self::TYPE_DATETIME, 'col_date' => self::TYPE_DATE, 'col_decimal' => self::TYPE_DECIMAL, 'col_float' => self::TYPE_FLOAT, 'col_integer' => self::TYPE_INT, 'col_smallint' => self::TYPE_SMALLINT, 'col_text' => self::TYPE_TEXT, 'col_time' => self::TYPE_TIME, 'col_string' => self::TYPE_VARCHAR | 255, 'col_array' => self::TYPE_TEXT, 'col_object' => self::TYPE_TEXT, 'col_json' => self::TYPE_TEXT, 'col_guid' => self::TYPE_VARCHAR | 36);
+    }
+}
+PHP;
+        }
 
         $expect = str_replace(["\r\n", "\n", "\r"], "\n", $expect);
         $actual = str_replace(["\r\n", "\n", "\r"], "\n", $actual);
