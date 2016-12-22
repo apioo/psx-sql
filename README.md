@@ -6,8 +6,8 @@ PSX Sql
 The SQL library helps to manage data from relational databases. It is designed 
 to use raw SQL queries and to build nested results. It has a simple table 
 concept where a table class represents a table on your database. You can simply 
-add custom methods to a table class which can use complex SQL queries.
- 
+add custom methods to a table class which can issue complex SQL queries.
+
 ## Basic usage
 
 The following are basic examples how you can work with a table class
