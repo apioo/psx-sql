@@ -37,13 +37,13 @@ $table->getAll(0, 12, 'id', Sql::SORT_DESC, $condition);
 $table->getAll(0, 12, 'id', Sql::SORT_DESC, null, Fields::blacklist(['password']));
 
 // returns all columsn which match the provided condition
-$table->getBy(new Condition('userId', '=', 1));
+$table->getBy(new Condition(['userId', '=', 1]));
 
 // it is also possible to use a magic method
 $table->getByUserId(1);
 
 // returns a single row matching the provided condition
-$table->getOneBy(new Condition('userId', '=', 1));
+$table->getOneBy(new Condition(['userId', '=', 1]));
 
 // it is also possible to use a magic method
 $table->getOneByUserId(1);
