@@ -54,6 +54,8 @@ class LoggerTest extends \PHPUnit_Framework_TestCase
 
     protected function getLogger()
     {
-        return $this->getMock('Psr\Log\LoggerInterface', array('emergency', 'alert', 'critical', 'warning', 'debug', 'log', 'info', 'notice', 'error'));
+        return $this->getMockBuilder('Psr\Log\LoggerInterface')
+            ->setMethods(['emergency', 'alert', 'critical', 'warning', 'debug', 'log', 'info', 'notice', 'error'])
+            ->getMock();
     }
 }
