@@ -1,4 +1,8 @@
 
+### 1.0.8 (2016-12-22)
+
+* Add jsonschema and php generator class
+
 ### 1.0.7 (2016-10-30)
 
 * Allow symfony 3.0 components
