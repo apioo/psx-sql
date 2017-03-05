@@ -34,6 +34,7 @@ abstract class TableAbstract implements TableInterface
 {
     use TableQueryTrait;
     use TableManipulationTrait;
+    use FieldFactoryTrait;
 
     /**
      * @var \Doctrine\DBAL\Connection
@@ -170,28 +171,55 @@ abstract class TableAbstract implements TableInterface
         }
     }
 
+    /**
+     * @param $value
+     * @return Field\DateTime
+     * @deprecated
+     */
     protected function dateTime($value)
     {
-        return new Field\DateTime($value);
+        return $this->fieldDateTime($value);
     }
 
+    /**
+     * @param $key
+     * @param \Closure $callback
+     * @return Field\Callback
+     * @deprecated 
+     */
     protected function callback($key, \Closure $callback)
     {
-        return new Field\Callback($key, $callback);
+        return $this->fieldCallback($key, $callback);
     }
 
+    /**
+     * @param $value
+     * @return Field\Replace
+     * @deprecated 
+     */
     protected function replace($value)
     {
-        return new Field\Replace($value);
+        return $this->fieldReplace($value);
     }
 
+    /**
+     * @param $key
+     * @param $type
+     * @return Field\Type
+     * @deprecated 
+     */
     protected function type($key, $type)
     {
-        return new Field\Type($key, $this->connection, $type);
+        return $this->fieldType($key, $type);
     }
 
+    /**
+     * @param $value
+     * @return Field\Value
+     * @deprecated 
+     */
     protected function value($value)
     {
-        return new Field\Value($value);
+        return $this->fieldValue($value);
     }
 }
