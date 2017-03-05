@@ -41,7 +41,7 @@ class Callback implements FieldInterface
         $this->callback = $callback;
     }
 
-    public function getResult(array $context = null)
+    public function getResult($context = null)
     {
         return call_user_func($this->callback, isset($context[$this->field]) ? $context[$this->field] : null, $context);
     }

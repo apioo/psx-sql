@@ -38,7 +38,7 @@ abstract class TransformFieldAbstract implements FieldInterface
         $this->field = $field;
     }
 
-    public function getResult(array $context = null)
+    public function getResult($context = null)
     {
         if (isset($context[$this->field])) {
             return $this->transform($context[$this->field]);

@@ -38,7 +38,7 @@ class Value implements FieldInterface
         $this->value = $value;
     }
 
-    public function getResult(array $context = null)
+    public function getResult($context = null)
     {
         return $this->value;
     }

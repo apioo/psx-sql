@@ -22,8 +22,8 @@ interface FieldInterface
     /**
      * Returns the value
      *
-     * @param array $context
-     * @return array
+     * @param array|\ArrayObject $context
+     * @return mixed
      */
-    public function getResult(array $context = null);
+    public function getResult($context = null);
 }
