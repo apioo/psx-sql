@@ -4,9 +4,11 @@ PSX Sql
 ## About
 
 The SQL library helps to manage data from relational databases. It is designed 
-to use raw SQL queries and to build nested results. It has a simple table 
-concept where a table class represents a table on your database. You can simply 
-add custom methods to a table class which can issue complex SQL queries.
+to build complex API responses from SQL queries. It has a simple table concept 
+where a table class represents a table on your database. The table knows about
+the available columns of the table thus it can provide basic CRUD operations.
+The strength of this library is the ability to build complex JSON responses 
+based on raw SQL queries.
 
 ## Basic usage
 
@@ -16,7 +18,7 @@ The following are basic examples how you can work with a table class
 $connection   = null; // a doctrine DBAL connection
 $tableManager = new TableManager($connection);
 
-$table = $tableManager->getTable('Acme\Table\News');
+$table = $tableManager->getTable(Acme\Table\News::class);
 
 // returns by default 16 entries from the table ordered by the primary column 
 // descending. The default settings can be overriden in the table class
@@ -36,10 +38,11 @@ $table->getAll(0, 12, 'id', Sql::SORT_DESC, $condition);
 // adds a blacklist so that the column "password" gets not returned
 $table->getAll(0, 12, 'id', Sql::SORT_DESC, null, Fields::blacklist(['password']));
 
-// returns all columsn which match the provided condition
+// returns all columns which match the provided condition
 $table->getBy(new Condition(['userId', '=', 1]));
 
-// it is also possible to use a magic method
+// it is also possible to use a magic method which adds a ['userId', '=', 1]
+// condition
 $table->getByUserId(1);
 
 // returns a single row matching the provided condition
@@ -97,50 +100,26 @@ class AcmeTable extends TableAbstract
     }
 
     /**
-     * In this method we use a custom query and specify the types of the return
-     * columns
-     */
-    public function getCustomQuery($title = null)
-    {
-        $params = [];
-        $sql = '    SELECT acme_table.title,
-                           acme_table.insertDate
-                      FROM acme_table 
-                INNER JOIN acme_news 
-                        ON acme_table.newsId = acme_news.id 
-                     WHERE acme_table.insertDate > DATE_SUB(NOW(), INTERVAL 1 DAY)';
-
-        if (!empty($title)) {
-            $sql.= ' AND title LIKE :title';
-            $params['title'] = '%' . $title . '%';
-        }
-
-        return $this->project($sql, $params, [
-            self::TYPE_VARCHAR,
-            self::TYPE_DATETIME,
-        ]);
-    }
-
-    /**
-     * Example howto build a nested result based on different tables
+     * Example howto build a nested result based on different tables. It 
+     * contains also some field tranformations
      */
     public function getNestedResult()
     {
         $definition = [
             'totalEntries' => $this->getCount(),
             'entries' => $this->doCollection('SELECT id, authorId, title, createDate FROM news ORDER BY createDate DESC', [], [
-                'id' => $this->type('id', TableInterface::TYPE_INT),
-                'title' => $this->callback('title', function($title){
+                'entryId' => 'id',
+                'title' => $this->fieldCallback('title', function($title){
                     return ucfirst($title);
                 }),
-                'isNew' => $this->value(true),
+                'isNew' => $this->fieldValue(true),
                 'author' => $this->doEntity('SELECT name, uri FROM author WHERE id = :id', ['id' => new Reference('authorId')], [
                     'displayName' => 'name',
                     'uri' => 'uri',
                 ]),
-                'date' => $this->dateTime('createDate'),
+                'date' => $this->fieldDateTime('createDate'),
                 'links' => [
-                    'self' => $this->replace('http://foobar.com/news/{id}'),
+                    'self' => $this->fieldReplace('http://foobar.com/news/{id}'),
                 ]
             ])
         ];
@@ -150,14 +129,14 @@ class AcmeTable extends TableAbstract
 }
 ```
 
-The getNestedResult method could produce the following json response
+The `getNestedResult` method could produce the following json response
 
 ```json
 {
     "totalEntries": 2,
     "entries": [
         {
-            "id": 1,
+            "entryId": 1,
             "title": "Foo",
             "isNew": true,
             "author": {
@@ -170,7 +149,7 @@ The getNestedResult method could produce the following json response
             }
         },
         {
-            "id": 2,
+            "entryId": 2,
             "title": "Bar",
             "isNew": true,
             "author": {
@@ -185,7 +164,6 @@ The getNestedResult method could produce the following json response
     ]
 }
 ```
-
 
 ## Generation
 
