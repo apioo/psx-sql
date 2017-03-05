@@ -40,7 +40,7 @@ trait TableQueryTestTrait
         $table = $this->getTable();
 
         if (!$table instanceof TableQueryInterface) {
-            $this->markTestSkipped('Table not an query interface');
+            $this->markTestSkipped('Table not a query interface');
         }
 
         $result = $table->getAll();
@@ -83,7 +83,7 @@ trait TableQueryTestTrait
         $table = $this->getTable();
 
         if (!$table instanceof TableQueryInterface) {
-            $this->markTestSkipped('Table not an query interface');
+            $this->markTestSkipped('Table not a query interface');
         }
 
         $result = $table->getAll(3);
@@ -108,7 +108,7 @@ trait TableQueryTestTrait
         $table = $this->getTable();
 
         if (!$table instanceof TableQueryInterface) {
-            $this->markTestSkipped('Table not an query interface');
+            $this->markTestSkipped('Table not a query interface');
         }
 
         $result = $table->getAll(0, 2);
@@ -139,7 +139,7 @@ trait TableQueryTestTrait
         $table = $this->getTable();
 
         if (!$table instanceof TableQueryInterface) {
-            $this->markTestSkipped('Table not an query interface');
+            $this->markTestSkipped('Table not a query interface');
         }
 
         $result = $table->getAll(2, 2);
@@ -170,7 +170,7 @@ trait TableQueryTestTrait
         $table = $this->getTable();
 
         if (!$table instanceof TableQueryInterface) {
-            $this->markTestSkipped('Table not an query interface');
+            $this->markTestSkipped('Table not a query interface');
         }
 
         $result = $table->getAll(2, 2, 'id', Sql::SORT_DESC);
@@ -201,7 +201,7 @@ trait TableQueryTestTrait
         $table = $this->getTable();
 
         if (!$table instanceof TableQueryInterface) {
-            $this->markTestSkipped('Table not an query interface');
+            $this->markTestSkipped('Table not a query interface');
         }
 
         $result = $table->getAll(2, 2, 'id', Sql::SORT_ASC);
@@ -232,7 +232,7 @@ trait TableQueryTestTrait
         $table = $this->getTable();
 
         if (!$table instanceof TableQueryInterface) {
-            $this->markTestSkipped('Table not an query interface');
+            $this->markTestSkipped('Table not a query interface');
         }
 
         $result = $table->getAll(0, 2, 'id', Sql::SORT_DESC);
@@ -272,7 +272,7 @@ trait TableQueryTestTrait
         $table = $this->getTable();
 
         if (!$table instanceof TableQueryInterface) {
-            $this->markTestSkipped('Table not an query interface');
+            $this->markTestSkipped('Table not a query interface');
         }
 
         $result = $table->getAll(0, 2, 'id', Sql::SORT_ASC);
@@ -303,7 +303,7 @@ trait TableQueryTestTrait
         $table = $this->getTable();
 
         if (!$table instanceof TableQueryInterface) {
-            $this->markTestSkipped('Table not an query interface');
+            $this->markTestSkipped('Table not a query interface');
         }
 
         $con    = new Condition(array('userId', '=', 1));
@@ -335,7 +335,7 @@ trait TableQueryTestTrait
         $table = $this->getTable();
 
         if (!$table instanceof TableQueryInterface) {
-            $this->markTestSkipped('Table not an query interface');
+            $this->markTestSkipped('Table not a query interface');
         }
 
         $con = new Condition();
@@ -372,7 +372,7 @@ trait TableQueryTestTrait
         $table = $this->getTable();
 
         if (!$table instanceof TableQueryInterface) {
-            $this->markTestSkipped('Table not an query interface');
+            $this->markTestSkipped('Table not a query interface');
         }
 
         $con = new Condition();
@@ -412,7 +412,7 @@ trait TableQueryTestTrait
         $table = $this->getTable();
 
         if (!$table instanceof TableQueryInterface) {
-            $this->markTestSkipped('Table not an query interface');
+            $this->markTestSkipped('Table not a query interface');
         }
 
         $result = $table->getAll(0, 2, 'id', Sql::SORT_DESC, null, Fields::whitelist(['id', 'title']));
@@ -439,7 +439,7 @@ trait TableQueryTestTrait
         $table = $this->getTable();
 
         if (!$table instanceof TableQueryInterface) {
-            $this->markTestSkipped('Table not an query interface');
+            $this->markTestSkipped('Table not a query interface');
         }
 
         $result = $table->getAll(0, 2, 'id', Sql::SORT_DESC, null, Fields::blacklist(['id', 'title']));
@@ -466,7 +466,7 @@ trait TableQueryTestTrait
         $table = $this->getTable();
 
         if (!$table instanceof TableQueryInterface) {
-            $this->markTestSkipped('Table not an query interface');
+            $this->markTestSkipped('Table not a query interface');
         }
 
         $result = $table->getByUserId(1);
@@ -497,7 +497,7 @@ trait TableQueryTestTrait
         $table = $this->getTable();
 
         if (!$table instanceof TableQueryInterface) {
-            $this->markTestSkipped('Table not an query interface');
+            $this->markTestSkipped('Table not a query interface');
         }
 
         $result = $table->getByUserId(1, Fields::whitelist(['id', 'title']));
@@ -524,7 +524,7 @@ trait TableQueryTestTrait
         $table = $this->getTable();
 
         if (!$table instanceof TableQueryInterface) {
-            $this->markTestSkipped('Table not an query interface');
+            $this->markTestSkipped('Table not a query interface');
         }
 
         $row = $table->getOneById(1);
@@ -546,7 +546,7 @@ trait TableQueryTestTrait
         $table = $this->getTable();
 
         if (!$table instanceof TableQueryInterface) {
-            $this->markTestSkipped('Table not an query interface');
+            $this->markTestSkipped('Table not a query interface');
         }
 
         $row = $table->getOneById(1, Fields::whitelist(['id', 'title']));
@@ -566,7 +566,7 @@ trait TableQueryTestTrait
         $table = $this->getTable();
 
         if (!$table instanceof TableQueryInterface) {
-            $this->markTestSkipped('Table not an query interface');
+            $this->markTestSkipped('Table not a query interface');
         }
 
         $row = $table->get(1);
@@ -588,7 +588,7 @@ trait TableQueryTestTrait
         $table = $this->getTable();
 
         if (!$table instanceof TableQueryInterface) {
-            $this->markTestSkipped('Table not an query interface');
+            $this->markTestSkipped('Table not a query interface');
         }
 
         $row = $table->get(1, Fields::whitelist(['id', 'title']));
@@ -608,7 +608,7 @@ trait TableQueryTestTrait
         $table = $this->getTable();
 
         if (!$table instanceof TableQueryInterface) {
-            $this->markTestSkipped('Table not an query interface');
+            $this->markTestSkipped('Table not a query interface');
         }
 
         $fields = $table->getSupportedFields();
@@ -621,7 +621,7 @@ trait TableQueryTestTrait
         $table = $this->getTable();
 
         if (!$table instanceof TableQueryInterface) {
-            $this->markTestSkipped('Table not an query interface');
+            $this->markTestSkipped('Table not a query interface');
         }
 
         $this->assertEquals(4, $table->getCount());
@@ -634,7 +634,7 @@ trait TableQueryTestTrait
         $table = $this->getTable();
 
         if (!$table instanceof TableQueryInterface) {
-            $this->markTestSkipped('Table not an query interface');
+            $this->markTestSkipped('Table not a query interface');
         }
 
         $obj = $table->getRecord();

@@ -39,7 +39,7 @@ trait TableManipulationTestTrait
         $table = $this->getTable();
 
         if (!$table instanceof TableManipulationInterface) {
-            $this->markTestSkipped('Table not an manipulation interface');
+            $this->markTestSkipped('Table not a manipulation interface');
         }
 
         $record = $table->getRecord();
@@ -69,7 +69,7 @@ trait TableManipulationTestTrait
         $table = $this->getTable();
 
         if (!$table instanceof TableManipulationInterface) {
-            $this->markTestSkipped('Table not an manipulation interface');
+            $this->markTestSkipped('Table not a manipulation interface');
         }
 
         $table->create(array());
@@ -80,7 +80,7 @@ trait TableManipulationTestTrait
         $table = $this->getTable();
 
         if (!$table instanceof TableManipulationInterface) {
-            $this->markTestSkipped('Table not an manipulation interface');
+            $this->markTestSkipped('Table not a manipulation interface');
         }
 
         $row = $table->getOneById(1);
@@ -105,7 +105,7 @@ trait TableManipulationTestTrait
         $table = $this->getTable();
 
         if (!$table instanceof TableManipulationInterface) {
-            $this->markTestSkipped('Table not an manipulation interface');
+            $this->markTestSkipped('Table not a manipulation interface');
         }
 
         $table->update(array());
@@ -116,7 +116,7 @@ trait TableManipulationTestTrait
         $table = $this->getTable();
 
         if (!$table instanceof TableManipulationInterface) {
-            $this->markTestSkipped('Table not an manipulation interface');
+            $this->markTestSkipped('Table not a manipulation interface');
         }
 
         $row = $table->getOneById(1);
@@ -136,7 +136,7 @@ trait TableManipulationTestTrait
         $table = $this->getTable();
 
         if (!$table instanceof TableManipulationInterface) {
-            $this->markTestSkipped('Table not an manipulation interface');
+            $this->markTestSkipped('Table not a manipulation interface');
         }
 
         $table->delete(array());

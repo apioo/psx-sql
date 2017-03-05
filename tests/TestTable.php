@@ -53,22 +53,22 @@ class TestTable extends TableAbstract
     public function getNestedResult()
     {
         $sql = '  SELECT id,
-				         userId,
-				         title,
-				         date
-				    FROM psx_handler_comment
-				ORDER BY id DESC';
+                         userId,
+                         title,
+                         date
+                    FROM psx_handler_comment
+                ORDER BY id DESC';
 
         $definition = $this->doCollection($sql, [], [
-            'id' => $this->type('id', self::TYPE_INT),
-            'title' => $this->callback('title', function($title){
+            'id' => $this->fieldType('id', self::TYPE_INT),
+            'title' => $this->fieldCallback('title', function($title){
                 return ucfirst($title);
             }),
             'author' => [
-                'id' => $this->replace('urn:profile:{userId}'),
-                'date' => $this->dateTime('date'),
+                'id' => $this->fieldReplace('urn:profile:{userId}'),
+                'date' => $this->fieldDateTime('date'),
             ],
-            'note' => $this->doEntity([$this->getTable('PSX\Sql\Tests\TestTableCommand'), 'getOneById'], [new Reference('id')], [
+            'note' => $this->doEntity([$this->getTable(TestTableCommand::class), 'getOneById'], [new Reference('id')], [
                 'comments' => true,
                 'title' => 'col_text',
             ])
@@ -80,22 +80,22 @@ class TestTable extends TableAbstract
     public function getNestedResultKey()
     {
         $sql = '  SELECT id,
-				         userId,
-				         title,
-				         date
-				    FROM psx_handler_comment
-				ORDER BY id DESC';
+                         userId,
+                         title,
+                         date
+                    FROM psx_handler_comment
+                ORDER BY id DESC';
 
         $definition = $this->doCollection($sql, [], [
-            'id' => $this->type('id', self::TYPE_INT),
-            'title' => $this->callback('title', function($title){
+            'id' => $this->fieldType('id', self::TYPE_INT),
+            'title' => $this->fieldCallback('title', function($title){
                 return ucfirst($title);
             }),
             'author' => [
-                'id' => $this->replace('urn:profile:{userId}'),
-                'date' => $this->dateTime('date'),
+                'id' => $this->fieldReplace('urn:profile:{userId}'),
+                'date' => $this->fieldDateTime('date'),
             ],
-            'note' => $this->doEntity([$this->getTable('PSX\Sql\Tests\TestTableCommand'), 'getOneById'], [new Reference('id')], [
+            'note' => $this->doEntity([$this->getTable(TestTableCommand::class), 'getOneById'], [new Reference('id')], [
                 'comments' => true,
                 'title' => 'col_text',
             ])
@@ -109,22 +109,22 @@ class TestTable extends TableAbstract
     public function getNestedResultFilter()
     {
         $sql = '  SELECT id,
-				         userId,
-				         title,
-				         date
-				    FROM psx_handler_comment
-				ORDER BY id DESC';
+                         userId,
+                         title,
+                         date
+                    FROM psx_handler_comment
+                ORDER BY id DESC';
 
         $definition = $this->doCollection($sql, [], [
-            'id' => $this->type('id', self::TYPE_INT),
-            'title' => $this->callback('title', function($title){
+            'id' => $this->fieldType('id', self::TYPE_INT),
+            'title' => $this->fieldCallback('title', function($title){
                 return ucfirst($title);
             }),
             'author' => [
-                'id' => $this->replace('urn:profile:{userId}'),
-                'date' => $this->dateTime('date'),
+                'id' => $this->fieldReplace('urn:profile:{userId}'),
+                'date' => $this->fieldDateTime('date'),
             ],
-            'note' => $this->doEntity([$this->getTable('PSX\Sql\Tests\TestTableCommand'), 'getOneById'], [new Reference('id')], [
+            'note' => $this->doEntity([$this->getTable(TestTableCommand::class), 'getOneById'], [new Reference('id')], [
                 'comments' => true,
                 'title' => 'col_text',
             ])
@@ -133,6 +133,39 @@ class TestTable extends TableAbstract
                 return $row['author']['id'] == 'urn:profile:1';
             }));
         });
+
+        return $this->build($definition);
+    }
+
+    public function getNestedResultFields()
+    {
+        $data = [
+            'boolean' => '1',
+            'callback' => 'foo',
+            'csv' => 'foo,bar',
+            'dateTime' => '2017-03-05 00:00:00',
+            'integer' => '1',
+            'json' => '{"foo": "bar"}',
+            'number' => '12.34',
+            'replace' => 'foo',
+            'type' => '1',
+            'value' => 'foo',
+        ];
+
+        $definition = $this->doEntity($data, [], [
+            'boolean' => $this->fieldBoolean('boolean'),
+            'callback' => $this->fieldCallback('callback', function(){
+                return 'bar';
+            }),
+            'csv' => $this->fieldCsv('csv'),
+            'dateTime' => $this->fieldDateTime('dateTime'),
+            'integer' => $this->fieldInteger('integer'),
+            'json' => $this->fieldJson('json'),
+            'number' => $this->fieldNumber('number'),
+            'replace' => $this->fieldReplace('http://foo.com/{replace}'),
+            'type' => $this->fieldType('type', self::TYPE_INT),
+            'value' => $this->fieldValue('bar'),
+        ]);
 
         return $this->build($definition);
     }
