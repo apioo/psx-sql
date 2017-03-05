@@ -1,4 +1,8 @@
 
+### 2.0.2
+
+* Add column provider
+
 ### 2.0.1 (2016-03-05)
 
 * Moved field factory methods to separate trait

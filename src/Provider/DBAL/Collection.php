@@ -37,7 +37,7 @@ class Collection extends DBALAbstract implements ProviderCollectionInterface
     protected $key;
     protected $filter;
 
-    public function __construct(Connection $connection, $sql, array $parameters, array $definition, $key = null, \Closure $filter = null)
+    public function __construct(Connection $connection, $sql, array $parameters, $definition, $key = null, \Closure $filter = null)
     {
         parent::__construct($connection, $sql, $parameters, $definition);
 

@@ -32,7 +32,7 @@ abstract class MapAbstract
     protected $result;
     protected $definition;
 
-    public function __construct($result, array $definition)
+    public function __construct($result, $definition)
     {
         $this->result     = $result;
         $this->definition = $definition;

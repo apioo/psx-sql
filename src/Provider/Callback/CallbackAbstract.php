@@ -35,7 +35,7 @@ abstract class CallbackAbstract
     protected $parameters;
     protected $definition;
 
-    public function __construct($callback, array $parameters, array $definition)
+    public function __construct($callback, array $parameters, $definition)
     {
         $this->callback   = $callback;
         $this->parameters = $parameters;

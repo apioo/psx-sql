@@ -35,7 +35,7 @@ class Collection extends PDOAbstract implements ProviderCollectionInterface
     protected $key;
     protected $filter;
 
-    public function __construct(PDO $pdo, $sql, array $parameters, array $definition, $key = null, \Closure $filter = null)
+    public function __construct(PDO $pdo, $sql, array $parameters, $definition, $key = null, \Closure $filter = null)
     {
         parent::__construct($pdo, $sql, $parameters, $definition);
 
@@ -55,6 +55,6 @@ class Collection extends PDOAbstract implements ProviderCollectionInterface
 
     public function getResult($context = null)
     {
-        return $this->getStatment($context)->fetchAll(PDO::FETCH_ASSOC);
+        return $this->getStatement($context)->fetchAll(PDO::FETCH_ASSOC);
     }
 }

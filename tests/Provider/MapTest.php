@@ -20,6 +20,7 @@
 
 namespace PSX\Sql\Tests\Provider;
 
+use PSX\Sql\Field;
 use PSX\Sql\Provider\Map;
 use PSX\Sql\Tests\ProviderTestCase;
 
@@ -52,10 +53,11 @@ class MapTest extends ProviderTestCase
         ];
 
         return [
-            'totalEntries' => new Map\Value(2),
+            'totalEntries' => new Map\Value(['cnt' => 2], new Field\Integer('cnt')),
             'entries' => new Map\Collection($news, [
                 'id' => 'id',
                 'title' => 'title',
+                'tags' => new Map\Column($news, 'title'),
                 'author' => new Map\Entity($author, [
                     'displayName' => 'name',
                     'uri' => 'uri',

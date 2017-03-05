@@ -34,7 +34,7 @@ class Collection extends MapAbstract implements ProviderCollectionInterface
     protected $key;
     protected $filter;
 
-    public function __construct(array $result, array $definition, $key = null, \Closure $filter = null)
+    public function __construct(array $result, $definition, $key = null, \Closure $filter = null)
     {
         parent::__construct($result, $definition);
 

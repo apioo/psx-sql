@@ -20,15 +20,15 @@
 
 namespace PSX\Sql\Provider\Callback;
 
-use PSX\Sql\Provider\ProviderValueInterface;
+use PSX\Sql\Provider\ProviderColumnInterface;
 
 /**
- * Value
+ * Column
  *
  * @author  Christoph Kappestein <k42b3.x@gmail.com>
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    http://phpsx.org
  */
-class Value extends CallbackAbstract implements ProviderValueInterface
+class Column extends CallbackAbstract implements ProviderColumnInterface
 {
 }

@@ -34,18 +34,33 @@ interface DatabaseFactoryInterface
      *
      * @param string $sql
      * @param array $parameters
-     * @param array $definition
+     * @param mixed $definition
      * @return ProviderCollectionInterface
      */
-    public function newCollection($sql, array $parameters, array $definition);
+    public function newCollection($sql, array $parameters, $definition, $key = null, \Closure $filter = null);
 
     /**
      * Returns a new entity instance
      *
      * @param string $sql
      * @param array $parameters
-     * @param array $definition
+     * @param mixed $definition
      * @return ProviderEntityInterface
      */
-    public function newEntity($sql, array $parameters, array $definition);
+    public function newEntity($sql, array $parameters, $definition);
+
+    /**
+     * @param string $sql
+     * @param array $parameters
+     * @param mixed $definition
+     * @return ProviderColumnInterface
+     */
+    public function newColumn($sql, array $parameters, $definition);
+
+    /**
+     * @param string $sql
+     * @param array $parameters
+     * @return mixed
+     */
+    public function newValue($sql, array $parameters, $definition);
 }

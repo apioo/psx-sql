@@ -71,7 +71,9 @@ class TestTable extends TableAbstract
             'note' => $this->doEntity([$this->getTable(TestTableCommand::class), 'getOneById'], [new Reference('id')], [
                 'comments' => true,
                 'title' => 'col_text',
-            ])
+            ]),
+            'count' => $this->doValue('SELECT COUNT(*) AS cnt FROM psx_handler_comment', [], $this->fieldInteger('cnt')),
+            'tags' => $this->doColumn('SELECT date FROM psx_handler_comment', [], 'date'),
         ]);
 
         return $this->build($definition);

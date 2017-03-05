@@ -158,7 +158,20 @@ abstract class TableAbstract implements TableInterface
         }
     }
 
-    protected function doValue($source, array $arguments, array $definition)
+    protected function doColumn($source, array $arguments, $definition)
+    {
+        if (is_callable($source)) {
+            return new Provider\Callback\Column($source, $arguments, $definition);
+        } elseif (is_string($source)) {
+            return new Provider\DBAL\Column($this->connection, $source, $arguments, $definition);
+        } elseif (is_array($source)) {
+            return new Provider\Map\Column($source, $definition);
+        } else {
+            throw new InvalidArgumentException('Source must be either a callable, string or array');
+        }
+    }
+
+    protected function doValue($source, array $arguments, $definition)
     {
         if (is_callable($source)) {
             return new Provider\Callback\Value($source, $arguments, $definition);

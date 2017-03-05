@@ -13,6 +13,7 @@ namespace PSX\Sql;
 use PSX\Record\Record;
 use PSX\Record\RecordInterface;
 use PSX\Sql\Provider\ProviderCollectionInterface;
+use PSX\Sql\Provider\ProviderColumnInterface;
 use PSX\Sql\Provider\ProviderEntityInterface;
 use PSX\Sql\Provider\ProviderValueInterface;
 use RuntimeException;
@@ -100,8 +101,13 @@ class Builder
             }
         } elseif ($provider instanceof ProviderEntityInterface) {
             $result = $this->build($definition, $data);
+        } elseif ($provider instanceof ProviderColumnInterface) {
+            $result = [];
+            foreach ($data as $row) {
+                $result[] = $this->build($definition, $row);
+            }
         } elseif ($provider instanceof ProviderValueInterface) {
-            $result = $data;
+            $result = $this->build($definition, $data);
         }
 
         return $result;

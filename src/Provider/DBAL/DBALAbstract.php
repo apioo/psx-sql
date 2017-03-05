@@ -36,9 +36,8 @@ abstract class DBALAbstract
     protected $sql;
     protected $parameters;
     protected $definition;
-    protected $statment;
 
-    public function __construct(Connection $connection, $sql, array $parameters, array $definition)
+    public function __construct(Connection $connection, $sql, array $parameters, $definition)
     {
         $this->connection = $connection;
         $this->sql        = $sql;
@@ -53,6 +52,7 @@ abstract class DBALAbstract
 
     /**
      * Returns an array of PDO type corresponding to the parameter array
+     *
      * @internal
      * @param array $parameters
      * @return array

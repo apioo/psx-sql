@@ -31,8 +31,4 @@ use PSX\Sql\Provider\ProviderValueInterface;
  */
 class Value extends MapAbstract implements ProviderValueInterface
 {
-    public function __construct($result)
-    {
-        parent::__construct($result, []);
-    }
 }

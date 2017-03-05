@@ -20,6 +20,7 @@
 
 namespace PSX\Sql\Tests\Provider;
 
+use PSX\Sql\Field;
 use PSX\Sql\Provider\Callback;
 use PSX\Sql\Reference;
 use PSX\Sql\Tests\ProviderTestCase;
@@ -40,10 +41,11 @@ class CallbackTest extends ProviderTestCase
         $this->authorId = 0;
 
         return [
-            'totalEntries' => new Callback\Value([$this, 'dataTotal'], []),
+            'totalEntries' => new Callback\Value([$this, 'dataTotal'], [], new Field\Integer('cnt')),
             'entries' => new Callback\Collection([$this, 'dataNews'], [], [
-                'id' => 'id',
+                'id' => new Field\Integer('id'),
                 'title' => 'title',
+                'tags' => new Callback\Column([$this, 'dataNews'], [], 'title'),
                 'author' => new Callback\Entity([$this, 'dataAuthor'], [new Reference('authorId'), 'bar'], [
                     'displayName' => 'name',
                     'uri' => 'uri',
@@ -81,6 +83,6 @@ class CallbackTest extends ProviderTestCase
 
     public function dataTotal()
     {
-        return 2;
+        return ['cnt' => 2];
     }
 }

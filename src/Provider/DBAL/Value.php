@@ -34,14 +34,9 @@ use PSX\Sql\Provider\ProviderValueInterface;
  */
 class Value extends DBALAbstract implements ProviderValueInterface
 {
-    public function __construct(Connection $connection, $sql, array $parameters)
-    {
-        parent::__construct($connection, $sql, $parameters, []);
-    }
-
     public function getResult($context = null)
     {
-        return $this->connection->fetchColumn(
+        return $this->connection->fetchAssoc(
             $this->sql,
             ParameterResolver::resolve($this->parameters, $context)
         );

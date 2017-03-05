@@ -36,9 +36,9 @@ abstract class PDOAbstract
     protected $sql;
     protected $parameters;
     protected $definition;
-    protected $statment;
+    protected $statement;
 
-    public function __construct(PDO $pdo, $sql, array $parameters, array $definition)
+    public function __construct(PDO $pdo, $sql, array $parameters, $definition)
     {
         $this->pdo        = $pdo;
         $this->sql        = $sql;
@@ -51,21 +51,21 @@ abstract class PDOAbstract
         return $this->definition;
     }
 
-    protected function getStatment($context = null)
+    protected function getStatement($context = null)
     {
-        if ($this->statment === null) {
-            $this->statment = $this->pdo->prepare($this->sql);
+        if ($this->statement === null) {
+            $this->statement = $this->pdo->prepare($this->sql);
         }
 
         $parameters = ParameterResolver::resolve($this->parameters, $context);
 
         foreach ($parameters as $name => $parameter) {
-            $this->statment->bindValue($name, $parameter, self::getType($parameter));
+            $this->statement->bindValue($name, $parameter, self::getType($parameter));
         }
 
-        $this->statment->execute();
+        $this->statement->execute();
 
-        return $this->statment;
+        return $this->statement;
     }
 
     /**

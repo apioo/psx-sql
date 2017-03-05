@@ -20,6 +20,7 @@
 
 namespace PSX\Sql\Tests\Provider;
 
+use PSX\Sql\Field;
 use PSX\Sql\Provider\PDO;
 use PSX\Sql\Reference;
 use PSX\Sql\Tests\ProviderTestCase;
@@ -38,10 +39,11 @@ class PDOTest extends ProviderTestCase
         $provider = new PDO\Factory($this->connection->getWrappedConnection());
 
         return [
-            'totalEntries' => $provider->newValue('SELECT COUNT(*) FROM psx_sql_provider_news', []),
+            'totalEntries' => $provider->newValue('SELECT COUNT(*) AS cnt FROM psx_sql_provider_news', [], new Field\Integer('cnt')),
             'entries' => $provider->newCollection('SELECT id, authorId, title, createDate FROM psx_sql_provider_news ORDER BY id ASC LIMIT :startIndex, 8', ['startIndex' => 0], [
-                'id' => 'id',
+                'id' => new Field\Integer('id'),
                 'title' => 'title',
+                'tags' => $provider->newColumn('SELECT title FROM psx_sql_provider_news', [], 'title'),
                 'author' => $provider->newEntity('SELECT id, name, uri FROM psx_sql_provider_author WHERE id = :id', ['id' => new Reference('authorId')], [
                     'displayName' => 'name',
                     'uri' => 'uri',

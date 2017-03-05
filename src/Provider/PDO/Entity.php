@@ -34,6 +34,6 @@ class Entity extends PDOAbstract implements ProviderEntityInterface
 {
     public function getResult($context = null)
     {
-        return $this->getStatment($context)->fetch(PDO::FETCH_ASSOC);
+        return $this->getStatement($context)->fetch(PDO::FETCH_ASSOC);
     }
 }

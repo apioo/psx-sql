@@ -33,13 +33,8 @@ use PSX\Sql\Provider\ProviderValueInterface;
  */
 class Value extends PDOAbstract implements ProviderValueInterface
 {
-    public function __construct(PDO $pdo, $sql, array $parameters)
-    {
-        parent::__construct($pdo, $sql, $parameters, []);
-    }
-
     public function getResult($context = null)
     {
-        return $this->getStatment($context)->fetchColumn();
+        return $this->getStatement($context)->fetch(PDO::FETCH_ASSOC);
     }
 }

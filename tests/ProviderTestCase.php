@@ -67,6 +67,10 @@ abstract class ProviderTestCase extends \PHPUnit_Extensions_Database_TestCase
         {
             "id": 1,
             "title": "foo",
+            "tags": [
+                "foo",
+                "bar"
+            ],
             "author": {
                 "displayName": "Foo Bar",
                 "uri": "http:\/\/phpsx.org"
@@ -75,6 +79,10 @@ abstract class ProviderTestCase extends \PHPUnit_Extensions_Database_TestCase
         {
             "id": 2,
             "title": "bar",
+            "tags": [
+                "foo",
+                "bar"
+            ],
             "author": {
                 "displayName": "Foo Bar",
                 "uri": "http:\/\/phpsx.org"

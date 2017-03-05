@@ -18,17 +18,17 @@
  * limitations under the License.
  */
 
-namespace PSX\Sql\Provider\Callback;
+namespace PSX\Sql\Provider;
 
-use PSX\Sql\Provider\ProviderValueInterface;
+use PSX\Sql\ProviderInterface;
 
 /**
- * Value
+ * ProviderColumnInterface
  *
  * @author  Christoph Kappestein <k42b3.x@gmail.com>
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    http://phpsx.org
  */
-class Value extends CallbackAbstract implements ProviderValueInterface
+interface ProviderColumnInterface extends ProviderInterface
 {
 }

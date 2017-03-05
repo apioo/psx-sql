@@ -81,7 +81,14 @@ class TableComplexTest extends \PHPUnit_Extensions_Database_TestCase
         "author": {
             "id": "urn:profile:3",
             "date": "2013-04-29T16:56:32+00:00"
-        }
+        },
+        "count": 4,
+        "tags": [
+            "2013-04-29 16:56:32",
+            "2013-04-29 16:56:32",
+            "2013-04-29 16:56:32",
+            "2013-04-29 16:56:32"
+        ]
     },
     {
         "id": 3,
@@ -89,7 +96,14 @@ class TableComplexTest extends \PHPUnit_Extensions_Database_TestCase
         "author": {
             "id": "urn:profile:2",
             "date": "2013-04-29T16:56:32+00:00"
-        }
+        },
+        "count": 4,
+        "tags": [
+            "2013-04-29 16:56:32",
+            "2013-04-29 16:56:32",
+            "2013-04-29 16:56:32",
+            "2013-04-29 16:56:32"
+        ]
     },
     {
         "id": 2,
@@ -97,7 +111,14 @@ class TableComplexTest extends \PHPUnit_Extensions_Database_TestCase
         "author": {
             "id": "urn:profile:1",
             "date": "2013-04-29T16:56:32+00:00"
-        }
+        },
+        "count": 4,
+        "tags": [
+            "2013-04-29 16:56:32",
+            "2013-04-29 16:56:32",
+            "2013-04-29 16:56:32",
+            "2013-04-29 16:56:32"
+        ]
     },
     {
         "id": 1,
@@ -109,7 +130,14 @@ class TableComplexTest extends \PHPUnit_Extensions_Database_TestCase
         "note": {
             "comments": true,
             "title": "foobar"
-        }
+        },
+        "count": 4,
+        "tags": [
+            "2013-04-29 16:56:32",
+            "2013-04-29 16:56:32",
+            "2013-04-29 16:56:32",
+            "2013-04-29 16:56:32"
+        ]
     }
 ]
 JSON;

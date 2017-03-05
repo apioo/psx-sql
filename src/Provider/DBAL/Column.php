@@ -18,17 +18,29 @@
  * limitations under the License.
  */
 
-namespace PSX\Sql\Provider\Callback;
+namespace PSX\Sql\Provider\DBAL;
 
-use PSX\Sql\Provider\ProviderValueInterface;
+use PSX\Sql\Provider\ParameterResolver;
+use PSX\Sql\Provider\ProviderColumnInterface;
 
 /**
- * Value
+ * Column
  *
  * @author  Christoph Kappestein <k42b3.x@gmail.com>
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    http://phpsx.org
  */
-class Value extends CallbackAbstract implements ProviderValueInterface
+class Column extends DBALAbstract implements ProviderColumnInterface
 {
+    public function getResult($context = null)
+    {
+        $parameters = ParameterResolver::resolve($this->parameters, $context);
+        $types      = self::getTypes($parameters);
+
+        return $this->connection->fetchAll(
+            $this->sql,
+            $parameters,
+            $types
+        );
+    }
 }
