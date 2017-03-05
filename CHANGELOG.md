@@ -1,4 +1,10 @@
 
+### 1.0.9 (2016-03-05)
+
+* Moved field factory methods to separate trait
+* Add CSV field
+* Removed array type hint from FieldInterface
+
 ### 1.0.8 (2016-12-22)
 
 * Add jsonschema and php generator class
