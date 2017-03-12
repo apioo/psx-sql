@@ -85,7 +85,7 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
                 "displayName": "Foo Bar",
                 "uri": "http:\/\/phpsx.org"
             },
-            "date": "2016-03-01T00:00:00+00:00",
+            "date": "2016-03-01T00:00:00Z",
             "links": {
                 "self": "http:\/\/foobar.com\/news\/1"
             }
@@ -98,7 +98,7 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
                 "displayName": "Foo Bar",
                 "uri": "http:\/\/phpsx.org"
             },
-            "date": "2016-03-01T00:00:00+00:00",
+            "date": "2016-03-01T00:00:00Z",
             "links": {
                 "self": "http:\/\/foobar.com\/news\/2"
             }

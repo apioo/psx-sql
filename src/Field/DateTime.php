@@ -40,6 +40,6 @@ class DateTime extends TransformFieldAbstract
             }
         }
 
-        return $value->format(\DateTime::RFC3339);
+        return $value->getOffset() == 0 ? $value->format('Y-m-d\TH:i:s') . 'Z' : $value->format(\DateTime::RFC3339);
     }
 }

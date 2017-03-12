@@ -65,7 +65,7 @@ class FieldTest extends \PHPUnit_Framework_TestCase
     "fields": {
         "boolean": true,
         "callback": "Foo",
-        "dateTime": "2016-03-01T00:00:00+00:00",
+        "dateTime": "2016-03-01T00:00:00Z",
         "number": 1.4,
         "integer": 2,
         "replace": "http:\/\/foobar.com\/entry\/2",

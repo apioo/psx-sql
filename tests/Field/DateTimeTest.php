@@ -35,6 +35,6 @@ class DateTimeTest extends \PHPUnit_Framework_TestCase
     {
         $field = new DateTime('foo');
 
-        $this->assertEquals('2016-06-01T00:00:00+00:00', $field->getResult(['foo' => '2016-06-01']));
+        $this->assertEquals('2016-06-01T00:00:00Z', $field->getResult(['foo' => '2016-06-01']));
     }
 }

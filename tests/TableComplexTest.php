@@ -80,7 +80,7 @@ class TableComplexTest extends \PHPUnit_Extensions_Database_TestCase
         "title": "Blub",
         "author": {
             "id": "urn:profile:3",
-            "date": "2013-04-29T16:56:32+00:00"
+            "date": "2013-04-29T16:56:32Z"
         },
         "count": 4,
         "tags": [
@@ -95,7 +95,7 @@ class TableComplexTest extends \PHPUnit_Extensions_Database_TestCase
         "title": "Test",
         "author": {
             "id": "urn:profile:2",
-            "date": "2013-04-29T16:56:32+00:00"
+            "date": "2013-04-29T16:56:32Z"
         },
         "count": 4,
         "tags": [
@@ -110,7 +110,7 @@ class TableComplexTest extends \PHPUnit_Extensions_Database_TestCase
         "title": "Bar",
         "author": {
             "id": "urn:profile:1",
-            "date": "2013-04-29T16:56:32+00:00"
+            "date": "2013-04-29T16:56:32Z"
         },
         "count": 4,
         "tags": [
@@ -125,7 +125,7 @@ class TableComplexTest extends \PHPUnit_Extensions_Database_TestCase
         "title": "Foo",
         "author": {
             "id": "urn:profile:1",
-            "date": "2013-04-29T16:56:32+00:00"
+            "date": "2013-04-29T16:56:32Z"
         },
         "note": {
             "comments": true,
@@ -156,7 +156,7 @@ JSON;
         "title": "Blub",
         "author": {
             "id": "urn:profile:3",
-            "date": "2013-04-29T16:56:32+00:00"
+            "date": "2013-04-29T16:56:32Z"
         }
     },
     "c81e728d": {
@@ -164,7 +164,7 @@ JSON;
         "title": "Test",
         "author": {
             "id": "urn:profile:2",
-            "date": "2013-04-29T16:56:32+00:00"
+            "date": "2013-04-29T16:56:32Z"
         }
     },
     "c4ca4238": {
@@ -172,7 +172,7 @@ JSON;
         "title": "Foo",
         "author": {
             "id": "urn:profile:1",
-            "date": "2013-04-29T16:56:32+00:00"
+            "date": "2013-04-29T16:56:32Z"
         },
         "note": {
             "comments": true,
@@ -196,7 +196,7 @@ JSON;
         "title": "Bar",
         "author": {
             "id": "urn:profile:1",
-            "date": "2013-04-29T16:56:32+00:00"
+            "date": "2013-04-29T16:56:32Z"
         }
     },
     {
@@ -204,7 +204,7 @@ JSON;
         "title": "Foo",
         "author": {
             "id": "urn:profile:1",
-            "date": "2013-04-29T16:56:32+00:00"
+            "date": "2013-04-29T16:56:32Z"
         },
         "note": {
             "comments": true,
@@ -229,7 +229,7 @@ JSON;
         "foo",
         "bar"
     ],
-    "dateTime": "2017-03-05T00:00:00+00:00",
+    "dateTime": "2017-03-05T00:00:00Z",
     "integer": 1,
     "json": {
         "foo": "bar"
