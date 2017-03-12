@@ -1,5 +1,9 @@
 
-### 2.0.2
+### 2.0.3 (2016-03-12)
+
+* Datetime field render as UTC
+
+### 2.0.2 (2016-03-05)
 
 * Add column provider
 
