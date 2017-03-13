@@ -1,4 +1,9 @@
 
+### 2.0.4 (2016-03-13)
+
+* CSV field handle empty values
+* Add ViewAbstract
+
 ### 2.0.3 (2016-03-12)
 
 * Datetime field render as UTC
