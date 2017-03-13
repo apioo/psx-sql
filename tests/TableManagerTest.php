@@ -21,6 +21,7 @@
 namespace PSX\Sql\Tests;
 
 use PSX\Sql\Table\Reader;
+use PSX\Sql\TableInterface;
 use PSX\Sql\TableManager;
 
 /**
@@ -46,9 +47,9 @@ class TableManagerTest extends \PHPUnit_Extensions_Database_TestCase
     {
         $manager = new TableManager(getConnection());
 
-        $table = $manager->getTable('PSX\Sql\Tests\TestTable');
+        $table = $manager->getTable(TestTable::class);
 
-        $this->assertInstanceOf('PSX\Sql\TableInterface', $table);
+        $this->assertInstanceOf(TableInterface::class, $table);
         $this->assertEquals('psx_handler_comment', $table->getName());
         $this->assertEquals(['id', 'userId', 'title', 'date'], array_keys($table->getColumns()));
     }

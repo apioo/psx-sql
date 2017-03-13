@@ -34,7 +34,7 @@ abstract class TableAbstract implements TableInterface
 {
     use TableQueryTrait;
     use TableManipulationTrait;
-    use FieldFactoryTrait;
+    use ViewTrait;
 
     /**
      * @var \Doctrine\DBAL\Connection
@@ -120,68 +120,6 @@ abstract class TableAbstract implements TableInterface
             $value,
             TypeMapper::getDoctrineTypeByType($type)
         );
-    }
-
-    protected function getTable($tableName)
-    {
-        return $this->tableManager->getTable($tableName);
-    }
-
-    protected function build($definition)
-    {
-        return $this->builder->build($definition);
-    }
-
-    protected function doCollection($source, array $arguments, array $definition, $key = null, \Closure $filter = null)
-    {
-        if (is_callable($source)) {
-            return new Provider\Callback\Collection($source, $arguments, $definition, $key, $filter);
-        } elseif (is_string($source)) {
-            return new Provider\DBAL\Collection($this->connection, $source, $arguments, $definition, $key, $filter);
-        } elseif (is_array($source)) {
-            return new Provider\Map\Collection($source, $definition, $key, $filter);
-        } else {
-            throw new InvalidArgumentException('Source must be either a callable, string or array');
-        }
-    }
-
-    protected function doEntity($source, array $arguments, array $definition)
-    {
-        if (is_callable($source)) {
-            return new Provider\Callback\Entity($source, $arguments, $definition);
-        } elseif (is_string($source)) {
-            return new Provider\DBAL\Entity($this->connection, $source, $arguments, $definition);
-        } elseif (is_array($source)) {
-            return new Provider\Map\Entity($source, $definition);
-        } else {
-            throw new InvalidArgumentException('Source must be either a callable, string or array');
-        }
-    }
-
-    protected function doColumn($source, array $arguments, $definition)
-    {
-        if (is_callable($source)) {
-            return new Provider\Callback\Column($source, $arguments, $definition);
-        } elseif (is_string($source)) {
-            return new Provider\DBAL\Column($this->connection, $source, $arguments, $definition);
-        } elseif (is_array($source)) {
-            return new Provider\Map\Column($source, $definition);
-        } else {
-            throw new InvalidArgumentException('Source must be either a callable, string or array');
-        }
-    }
-
-    protected function doValue($source, array $arguments, $definition)
-    {
-        if (is_callable($source)) {
-            return new Provider\Callback\Value($source, $arguments, $definition);
-        } elseif (is_string($source)) {
-            return new Provider\DBAL\Value($this->connection, $source, $arguments, $definition);
-        } elseif (is_array($source)) {
-            return new Provider\Map\Value($source, $definition);
-        } else {
-            throw new InvalidArgumentException('Source must be either a callable, string or array');
-        }
     }
 
     /**

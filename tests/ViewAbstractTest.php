@@ -25,13 +25,13 @@ use PSX\Sql\TableInterface;
 use PSX\Sql\TableManager;
 
 /**
- * TableComplexTest
+ * ViewAbstractTest
  *
  * @author  Christoph Kappestein <k42b3.x@gmail.com>
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    http://phpsx.org
  */
-class TableComplexTest extends \PHPUnit_Extensions_Database_TestCase
+class ViewAbstractTest extends \PHPUnit_Extensions_Database_TestCase
 {
     /**
      * @var \Doctrine\DBAL\Connection
@@ -62,11 +62,11 @@ class TableComplexTest extends \PHPUnit_Extensions_Database_TestCase
     }
 
     /**
-     * @return TestTable
+     * @return TestView
      */
     protected function getTable()
     {
-        return $this->manager->getTable(TestTable::class);
+        return $this->manager->getTable(TestView::class);
     }
 
     public function testGetNestedResult()
