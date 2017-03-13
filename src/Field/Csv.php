@@ -40,6 +40,10 @@ class Csv extends TransformFieldAbstract
 
     protected function transform($value)
     {
-        return explode($this->delimiter, $value);
+        if (empty($value)) {
+            return [];
+        } else {
+            return explode($this->delimiter, $value);
+        }
     }
 }
