@@ -20,8 +20,6 @@
 
 namespace PSX\Sql\Tests\Table\Reader;
 
-use PSX\DateTime\DateTime;
-use PSX\Sql\Table;
 use PSX\Sql\Table\Reader\Schema;
 use PSX\Sql\TableInterface;
 

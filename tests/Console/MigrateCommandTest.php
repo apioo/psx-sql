@@ -20,7 +20,6 @@
 
 namespace PSX\Sql\Tests\Console;
 
-use PSX\Sql\Console\GenerateCommand;
 use PSX\Sql\Console\MigrateCommand;
 use PSX\Sql\TableManager;
 use Symfony\Component\Console\Tester\CommandTester;

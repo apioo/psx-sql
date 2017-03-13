@@ -21,9 +21,6 @@
 namespace PSX\Sql\Tests;
 
 use Doctrine\DBAL\Types\Type;
-use PSX\Sql\Builder;
-use PSX\Sql\Field;
-use PSX\Sql\Provider\Map;
 use PSX\Sql\TableInterface;
 use PSX\Sql\TypeMapper;
 

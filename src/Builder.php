@@ -11,7 +11,6 @@
 namespace PSX\Sql;
 
 use PSX\Record\Record;
-use PSX\Record\RecordInterface;
 use PSX\Sql\Provider\ProviderCollectionInterface;
 use PSX\Sql\Provider\ProviderColumnInterface;
 use PSX\Sql\Provider\ProviderEntityInterface;

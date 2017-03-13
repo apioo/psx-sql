@@ -21,7 +21,6 @@
 namespace PSX\Sql\Provider\PDO;
 
 use PDO;
-use PSX\Sql\Provider\ProviderEntityInterface;
 use PSX\Sql\Provider\ProviderValueInterface;
 
 /**

@@ -20,7 +20,6 @@
 
 namespace PSX\Sql\Tests\Field;
 
-use PSX\Sql\Field\Boolean;
 use PSX\Sql\Field\Callback;
 
 /**

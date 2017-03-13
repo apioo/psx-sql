@@ -21,7 +21,6 @@
 namespace PSX\Sql\Field;
 
 use Doctrine\DBAL\Connection;
-use PSX\Sql\TableInterface;
 use PSX\Sql\TypeMapper;
 
 /**

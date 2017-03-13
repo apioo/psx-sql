@@ -22,7 +22,6 @@ namespace PSX\Sql\Provider\DBAL;
 
 use Doctrine\DBAL\Connection;
 use PSX\Sql\Provider\ParameterResolver;
-use PSX\Sql\Provider\PDO\PDOAbstract;
 use PSX\Sql\Provider\ProviderCollectionInterface;
 
 /**

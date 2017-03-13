@@ -20,7 +20,6 @@
 
 namespace PSX\Sql;
 
-use Doctrine\DBAL\Connection;
 use PSX\Exception;
 
 /**

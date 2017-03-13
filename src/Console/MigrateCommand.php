@@ -20,17 +20,8 @@
 
 namespace PSX\Sql\Console;
 
-use Doctrine\Common\Annotations\Reader;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\DBAL\Schema\Table;
-use Doctrine\DBAL\Types\Type;
-use PhpParser\BuilderFactory;
-use PhpParser\Node;
-use PhpParser\PrettyPrinter;
-use PSX\Schema\Generator;
-use PSX\Schema\Parser;
 use PSX\Sql\TableInterface;
 use PSX\Sql\TableManagerInterface;
 use PSX\Sql\TypeMapper;

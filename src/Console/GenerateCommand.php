@@ -21,11 +21,7 @@
 namespace PSX\Sql\Console;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Schema\Column;
-use Doctrine\DBAL\Schema\Table;
 use PSX\Sql\Generator;
-use PSX\Sql\TableInterface;
-use PSX\Sql\TypeMapper;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;

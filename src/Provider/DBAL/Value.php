@@ -20,9 +20,7 @@
 
 namespace PSX\Sql\Provider\DBAL;
 
-use Doctrine\DBAL\Connection;
 use PSX\Sql\Provider\ParameterResolver;
-use PSX\Sql\Provider\ProviderEntityInterface;
 use PSX\Sql\Provider\ProviderValueInterface;
 
 /**

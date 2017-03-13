@@ -22,8 +22,6 @@ namespace PSX\Sql\Tests\Table\Reader;
 
 use Doctrine\Common\Cache\ArrayCache;
 use PSX\Cache\Pool;
-use PSX\DateTime\DateTime;
-use PSX\Sql\Table;
 use PSX\Sql\Table\Reader\CachedReader;
 use PSX\Sql\Table\Reader\Schema;
 use PSX\Sql\TableInterface;
