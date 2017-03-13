@@ -124,4 +124,19 @@ interface TableInterface extends TableQueryInterface, TableManipulationInterface
      * @return boolean
      */
     public function hasColumn($column);
+
+    /**
+     * Start a transaction
+     */
+    public function beginTransaction();
+
+    /**
+     * Commit a transaction
+     */
+    public function commit();
+
+    /**
+     * Rollback a transaction
+     */
+    public function rollBack();
 }

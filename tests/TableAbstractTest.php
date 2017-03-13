@@ -128,4 +128,30 @@ class TableAbstractTest extends \PHPUnit_Extensions_Database_TestCase
         $this->assertTrue($this->getTable()->hasColumn('title'));
         $this->assertFalse($this->getTable()->hasColumn('foobar'));
     }
+
+    public function testTransaction()
+    {
+        $table = $this->getTable();
+
+        $this->assertEquals(4, $table->getCount());
+        
+        $table->beginTransaction();
+        $table->delete(['id' => 1]);
+        $table->commit();
+
+        $this->assertEquals(3, $table->getCount());
+    }
+
+    public function testTransactionRollback()
+    {
+        $table = $this->getTable();
+
+        $this->assertEquals(4, $table->getCount());
+
+        $table->beginTransaction();
+        $table->delete(['id' => 1]);
+        $table->rollback();
+
+        $this->assertEquals(4, $table->getCount());
+    }
 }
