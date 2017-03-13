@@ -31,16 +31,32 @@ use InvalidArgumentException;
  */
 trait ViewTrait
 {
+    /**
+     * @param string $tableName
+     * @return \PSX\Sql\TableInterface
+     */
     protected function getTable($tableName)
     {
         return $this->tableManager->getTable($tableName);
     }
 
+    /**
+     * @param array $definition
+     * @return mixed
+     */
     protected function build($definition)
     {
         return $this->builder->build($definition);
     }
 
+    /**
+     * @param mixed $source
+     * @param array $arguments
+     * @param array $definition
+     * @param string|null $key
+     * @param \Closure|null $filter
+     * @return \PSX\Sql\Provider\ProviderCollectionInterface
+     */
     protected function doCollection($source, array $arguments, array $definition, $key = null, \Closure $filter = null)
     {
         if (is_callable($source)) {
@@ -54,6 +70,12 @@ trait ViewTrait
         }
     }
 
+    /**
+     * @param mixed $source
+     * @param array $arguments
+     * @param array $definition
+     * @return \PSX\Sql\Provider\ProviderEntityInterface
+     */
     protected function doEntity($source, array $arguments, array $definition)
     {
         if (is_callable($source)) {
@@ -67,6 +89,12 @@ trait ViewTrait
         }
     }
 
+    /**
+     * @param mixed $source
+     * @param array $arguments
+     * @param mixed $definition
+     * @return \PSX\Sql\Provider\ProviderColumnInterface
+     */
     protected function doColumn($source, array $arguments, $definition)
     {
         if (is_callable($source)) {
@@ -80,6 +108,12 @@ trait ViewTrait
         }
     }
 
+    /**
+     * @param mixed $source
+     * @param array $arguments
+     * @param mixed $definition
+     * @return \PSX\Sql\Provider\ProviderValueInterface
+     */
     protected function doValue($source, array $arguments, $definition)
     {
         if (is_callable($source)) {
@@ -93,51 +127,94 @@ trait ViewTrait
         }
     }
 
+    /**
+     * @param string $value
+     * @return \PSX\Sql\Field\Boolean
+     */
     protected function fieldBoolean($value)
     {
         return new Field\Boolean($value);
     }
 
+    /**
+     * @param string $key
+     * @param \Closure $callback
+     * @return \PSX\Sql\Field\Callback
+     */
     protected function fieldCallback($key, \Closure $callback)
     {
         return new Field\Callback($key, $callback);
     }
 
+    /**
+     * @param string $key
+     * @param string $delimiter
+     * @return \PSX\Sql\Field\Csv
+     */
     protected function fieldCsv($key, $delimiter = ',')
     {
         return new Field\Csv($key, $delimiter);
     }
 
+    /**
+     * @param string $value
+     * @return \PSX\Sql\Field\DateTime
+     */
     protected function fieldDateTime($value)
     {
         return new Field\DateTime($value);
     }
 
+    /**
+     * @param string $value
+     * @return \PSX\Sql\Field\Integer
+     */
     protected function fieldInteger($value)
     {
         return new Field\Integer($value);
     }
 
+    /**
+     * @param string $value
+     * @return \PSX\Sql\Field\Json
+     */
     protected function fieldJson($value)
     {
         return new Field\Json($value);
     }
 
+    /**
+     * @param string $value
+     * @return \PSX\Sql\Field\Number
+     */
     protected function fieldNumber($value)
     {
         return new Field\Number($value);
     }
 
+    /**
+     * @param string $value
+     * @return \PSX\Sql\Field\Replace
+     */
     protected function fieldReplace($value)
     {
         return new Field\Replace($value);
     }
 
+    /**
+     * @param string $value
+     * @param integer $type
+     * @return \PSX\Sql\Field\Type
+     */
     protected function fieldType($value, $type)
     {
         return new Field\Type($value, $this->connection, $type);
     }
 
+    /**
+     * @param string $value
+     * @return \PSX\Sql\Field\Value
+     */
     protected function fieldValue($value)
     {
         return new Field\Value($value);
