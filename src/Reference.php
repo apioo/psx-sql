@@ -1,11 +1,21 @@
 <?php
 /*
- * This file is part of the PSX structor package.
+ * PSX is a open source PHP framework to develop RESTful APIs.
+ * For the current version and informations visit <http://phpsx.org>
  *
- * (c) Christoph Kappestein <christoph.kappestein@gmail.com>
+ * Copyright 2010-2017 Christoph Kappestein <christoph.kappestein@gmail.com>
  *
- * For the full copyright and license information, please view the LICENSE file 
- * that was distributed with this source code.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 namespace PSX\Sql;
@@ -13,7 +23,7 @@ namespace PSX\Sql;
 /**
  * Represents a reference to another value inside the context
  *
- * @author  Christoph Kappestein <k42b3.x@gmail.com>
+ * @author  Christoph Kappestein <christoph.kappestein@gmail.com>
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    http://phpsx.org
  */
