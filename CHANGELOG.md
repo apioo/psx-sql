@@ -1,4 +1,8 @@
 
+### 2.0.6 (2016-07-01)
+
+* Remove column alias for create, update and delete method
+
 ### 2.0.5 (2016-07-01)
 
 * Add newQueryBuilder method to simplify modifying the base query
