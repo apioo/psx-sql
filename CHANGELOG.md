@@ -1,4 +1,10 @@
 
+### 2.0.5 (2016-07-01)
+
+* Add newQueryBuilder method to simplify modifying the base query
+* Fix json unserialize using assoc false to distinct between empty array and 
+  objects
+
 ### 2.0.4 (2016-03-13)
 
 * CSV field handle empty values
