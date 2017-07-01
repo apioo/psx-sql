@@ -55,7 +55,7 @@ class TableCustomQueryTest extends \PHPUnit_Extensions_Database_TestCase
         "title": "bar",
         "createDate": "2016-03-01 00:00:00",
         "authorName": "Foo Bar",
-        "authorUri": "http:\/\/phpsx.org"
+        "uri": "http:\/\/phpsx.org"
     },
     {
         "id": "1",
@@ -63,7 +63,7 @@ class TableCustomQueryTest extends \PHPUnit_Extensions_Database_TestCase
         "title": "foo",
         "createDate": "2016-03-01 00:00:00",
         "authorName": "Foo Bar",
-        "authorUri": "http:\/\/phpsx.org"
+        "uri": "http:\/\/phpsx.org"
     }
 ]
 JSON;
@@ -77,5 +77,51 @@ JSON;
         $table   = $manager->getTable(TestTableCustomQuery::class);
 
         $this->assertEquals(2, $table->getCount());
+    }
+
+    public function testCreate()
+    {
+        $manager = new TableManager(getConnection());
+        $table   = $manager->getTable(TestTableCustomQuery::class);
+
+        $table->create([
+            'authorId'   => 1,
+            'title'      => 'foo',
+            'createDate' => new \DateTime('2016-03-01 00:00:00'),
+            'authorName' => 'foo',
+            'uri'        => 'foo',
+        ]);
+
+        $result = json_encode($table->getAll(), JSON_PRETTY_PRINT);
+        $expect = <<<JSON
+[
+    {
+        "id": "3",
+        "authorId": "1",
+        "title": "foo",
+        "createDate": "2016-03-01 00:00:00",
+        "authorName": "Foo Bar",
+        "uri": "http:\/\/phpsx.org"
+    },
+    {
+        "id": "2",
+        "authorId": "1",
+        "title": "bar",
+        "createDate": "2016-03-01 00:00:00",
+        "authorName": "Foo Bar",
+        "uri": "http:\/\/phpsx.org"
+    },
+    {
+        "id": "1",
+        "authorId": "1",
+        "title": "foo",
+        "createDate": "2016-03-01 00:00:00",
+        "authorName": "Foo Bar",
+        "uri": "http:\/\/phpsx.org"
+    }
+]
+JSON;
+
+        $this->assertJsonStringEqualsJsonString($expect, $result, $result);
     }
 }

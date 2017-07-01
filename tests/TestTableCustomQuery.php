@@ -45,7 +45,7 @@ class TestTableCustomQuery extends TableAbstract
             'news.title'                => TableInterface::TYPE_VARCHAR | 32,
             'news.createDate'           => TableInterface::TYPE_DATETIME,
             'author.name AS authorName' => TableInterface::TYPE_VARCHAR,
-            'author.uri AS authorUri'   => TableInterface::TYPE_VARCHAR,
+            'author.uri'                => TableInterface::TYPE_VARCHAR,
         );
     }
 
