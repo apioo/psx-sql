@@ -103,14 +103,43 @@ abstract class TableAbstract implements TableInterface
         return null;
     }
 
+    /**
+     * Returns a php type based on the serialized string representation
+     * 
+     * @param string $value
+     * @param integer $type
+     * @return mixed
+     */
     protected function unserializeType($value, $type)
     {
-        return $this->connection->convertToPHPValue(
-            $value,
-            TypeMapper::getDoctrineTypeByType($type)
-        );
+        if ($type === self::TYPE_JSON) {
+            // overwrite the doctrine json type since it uses the assoc
+            // parameter. This is a problem for empty objects since we cant
+            // distinguish between an empty array or object
+            if ($value === null) {
+                return null;
+            } elseif ($value === '') {
+                return new \stdClass();
+            } elseif (is_resource($value)) {
+                $value = stream_get_contents($value);
+            }
+
+            return json_decode($value);
+        } else {
+            return $this->connection->convertToPHPValue(
+                $value,
+                TypeMapper::getDoctrineTypeByType($type)
+            );
+        }
     }
 
+    /**
+     * Returns a string representation which can be stored in the database
+     * 
+     * @param mixed $value
+     * @param integer $type
+     * @return string
+     */
     protected function serializeType($value, $type)
     {
         return $this->connection->convertToDatabaseValue(
