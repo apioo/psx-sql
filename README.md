@@ -15,6 +15,13 @@ based on raw SQL queries.
 The following are basic examples how you can work with a table class
 
 ```php
+<?php
+
+use PSX\Sql\Condition;
+use PSX\Sql\Fields;
+use PSX\Sql\Sql;
+use PSX\Sql\TableManager;
+
 $connection   = null; // a doctrine DBAL connection
 $tableManager = new TableManager($connection);
 
@@ -81,6 +88,12 @@ $table->delete([
 The following is an example of a table class.
 
 ```php
+<?php
+
+namespace Acme\Table;
+
+use PSX\Sql\TableAbstract;
+use PSX\Sql\TableInterface;
 
 class AcmeTable extends TableAbstract
 {
@@ -98,7 +111,24 @@ class AcmeTable extends TableAbstract
             'date'   => TableInterface::TYPE_DATETIME,
         );
     }
+}
+```
 
+## Views
+
+It is also possible to build view classes which is not based on a specific 
+table. Instead you can build complex aggregated result sets.
+
+```php
+<?php
+
+namespace Acme\View;
+
+use PSX\Sql\Reference;
+use PSX\Sql\ViewAbstract;
+
+class AcmeView extends ViewAbstract
+{
     /**
      * Example howto build a nested result based on different tables. It 
      * contains also some field tranformations
@@ -124,7 +154,7 @@ class AcmeTable extends TableAbstract
             ])
         ];
 
-        return $this->build($definition));
+        return $this->build($definition);
     }
 }
 ```
