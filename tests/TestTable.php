@@ -20,7 +20,6 @@
 
 namespace PSX\Sql\Tests;
 
-use PSX\Sql\Reference;
 use PSX\Sql\TableAbstract;
 use PSX\Sql\TableInterface;
 

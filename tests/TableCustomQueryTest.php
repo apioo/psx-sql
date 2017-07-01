@@ -20,8 +20,6 @@
 
 namespace PSX\Sql\Tests;
 
-use PSX\Sql\Table;
-use PSX\Sql\TableInterface;
 use PSX\Sql\TableManager;
 
 /**
