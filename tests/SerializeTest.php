@@ -87,10 +87,9 @@ class SerializeTest extends \PHPUnit_Extensions_Database_TestCase
         $this->assertEquals($array, $row->col_array);
         $this->assertInstanceOf('stdClass', $row->col_object);
         $this->assertEquals($object, $row->col_object);
-        $this->assertInternalType('array', $row->col_json);
-        $this->assertEquals(['foo' => 'bar'], $row->col_json);
+        $this->assertInstanceOf('stdClass', $row->col_json);
+        $this->assertEquals($object, $row->col_json);
         $this->assertInternalType('string', $row->col_guid);
         $this->assertEquals('ebe865da-4982-4353-bc44-dcdf7239e386', $row->col_guid);
-
     }
 }

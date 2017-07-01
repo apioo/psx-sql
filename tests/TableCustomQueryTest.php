@@ -20,23 +20,22 @@
 
 namespace PSX\Sql\Tests;
 
-use Doctrine\DBAL\Connection;
-use PSX\Sql\Table\Reader;
+use PSX\Sql\Table;
 use PSX\Sql\TableInterface;
 use PSX\Sql\TableManager;
 
 /**
- * TableManagerTest
+ * TableCustomQueryTest
  *
  * @author  Christoph Kappestein <christoph.kappestein@gmail.com>
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    http://phpsx.org
  */
-class TableManagerTest extends \PHPUnit_Extensions_Database_TestCase
+class TableCustomQueryTest extends \PHPUnit_Extensions_Database_TestCase
 {
     public function getDataSet()
     {
-        return $this->createFlatXMLDataSet(__DIR__ . '/table_fixture.xml');
+        return $this->createFlatXMLDataSet(__DIR__ . '/provider_fixture.xml');
     }
 
     public function getConnection()
@@ -44,41 +43,41 @@ class TableManagerTest extends \PHPUnit_Extensions_Database_TestCase
         return $this->createDefaultDBConnection(getConnection()->getWrappedConnection(), '');
     }
 
-    public function testGetTable()
+    public function testGetAll()
     {
         $manager = new TableManager(getConnection());
+        $table   = $manager->getTable(TestTableCustomQuery::class);
 
-        $table = $manager->getTable(TestTable::class);
-
-        $this->assertInstanceOf(TableInterface::class, $table);
-        $this->assertEquals('psx_handler_comment', $table->getName());
-        $this->assertEquals(['id', 'userId', 'title', 'date'], array_keys($table->getColumns()));
-    }
-
-    public function testGetTableWithReader()
+        $result = json_encode($table->getAll(), JSON_PRETTY_PRINT);
+        $expect = <<<JSON
+[
     {
-        $manager = new TableManager(getConnection(), new Reader\Schema(getConnection()));
+        "id": "2",
+        "authorId": "1",
+        "title": "bar",
+        "createDate": "2016-03-01 00:00:00",
+        "authorName": "Foo Bar",
+        "authorUri": "http:\/\/phpsx.org"
+    },
+    {
+        "id": "1",
+        "authorId": "1",
+        "title": "foo",
+        "createDate": "2016-03-01 00:00:00",
+        "authorName": "Foo Bar",
+        "authorUri": "http:\/\/phpsx.org"
+    }
+]
+JSON;
 
-        $table = $manager->getTable('psx_handler_comment');
-
-        $this->assertInstanceOf(TableInterface::class, $table);
-        $this->assertEquals('psx_handler_comment', $table->getName());
-        $this->assertEquals(['id', 'userId', 'title', 'date'], array_keys($table->getColumns()));
+        $this->assertJsonStringEqualsJsonString($expect, $result, $result);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testGetTableInvalidTable()
+    public function testGetCount()
     {
         $manager = new TableManager(getConnection());
-        $manager->getTable('PSX\Sql\FooTable');
-    }
+        $table   = $manager->getTable(TestTableCustomQuery::class);
 
-    public function testGetConnection()
-    {
-        $manager = new TableManager(getConnection());
-
-        $this->assertInstanceOf(Connection::class, $manager->getConnection());
+        $this->assertEquals(2, $table->getCount());
     }
 }

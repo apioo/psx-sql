@@ -21,6 +21,7 @@
 namespace PSX\Sql;
 
 use BadMethodCallException;
+use Doctrine\DBAL\Query\QueryBuilder;
 use InvalidArgumentException;
 use PSX\Record\Record;
 
@@ -122,20 +123,12 @@ trait TableQueryTrait
      */
     public function getCount(Condition $condition = null)
     {
-        $builder = $this->connection->createQueryBuilder()
-            ->select($this->connection->getDatabasePlatform()->getCountExpression($this->getPrimaryKey()))
-            ->from($this->getName(), null);
+        list($sql, $parameters) = $this->getQueryCount(
+            $this->getName(),
+            $condition
+        );
 
-        if ($condition !== null && $condition->hasCondition()) {
-            $builder->where($condition->getExpression($this->connection->getDatabasePlatform()));
-
-            $values = $condition->getValues();
-            foreach ($values as $key => $value) {
-                $builder->setParameter($key, $value);
-            }
-        }
-
-        return (int) $this->connection->fetchColumn($builder->getSQL(), $builder->getParameters());
+        return (int) $this->connection->fetchColumn($sql, $parameters);
     }
 
     /**
@@ -197,8 +190,9 @@ trait TableQueryTrait
     }
 
     /**
-     * Builds the SQL query and returns the sql statment and parameters. Can be
-     * override to provide a more complex query
+     * Returns an array which contains as first value a SQL query and as second
+     * an array of parameters. Uses by default the dbal query builder to create
+     * the SQL query. The query is used for the default query methods
      *
      * @param string $table
      * @param array $fields
@@ -206,28 +200,35 @@ trait TableQueryTrait
      * @param integer $count
      * @param string $sortBy
      * @param string $sortOrder
-     * @param \PSX\Sql\Condition $condition
+     * @param \PSX\Sql\Condition|null $condition
      * @return array
      */
     protected function getQuery($table, array $fields, $startIndex, $count, $sortBy, $sortOrder, Condition $condition = null)
     {
-        $builder = $this->connection->createQueryBuilder()
+        $builder = $this->newQueryBuilder($table)
             ->select($fields)
-            ->from($table, null)
             ->orderBy($sortBy, $sortOrder == Sql::SORT_ASC ? 'ASC' : 'DESC')
             ->setFirstResult($startIndex)
             ->setMaxResults($count);
 
-        if ($condition !== null && $condition->hasCondition()) {
-            $builder->where($condition->getExpression($this->connection->getDatabasePlatform()));
+        return $this->convertBuilder($builder, $condition);
+    }
 
-            $values = $condition->getValues();
-            foreach ($values as $key => $value) {
-                $builder->setParameter($key, $value);
-            }
-        }
+    /**
+     * Returns an array which contains as first value a SQL query and as second
+     * an array of parameters. Uses by default the dbal query builder to create
+     * the SQL query. The query is used for the count method
+     * 
+     * @param string $table
+     * @param \PSX\Sql\Condition|null $condition
+     * @return array
+     */
+    protected function getQueryCount($table, Condition $condition = null)
+    {
+        $builder = $this->newQueryBuilder($table)
+            ->select($this->connection->getDatabasePlatform()->getCountExpression($this->getPrimaryKey()));
 
-        return [$builder->getSQL(), $builder->getParameters()];
+        return $this->convertBuilder($builder, $condition);
     }
 
     protected function project($sql, array $params = array(), array $columns = null)
@@ -254,11 +255,6 @@ trait TableQueryTrait
         return $result;
     }
 
-    protected function projectRow($sql, array $params = array(), array $columns = null)
-    {
-        return reset($this->project($sql, $params, $columns));
-    }
-
     protected function limit()
     {
         return 16;
@@ -272,5 +268,34 @@ trait TableQueryTrait
     protected function sortOrder()
     {
         return Sql::SORT_DESC;
+    }
+
+    /**
+     * @param string $table
+     * @return \Doctrine\DBAL\Query\QueryBuilder
+     */
+    protected function newQueryBuilder($table)
+    {
+        return $this->connection->createQueryBuilder()
+            ->from($table, null);
+    }
+
+    /**
+     * @param \Doctrine\DBAL\Query\QueryBuilder $builder
+     * @param \PSX\Sql\Condition|null $condition
+     * @return array
+     */
+    private function convertBuilder(QueryBuilder $builder, Condition $condition = null)
+    {
+        if ($condition !== null && $condition->hasCondition()) {
+            $builder->where($condition->getExpression($this->connection->getDatabasePlatform()));
+
+            $values = $condition->getValues();
+            foreach ($values as $key => $value) {
+                $builder->setParameter($key, $value);
+            }
+        }
+
+        return [$builder->getSQL(), $builder->getParameters()];
     }
 }
