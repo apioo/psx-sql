@@ -1,5 +1,5 @@
 
-### 2.0.7 (2016-11-02)
+### 2.1.0 (2016-11-02)
 
 * Add option to specify multiple conditions in condition constructor
 * Add arguments to finer control the getBy result set
