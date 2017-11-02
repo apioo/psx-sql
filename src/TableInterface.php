@@ -72,7 +72,7 @@ interface TableInterface extends TableQueryInterface, TableManipulationInterface
 
     /**
      * Returns the columns of the table where the key is the name of the column
-     * and the value contains OR connected informations. I.e.:
+     * and the value contains OR connected information. I.e.:
      * <code>
      * array(
      *  'id'    => self::TYPE_INT | 10 | self::PRIMARY_KEY,
