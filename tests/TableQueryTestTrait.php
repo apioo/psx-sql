@@ -519,6 +519,31 @@ trait TableQueryTestTrait
         $this->assertEquals($expect, $result);
     }
 
+    public function testGetByStartIndexCountOrder()
+    {
+        $table = $this->getTable();
+
+        if (!$table instanceof TableQueryInterface) {
+            $this->markTestSkipped('Table not a query interface');
+        }
+
+        $result = $table->getByUserId(1, null, 0, 1, 'id', Sql::SORT_ASC);
+
+        $this->assertEquals(true, is_array($result));
+        $this->assertEquals(1, count($result));
+
+        $expect = array(
+            new Record('comment', array(
+                'id' => 1,
+                'userId' => 1,
+                'title' => 'foo',
+                'date' => new \DateTime('2013-04-29 16:56:32'),
+            )),
+        );
+
+        $this->assertEquals($expect, $result);
+    }
+
     public function testGetOneBy()
     {
         $table = $this->getTable();

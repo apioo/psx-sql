@@ -86,11 +86,15 @@ trait TableQueryTrait
     /**
      * @param Condition $condition
      * @param Fields|null $fields
-     * @return \PSX\Record\Record[]
+     * @param integer $startIndex
+     * @param integer $count
+     * @param string $sortBy
+     * @param integer $sortOrder
+     * @return Record[]
      */
-    public function getBy(Condition $condition, Fields $fields = null)
+    public function getBy(Condition $condition, Fields $fields = null, $startIndex = null, $count = null, $sortBy = null, $sortOrder = null)
     {
-        return $this->getAll(null, null, null, null, $condition, $fields);
+        return $this->getAll($startIndex, $count, $sortBy, $sortOrder, $condition, $fields);
     }
 
     /**
@@ -183,7 +187,12 @@ trait TableQueryTrait
                 throw new InvalidArgumentException('Value required');
             }
 
-            return $this->getBy($condition, $field);
+            $startIndex = isset($arguments[2]) ? $arguments[2] : null;
+            $count      = isset($arguments[3]) ? $arguments[3] : null;
+            $sortBy     = isset($arguments[4]) ? $arguments[4] : null;
+            $sortOrder  = isset($arguments[5]) ? $arguments[5] : null;
+
+            return $this->getBy($condition, $field, $startIndex, $count, $sortBy, $sortOrder);
         } else {
             throw new BadMethodCallException('Undefined method ' . $method);
         }
