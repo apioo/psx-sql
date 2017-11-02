@@ -1,4 +1,9 @@
 
+### 2.0.7 (2016-11-02)
+
+* Add option to specify multiple conditions in condition constructor
+* Add arguments to finer control the getBy result set
+
 ### 2.0.6 (2016-07-01)
 
 * Remove column alias for create, update and delete method
