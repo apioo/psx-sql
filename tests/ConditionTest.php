@@ -45,6 +45,29 @@ class ConditionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('1'), $con->getValues());
     }
 
+    public function testConditionConstructor()
+    {
+        $con = new Condition(['id', '=', '1', 'OR'], ['id', '=', '2']);
+
+        $this->assertEquals('WHERE (id = ? OR id = ?)', $con->getStatment());
+        $this->assertEquals(array('1', '2'), $con->getValues());
+
+
+        $con = new Condition(['id', '=', '1', 'OR'], new Condition\Raw('(1 = 1 OR 2 = 2)'));
+
+        $this->assertEquals('WHERE (id = ? OR (1 = 1 OR 2 = 2))', $con->getStatment());
+        $this->assertEquals(array('1'), $con->getValues());
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Condition argument must be either an array or PSX\Sql\Condition\ExpressionInterface
+     */
+    public function testConditionConstructorException()
+    {
+        new Condition('foo');
+    }
+
     public function testConditionMultiple()
     {
         $con = new Condition(array('id', '=', '1', 'OR'));

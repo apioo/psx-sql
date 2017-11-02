@@ -42,19 +42,21 @@ class Condition extends ExpressionAbstract implements Countable
     protected $expressions = array();
     protected $isInverse   = false;
 
-    public function __construct(array $condition = array())
+    public function __construct(...$conditions)
     {
-        if (count($condition) >= 3) {
-            if (isset($condition[3])) {
-                $this->add($condition[0], $condition[1], $condition[2], $condition[3]);
+        foreach ($conditions as $condition) {
+            if (is_array($condition)) {
+                $this->add(...$condition);
+            } elseif ($condition instanceof ExpressionInterface) {
+                $this->addExpression($condition);
             } else {
-                $this->add($condition[0], $condition[1], $condition[2]);
+                throw new \InvalidArgumentException('Condition argument must be either an array or PSX\Sql\Condition\ExpressionInterface');
             }
         }
     }
 
     /**
-     * Adds an condition and tries to detect the type of the condition based on
+     * Adds a condition and tries to detect the type of the condition based on
      * the provided values. It is recommended to use an explicit method
      *
      * @param string $column
