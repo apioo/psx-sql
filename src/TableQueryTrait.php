@@ -90,7 +90,7 @@ trait TableQueryTrait
      * @param integer $count
      * @param string $sortBy
      * @param integer $sortOrder
-     * @return Record[]
+     * @return \PSX\Record\Record[]
      */
     public function getBy(Condition $condition, Fields $fields = null, $startIndex = null, $count = null, $sortBy = null, $sortOrder = null)
     {
