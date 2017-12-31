@@ -46,10 +46,13 @@ abstract class ViewAbstract
      */
     private $builder;
 
+    /**
+     * @param \PSX\Sql\TableManager $tableManager
+     */
     public function __construct(TableManager $tableManager)
     {
         $this->connection   = $tableManager->getConnection();
         $this->tableManager = $tableManager;
-        $this->builder      = new Builder();
+        $this->builder      = new Builder($this->connection);
     }
 }

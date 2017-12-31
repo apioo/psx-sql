@@ -1,33 +1,37 @@
 
-### 2.1.0 (2016-11-02)
+### 2.1.1
+
+* Move ViewAbstract methods to Builder class
+
+### 2.1.0 (2017-11-02)
 
 * Add option to specify multiple conditions in condition constructor
 * Add arguments to finer control the getBy result set
 
-### 2.0.6 (2016-07-01)
+### 2.0.6 (2017-07-01)
 
 * Remove column alias for create, update and delete method
 
-### 2.0.5 (2016-07-01)
+### 2.0.5 (2017-07-01)
 
 * Add newQueryBuilder method to simplify modifying the base query
 * Fix json unserialize using assoc false to distinct between empty array and 
   objects
 
-### 2.0.4 (2016-03-13)
+### 2.0.4 (2017-03-13)
 
 * CSV field handle empty values
 * Add ViewAbstract
 
-### 2.0.3 (2016-03-12)
+### 2.0.3 (2017-03-12)
 
 * Datetime field render as UTC
 
-### 2.0.2 (2016-03-05)
+### 2.0.2 (2017-03-05)
 
 * Add column provider
 
-### 2.0.1 (2016-03-05)
+### 2.0.1 (2017-03-05)
 
 * Moved field factory methods to separate trait
 * Add CSV field

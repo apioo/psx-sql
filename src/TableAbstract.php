@@ -48,11 +48,14 @@ abstract class TableAbstract implements TableInterface
      */
     private $builder;
 
+    /**
+     * @param \PSX\Sql\TableManager $tableManager
+     */
     public function __construct(TableManager $tableManager)
     {
         $this->connection   = $tableManager->getConnection();
         $this->tableManager = $tableManager;
-        $this->builder      = new Builder();
+        $this->builder      = new Builder($this->connection);
     }
 
     public function getDisplayName()
@@ -90,6 +93,10 @@ abstract class TableAbstract implements TableInterface
         $this->connection->rollBack();
     }
 
+    /**
+     * @param integer $searchAttr
+     * @return string|null
+     */
     protected function getFirstColumnWithAttr($searchAttr)
     {
         $columns = $this->getColumns();

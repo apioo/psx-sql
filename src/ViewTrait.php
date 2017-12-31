@@ -20,8 +20,6 @@
 
 namespace PSX\Sql;
 
-use InvalidArgumentException;
-
 /**
  * ViewTrait
  *
@@ -59,15 +57,7 @@ trait ViewTrait
      */
     protected function doCollection($source, array $arguments, array $definition, $key = null, \Closure $filter = null)
     {
-        if (is_callable($source)) {
-            return new Provider\Callback\Collection($source, $arguments, $definition, $key, $filter);
-        } elseif (is_string($source)) {
-            return new Provider\DBAL\Collection($this->connection, $source, $arguments, $definition, $key, $filter);
-        } elseif (is_array($source)) {
-            return new Provider\Map\Collection($source, $definition, $key, $filter);
-        } else {
-            throw new InvalidArgumentException('Source must be either a callable, string or array');
-        }
+        return $this->builder->doCollection($source, $arguments, $definition, $key, $filter);
     }
 
     /**
@@ -78,15 +68,7 @@ trait ViewTrait
      */
     protected function doEntity($source, array $arguments, array $definition)
     {
-        if (is_callable($source)) {
-            return new Provider\Callback\Entity($source, $arguments, $definition);
-        } elseif (is_string($source)) {
-            return new Provider\DBAL\Entity($this->connection, $source, $arguments, $definition);
-        } elseif (is_array($source)) {
-            return new Provider\Map\Entity($source, $definition);
-        } else {
-            throw new InvalidArgumentException('Source must be either a callable, string or array');
-        }
+        return $this->builder->doEntity($source, $arguments, $definition);
     }
 
     /**
@@ -97,15 +79,7 @@ trait ViewTrait
      */
     protected function doColumn($source, array $arguments, $definition)
     {
-        if (is_callable($source)) {
-            return new Provider\Callback\Column($source, $arguments, $definition);
-        } elseif (is_string($source)) {
-            return new Provider\DBAL\Column($this->connection, $source, $arguments, $definition);
-        } elseif (is_array($source)) {
-            return new Provider\Map\Column($source, $definition);
-        } else {
-            throw new InvalidArgumentException('Source must be either a callable, string or array');
-        }
+        return $this->builder->doColumn($source, $arguments, $definition);
     }
 
     /**
@@ -116,15 +90,7 @@ trait ViewTrait
      */
     protected function doValue($source, array $arguments, $definition)
     {
-        if (is_callable($source)) {
-            return new Provider\Callback\Value($source, $arguments, $definition);
-        } elseif (is_string($source)) {
-            return new Provider\DBAL\Value($this->connection, $source, $arguments, $definition);
-        } elseif (is_array($source)) {
-            return new Provider\Map\Value($source, $definition);
-        } else {
-            throw new InvalidArgumentException('Source must be either a callable, string or array');
-        }
+        return $this->builder->doValue($source, $arguments, $definition);
     }
 
     /**
@@ -133,7 +99,7 @@ trait ViewTrait
      */
     protected function fieldBoolean($value)
     {
-        return new Field\Boolean($value);
+        return $this->builder->fieldBoolean($value);
     }
 
     /**
@@ -143,7 +109,7 @@ trait ViewTrait
      */
     protected function fieldCallback($key, \Closure $callback)
     {
-        return new Field\Callback($key, $callback);
+        return $this->builder->fieldCallback($key, $callback);
     }
 
     /**
@@ -153,7 +119,7 @@ trait ViewTrait
      */
     protected function fieldCsv($key, $delimiter = ',')
     {
-        return new Field\Csv($key, $delimiter);
+        return $this->builder->fieldCsv($key, $delimiter);
     }
 
     /**
@@ -162,7 +128,7 @@ trait ViewTrait
      */
     protected function fieldDateTime($value)
     {
-        return new Field\DateTime($value);
+        return $this->builder->fieldDateTime($value);
     }
 
     /**
@@ -171,7 +137,7 @@ trait ViewTrait
      */
     protected function fieldInteger($value)
     {
-        return new Field\Integer($value);
+        return $this->builder->fieldInteger($value);
     }
 
     /**
@@ -180,7 +146,7 @@ trait ViewTrait
      */
     protected function fieldJson($value)
     {
-        return new Field\Json($value);
+        return $this->builder->fieldJson($value);
     }
 
     /**
@@ -189,7 +155,7 @@ trait ViewTrait
      */
     protected function fieldNumber($value)
     {
-        return new Field\Number($value);
+        return $this->builder->fieldNumber($value);
     }
 
     /**
@@ -198,7 +164,7 @@ trait ViewTrait
      */
     protected function fieldReplace($value)
     {
-        return new Field\Replace($value);
+        return $this->builder->fieldReplace($value);
     }
 
     /**
@@ -208,7 +174,7 @@ trait ViewTrait
      */
     protected function fieldType($value, $type)
     {
-        return new Field\Type($value, $this->connection, $type);
+        return $this->builder->fieldType($value, $type);
     }
 
     /**
@@ -217,6 +183,6 @@ trait ViewTrait
      */
     protected function fieldValue($value)
     {
-        return new Field\Value($value);
+        return $this->builder->fieldValue($value);
     }
 }

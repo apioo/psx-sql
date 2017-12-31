@@ -20,12 +20,14 @@
 
 namespace PSX\Sql;
 
+use Doctrine\DBAL\Connection;
 use PSX\Record\Record;
 use PSX\Sql\Provider\ProviderCollectionInterface;
 use PSX\Sql\Provider\ProviderColumnInterface;
 use PSX\Sql\Provider\ProviderEntityInterface;
 use PSX\Sql\Provider\ProviderValueInterface;
 use RuntimeException;
+use InvalidArgumentException;
 
 /**
  * The build method resolves the definition through calling every provider and 
@@ -38,11 +40,25 @@ use RuntimeException;
 class Builder
 {
     /**
+     * @var \Doctrine\DBAL\Connection
+     */
+    protected $connection;
+
+    /**
+     * @param \Doctrine\DBAL\Connection|null $connection
+     */
+    public function __construct(Connection $connection = null)
+    {
+        $this->connection = $connection;
+    }
+
+    /**
      * Returns an array based on the resolved definition
      *
      * @param mixed $definition
      * @param array $context
-     * @return array
+     * @param string $name
+     * @return mixed
      */
     public function build($definition, $context = null, $name = null)
     {
@@ -75,6 +91,182 @@ class Builder
         }
     }
 
+    /**
+     * @param mixed $source
+     * @param array $arguments
+     * @param array $definition
+     * @param string|null $key
+     * @param \Closure|null $filter
+     * @return \PSX\Sql\Provider\ProviderCollectionInterface
+     */
+    public function doCollection($source, array $arguments, array $definition, $key = null, \Closure $filter = null)
+    {
+        if (is_callable($source)) {
+            return new Provider\Callback\Collection($source, $arguments, $definition, $key, $filter);
+        } elseif (is_string($source)) {
+            return new Provider\DBAL\Collection($this->connection, $source, $arguments, $definition, $key, $filter);
+        } elseif (is_array($source)) {
+            return new Provider\Map\Collection($source, $definition, $key, $filter);
+        } else {
+            throw new InvalidArgumentException('Source must be either a callable, string or array');
+        }
+    }
+
+    /**
+     * @param mixed $source
+     * @param array $arguments
+     * @param array $definition
+     * @return \PSX\Sql\Provider\ProviderEntityInterface
+     */
+    public function doEntity($source, array $arguments, array $definition)
+    {
+        if (is_callable($source)) {
+            return new Provider\Callback\Entity($source, $arguments, $definition);
+        } elseif (is_string($source)) {
+            return new Provider\DBAL\Entity($this->connection, $source, $arguments, $definition);
+        } elseif (is_array($source)) {
+            return new Provider\Map\Entity($source, $definition);
+        } else {
+            throw new InvalidArgumentException('Source must be either a callable, string or array');
+        }
+    }
+
+    /**
+     * @param mixed $source
+     * @param array $arguments
+     * @param mixed $definition
+     * @return \PSX\Sql\Provider\ProviderColumnInterface
+     */
+    public function doColumn($source, array $arguments, $definition)
+    {
+        if (is_callable($source)) {
+            return new Provider\Callback\Column($source, $arguments, $definition);
+        } elseif (is_string($source)) {
+            return new Provider\DBAL\Column($this->connection, $source, $arguments, $definition);
+        } elseif (is_array($source)) {
+            return new Provider\Map\Column($source, $definition);
+        } else {
+            throw new InvalidArgumentException('Source must be either a callable, string or array');
+        }
+    }
+
+    /**
+     * @param mixed $source
+     * @param array $arguments
+     * @param mixed $definition
+     * @return \PSX\Sql\Provider\ProviderValueInterface
+     */
+    public function doValue($source, array $arguments, $definition)
+    {
+        if (is_callable($source)) {
+            return new Provider\Callback\Value($source, $arguments, $definition);
+        } elseif (is_string($source)) {
+            return new Provider\DBAL\Value($this->connection, $source, $arguments, $definition);
+        } elseif (is_array($source)) {
+            return new Provider\Map\Value($source, $definition);
+        } else {
+            throw new InvalidArgumentException('Source must be either a callable, string or array');
+        }
+    }
+
+    /**
+     * @param string $value
+     * @return \PSX\Sql\Field\Boolean
+     */
+    public function fieldBoolean($value)
+    {
+        return new Field\Boolean($value);
+    }
+
+    /**
+     * @param string $key
+     * @param \Closure $callback
+     * @return \PSX\Sql\Field\Callback
+     */
+    public function fieldCallback($key, \Closure $callback)
+    {
+        return new Field\Callback($key, $callback);
+    }
+
+    /**
+     * @param string $key
+     * @param string $delimiter
+     * @return \PSX\Sql\Field\Csv
+     */
+    public function fieldCsv($key, $delimiter = ',')
+    {
+        return new Field\Csv($key, $delimiter);
+    }
+
+    /**
+     * @param string $value
+     * @return \PSX\Sql\Field\DateTime
+     */
+    public function fieldDateTime($value)
+    {
+        return new Field\DateTime($value);
+    }
+
+    /**
+     * @param string $value
+     * @return \PSX\Sql\Field\Integer
+     */
+    public function fieldInteger($value)
+    {
+        return new Field\Integer($value);
+    }
+
+    /**
+     * @param string $value
+     * @return \PSX\Sql\Field\Json
+     */
+    public function fieldJson($value)
+    {
+        return new Field\Json($value);
+    }
+
+    /**
+     * @param string $value
+     * @return \PSX\Sql\Field\Number
+     */
+    public function fieldNumber($value)
+    {
+        return new Field\Number($value);
+    }
+
+    /**
+     * @param string $value
+     * @return \PSX\Sql\Field\Replace
+     */
+    public function fieldReplace($value)
+    {
+        return new Field\Replace($value);
+    }
+
+    /**
+     * @param string $value
+     * @param integer $type
+     * @return \PSX\Sql\Field\Type
+     */
+    public function fieldType($value, $type)
+    {
+        return new Field\Type($value, $this->connection, $type);
+    }
+
+    /**
+     * @param string $value
+     * @return \PSX\Sql\Field\Value
+     */
+    public function fieldValue($value)
+    {
+        return new Field\Value($value);
+    }
+
+    /**
+     * @param \PSX\Sql\ProviderInterface $provider
+     * @param array|\ArrayAccess|null $context
+     * @return array|mixed|null
+     */
     protected function getProviderValue(ProviderInterface $provider, $context = null)
     {
         $data       = $provider->getResult($context);
