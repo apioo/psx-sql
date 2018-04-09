@@ -1,5 +1,9 @@
 
-### 2.1.1
+### 2.1.2 (2017-04-09)
+
+* Add symfony 4.0 support
+
+### 2.1.1 (2017-12-31)
 
 * Move ViewAbstract methods to Builder class
 
