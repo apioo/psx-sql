@@ -143,4 +143,42 @@ JSON;
 
         $this->assertEquals(Record::fromArray($definition), $result);
     }
+
+    public function testBuildFieldWithNullValue()
+    {
+        $news = [[
+            'id' => 1,
+            'title' => 'foo',
+        ],[
+            'id' => 2,
+            'title' => null,
+        ]];
+
+        $definition = [
+            'entries' => new Map\Collection($news, [
+                'id' => 'id',
+                'title' => 'title'
+            ])
+        ];
+
+        $expect = <<<JSON
+{
+    "entries": [
+        {
+            "id": 1,
+            "title": "foo"
+        },
+        {
+            "id": 2
+        }
+    ]
+}
+JSON;
+
+        $builder = new Builder();
+        $result  = json_encode($builder->build($definition), JSON_PRETTY_PRINT);
+
+        $this->assertJsonStringEqualsJsonString($expect, $result, $result);
+    }
+
 }
