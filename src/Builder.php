@@ -78,10 +78,20 @@ class Builder
             );
         } elseif (is_string($definition)) {
             if ($context !== null) {
-                if (isset($context[$definition])) {
-                    return $context[$definition];
+                if (is_array($context)) {
+                    if (array_key_exists($definition, $context)) {
+                        return $context[$definition];
+                    } else {
+                        throw new RuntimeException('Referenced unknown key "' . $definition . '" in context');
+                    }
+                } elseif ($context instanceof \ArrayAccess) {
+                    if ($context->offsetExists($definition)) {
+                        return $context->offsetGet($definition);
+                    } else {
+                        throw new RuntimeException('Referenced unknown key "' . $definition . '" in context');
+                    }
                 } else {
-                    throw new RuntimeException('Referenced unknown key "' . $definition . '" in context');
+                    throw new RuntimeException('Context must be either an array or instance of ArrayAccess');
                 }
             } else {
                 return $definition;
