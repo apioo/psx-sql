@@ -1,10 +1,7 @@
 
-### 2.1.3 (2017-07-11)
+### 2.1.2 (2018-07-11)
 
 * Improved handling with null values
-
-### 2.1.2 (2017-04-09)
-
 * Add symfony 4.0 support
 
 ### 2.1.1 (2017-12-31)
