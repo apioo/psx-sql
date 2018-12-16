@@ -1,4 +1,8 @@
 
+### 2.1.3 (2018-12-15)
+
+* Upgrade PHPUnit to 6.0
+
 ### 2.1.2 (2018-07-11)
 
 * Improved handling with null values
