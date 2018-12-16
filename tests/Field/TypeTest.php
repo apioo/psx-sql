@@ -22,6 +22,7 @@ namespace PSX\Sql\Tests\Field;
 
 use PSX\Sql\Field\Type;
 use PSX\Sql\TableInterface;
+use PSX\Sql\Tests\TableTestCase;
 
 /**
  * TypeTest
@@ -30,18 +31,8 @@ use PSX\Sql\TableInterface;
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    http://phpsx.org
  */
-class TypeTest extends \PHPUnit_Extensions_Database_TestCase
+class TypeTest extends TableTestCase
 {
-    public function getDataSet()
-    {
-        return $this->createFlatXMLDataSet(__DIR__ . '/../table_fixture.xml');
-    }
-
-    public function getConnection()
-    {
-        return $this->createDefaultDBConnection(getConnection()->getWrappedConnection(), '');
-    }
-
     public function testTransform()
     {
         $field = new Type('foo', getConnection(), TableInterface::TYPE_JSON);

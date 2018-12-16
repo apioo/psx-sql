@@ -30,15 +30,10 @@ use PSX\Sql\TableManager;
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    http://phpsx.org
  */
-class TableAbstractTest extends \PHPUnit_Extensions_Database_TestCase
+class TableAbstractTest extends TableTestCase
 {
     use TableQueryTestTrait;
     use TableManipulationTestTrait;
-
-    /**
-     * @var \Doctrine\DBAL\Connection
-     */
-    protected $connection;
 
     /**
      * @var \PSX\Sql\TableManagerInterface
@@ -49,18 +44,7 @@ class TableAbstractTest extends \PHPUnit_Extensions_Database_TestCase
     {
         parent::setUp();
 
-        $this->connection = getConnection();
-        $this->manager    = new TableManager($this->connection);
-    }
-
-    public function getDataSet()
-    {
-        return $this->createFlatXMLDataSet(__DIR__ . '/table_fixture.xml');
-    }
-
-    public function getConnection()
-    {
-        return $this->createDefaultDBConnection(getConnection()->getWrappedConnection(), '');
+        $this->manager = new TableManager($this->connection);
     }
 
     /**

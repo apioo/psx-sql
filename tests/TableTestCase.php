@@ -20,35 +20,34 @@
 
 namespace PSX\Sql\Tests;
 
-use PSX\Framework\Test\DbTestCase;
-use PSX\Framework\Test\Environment;
+use PHPUnit\Framework\TestCase;
+use PSX\Sql\Test\DatabaseTestCaseTrait;
 
 /**
- * DoctrineTestCase
+ * TableTestCase
  *
  * @author  Christoph Kappestein <christoph.kappestein@gmail.com>
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    http://phpsx.org
  */
-abstract class DoctrineTestCase extends DbTestCase
+abstract class TableTestCase extends TestCase
 {
-    private static $em;
+    use DatabaseTestCaseTrait;
 
-    public function setUp()
+    protected function setUp()
     {
-        if (!class_exists('Doctrine\ORM\EntityManager')) {
-            $this->markTestSkipped('Doctrine not installed');
-        }
-
         parent::setUp();
+
+        $this->setUpFixture();
     }
 
-    protected function getEntityManager()
+    public function getDataSet()
     {
-        if (self::$em === null) {
-            self::$em = Environment::getService('entity_manager');
-        }
+        return include __DIR__ . '/table_fixture.php';
+    }
 
-        return self::$em;
+    public function getConnection()
+    {
+        return getConnection();
     }
 }

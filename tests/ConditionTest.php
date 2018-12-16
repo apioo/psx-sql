@@ -20,6 +20,7 @@
 
 namespace PSX\Sql\Tests;
 
+use PHPUnit\Framework\TestCase;
 use PSX\Sql\Condition;
 
 /**
@@ -29,7 +30,7 @@ use PSX\Sql\Condition;
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    http://phpsx.org
  */
-class ConditionTest extends \PHPUnit_Framework_TestCase
+class ConditionTest extends TestCase
 {
     public function testCondition()
     {

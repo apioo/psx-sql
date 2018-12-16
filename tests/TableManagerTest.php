@@ -21,9 +21,11 @@
 namespace PSX\Sql\Tests;
 
 use Doctrine\DBAL\Connection;
+use PHPUnit\Framework\TestCase;
 use PSX\Sql\Table\Reader;
 use PSX\Sql\TableInterface;
 use PSX\Sql\TableManager;
+use PSX\Sql\Test\DatabaseTestCaseTrait;
 
 /**
  * TableManagerTest
@@ -32,18 +34,8 @@ use PSX\Sql\TableManager;
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    http://phpsx.org
  */
-class TableManagerTest extends \PHPUnit_Extensions_Database_TestCase
+class TableManagerTest extends TableTestCase
 {
-    public function getDataSet()
-    {
-        return $this->createFlatXMLDataSet(__DIR__ . '/table_fixture.xml');
-    }
-
-    public function getConnection()
-    {
-        return $this->createDefaultDBConnection(getConnection()->getWrappedConnection(), '');
-    }
-
     public function testGetTable()
     {
         $manager = new TableManager(getConnection());

@@ -20,6 +20,8 @@
 
 namespace PSX\Sql\Tests;
 
+use Doctrine\DBAL\Logging\SQLLogger;
+use PHPUnit\Framework\TestCase;
 use PSX\Sql\Logger;
 
 /**
@@ -29,7 +31,7 @@ use PSX\Sql\Logger;
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    http://phpsx.org
  */
-class LoggerTest extends \PHPUnit_Framework_TestCase
+class LoggerTest extends TestCase
 {
     public function testStartQuery()
     {
@@ -44,12 +46,16 @@ class LoggerTest extends \PHPUnit_Framework_TestCase
 
         $logger = new Logger($psrLogger);
         $logger->startQuery('SELECT PI()', array('bar' => 'foo', 'foo' => str_repeat('x', 34), 'bin' => "\xFF\xFF"));
+
+        $this->assertInstanceOf(SQLLogger::class, $logger);
     }
 
     public function testStopQuery()
     {
         $logger = new Logger($this->getLogger());
         $logger->stopQuery();
+
+        $this->assertInstanceOf(SQLLogger::class, $logger);
     }
 
     protected function getLogger()

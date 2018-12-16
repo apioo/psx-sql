@@ -22,6 +22,7 @@ namespace PSX\Sql\Tests\Table\Reader;
 
 use PSX\Sql\Table\Reader\Schema;
 use PSX\Sql\TableInterface;
+use PSX\Sql\Tests\TableTestCase;
 
 /**
  * SchemaTest
@@ -30,18 +31,8 @@ use PSX\Sql\TableInterface;
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    http://phpsx.org
  */
-class SchemaTest extends \PHPUnit_Extensions_Database_TestCase
+class SchemaTest extends TableTestCase
 {
-    public function getDataSet()
-    {
-        return $this->createFlatXMLDataSet(__DIR__ . '/../../table_fixture.xml');
-    }
-
-    public function getConnection()
-    {
-        return $this->createDefaultDBConnection(getConnection()->getWrappedConnection(), '');
-    }
-
     public function testGetTableDefinition()
     {
         $reader = new Schema(getConnection());

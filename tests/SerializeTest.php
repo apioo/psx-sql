@@ -29,18 +29,8 @@ use PSX\Sql\TableManager;
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    http://phpsx.org
  */
-class SerializeTest extends \PHPUnit_Extensions_Database_TestCase
+class SerializeTest extends TableTestCase
 {
-    public function getDataSet()
-    {
-        return $this->createFlatXMLDataSet(__DIR__ . '/table_fixture.xml');
-    }
-
-    public function getConnection()
-    {
-        return $this->createDefaultDBConnection(getConnection()->getWrappedConnection(), '');
-    }
-
     public function testSerialize()
     {
         $tableManager = new TableManager(getConnection());

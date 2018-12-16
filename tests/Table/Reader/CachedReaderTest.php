@@ -25,6 +25,7 @@ use PSX\Cache\Pool;
 use PSX\Sql\Table\Reader\CachedReader;
 use PSX\Sql\Table\Reader\Schema;
 use PSX\Sql\TableInterface;
+use PSX\Sql\Tests\TableTestCase;
 
 /**
  * CachedReaderTest
@@ -33,18 +34,8 @@ use PSX\Sql\TableInterface;
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    http://phpsx.org
  */
-class CachedReaderTest extends \PHPUnit_Extensions_Database_TestCase
+class CachedReaderTest extends TableTestCase
 {
-    public function getDataSet()
-    {
-        return $this->createFlatXMLDataSet(__DIR__ . '/../../table_fixture.xml');
-    }
-
-    public function getConnection()
-    {
-        return $this->createDefaultDBConnection(getConnection()->getWrappedConnection(), '');
-    }
-
     public function testGetTableDefinition()
     {
         $cache  = new Pool(new ArrayCache());

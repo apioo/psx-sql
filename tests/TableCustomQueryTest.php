@@ -20,7 +20,9 @@
 
 namespace PSX\Sql\Tests;
 
+use PHPUnit\Framework\TestCase;
 use PSX\Sql\TableManager;
+use PSX\Sql\Test\Fixture;
 
 /**
  * TableCustomQueryTest
@@ -29,16 +31,26 @@ use PSX\Sql\TableManager;
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    http://phpsx.org
  */
-class TableCustomQueryTest extends \PHPUnit_Extensions_Database_TestCase
+class TableCustomQueryTest extends TestCase
 {
-    public function getDataSet()
+    /**
+     * @var \Doctrine\DBAL\Connection
+     */
+    protected $connection;
+
+    protected function setUp()
     {
-        return $this->createFlatXMLDataSet(__DIR__ . '/provider_fixture.xml');
+        parent::setUp();
+
+        $this->connection = getConnection();
+
+        Fixture::truncate($this->connection);
+        Fixture::insert($this->connection, $this->getDataSet());
     }
 
-    public function getConnection()
+    public function getDataSet()
     {
-        return $this->createDefaultDBConnection(getConnection()->getWrappedConnection(), '');
+        return include __DIR__ . '/provider_fixture.php';
     }
 
     public function testGetAll()

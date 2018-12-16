@@ -20,6 +20,7 @@
 
 namespace PSX\Sql\Tests\Table;
 
+use PHPUnit\Framework\TestCase;
 use PSX\Sql\Table\ColumnAllocation;
 
 /**
@@ -29,7 +30,7 @@ use PSX\Sql\Table\ColumnAllocation;
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    http://phpsx.org
  */
-class ColumnAllocationTest extends \PHPUnit_Framework_TestCase
+class ColumnAllocationTest extends TestCase
 {
     public function testAllocation()
     {

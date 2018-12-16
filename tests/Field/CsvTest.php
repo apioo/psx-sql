@@ -20,6 +20,7 @@
 
 namespace PSX\Sql\Tests\Field;
 
+use PHPUnit\Framework\TestCase;
 use PSX\Sql\Field\Csv;
 
 /**
@@ -29,7 +30,7 @@ use PSX\Sql\Field\Csv;
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    http://phpsx.org
  */
-class CsvTest extends \PHPUnit_Framework_TestCase
+class CsvTest extends TestCase
 {
     public function testTransform()
     {

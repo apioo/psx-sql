@@ -20,6 +20,7 @@
 
 namespace PSX\Sql\Tests;
 
+use PHPUnit\Framework\TestCase;
 use PSX\Record\Record;
 use PSX\Sql\Builder;
 use PSX\Sql\Field;
@@ -32,7 +33,7 @@ use PSX\Sql\Provider\Map;
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    http://phpsx.org
  */
-class BuilderTest extends \PHPUnit_Framework_TestCase
+class BuilderTest extends TestCase
 {
     public function testBuild()
     {

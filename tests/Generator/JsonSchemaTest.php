@@ -21,6 +21,7 @@
 namespace PSX\Sql\Tests\Generator;
 
 use PSX\Sql\Generator;
+use PSX\Sql\Tests\TableTestCase;
 
 /**
  * JsonSchemaTest
@@ -29,18 +30,8 @@ use PSX\Sql\Generator;
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    http://phpsx.org
  */
-class JsonSchemaTest extends \PHPUnit_Extensions_Database_TestCase
+class JsonSchemaTest extends TableTestCase
 {
-    public function getDataSet()
-    {
-        return $this->createFlatXMLDataSet(__DIR__ . '/../table_fixture.xml');
-    }
-
-    public function getConnection()
-    {
-        return $this->createDefaultDBConnection(getConnection()->getWrappedConnection(), '');
-    }
-
     public function testGenerate()
     {
         $table = getConnection()

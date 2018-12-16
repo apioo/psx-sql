@@ -20,6 +20,7 @@
 
 namespace PSX\Sql\Tests\Field;
 
+use PHPUnit\Framework\TestCase;
 use PSX\Sql\Field\Replace;
 
 /**
@@ -29,7 +30,7 @@ use PSX\Sql\Field\Replace;
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    http://phpsx.org
  */
-class ReplaceTest extends \PHPUnit_Framework_TestCase
+class ReplaceTest extends TestCase
 {
     public function testTransform()
     {

@@ -29,13 +29,8 @@ use PSX\Sql\TableManager;
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    http://phpsx.org
  */
-class ViewAbstractTest extends \PHPUnit_Extensions_Database_TestCase
+class ViewAbstractTest extends TableTestCase
 {
-    /**
-     * @var \Doctrine\DBAL\Connection
-     */
-    protected $connection;
-
     /**
      * @var \PSX\Sql\TableManagerInterface
      */
@@ -44,19 +39,8 @@ class ViewAbstractTest extends \PHPUnit_Extensions_Database_TestCase
     protected function setUp()
     {
         parent::setUp();
-
-        $this->connection = getConnection();
-        $this->manager    = new TableManager($this->connection);
-    }
-
-    public function getDataSet()
-    {
-        return $this->createFlatXMLDataSet(__DIR__ . '/table_fixture.xml');
-    }
-
-    public function getConnection()
-    {
-        return $this->createDefaultDBConnection(getConnection()->getWrappedConnection(), '');
+        
+        $this->manager = new TableManager($this->connection);
     }
 
     /**

@@ -20,6 +20,7 @@
 
 namespace PSX\Sql\Tests\Field;
 
+use PHPUnit\Framework\TestCase;
 use PSX\Sql\Field\Value;
 
 /**
@@ -29,7 +30,7 @@ use PSX\Sql\Field\Value;
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    http://phpsx.org
  */
-class ValueTest extends \PHPUnit_Framework_TestCase
+class ValueTest extends TestCase
 {
     public function testTransform()
     {

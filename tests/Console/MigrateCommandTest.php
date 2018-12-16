@@ -22,6 +22,7 @@ namespace PSX\Sql\Tests\Console;
 
 use PSX\Sql\Console\MigrateCommand;
 use PSX\Sql\TableManager;
+use PSX\Sql\Tests\TableTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
 /**
@@ -31,18 +32,8 @@ use Symfony\Component\Console\Tester\CommandTester;
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    http://phpsx.org
  */
-class MigrateCommandTest extends \PHPUnit_Extensions_Database_TestCase
+class MigrateCommandTest extends TableTestCase
 {
-    public function getDataSet()
-    {
-        return $this->createFlatXMLDataSet(__DIR__ . '/../table_fixture.xml');
-    }
-
-    public function getConnection()
-    {
-        return $this->createDefaultDBConnection(getConnection()->getWrappedConnection(), '');
-    }
-
     public function testCommand()
     {
         $connection = getConnection();

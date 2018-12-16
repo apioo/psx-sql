@@ -21,6 +21,7 @@
 namespace PSX\Sql\Tests;
 
 use Doctrine\DBAL\Types\Type;
+use PHPUnit\Framework\TestCase;
 use PSX\Sql\TableInterface;
 use PSX\Sql\TypeMapper;
 
@@ -31,7 +32,7 @@ use PSX\Sql\TypeMapper;
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    http://phpsx.org
  */
-class TypeMapperTest extends \PHPUnit_Framework_TestCase
+class TypeMapperTest extends TestCase
 {
     protected $types = array(
         TableInterface::TYPE_SMALLINT => Type::SMALLINT,

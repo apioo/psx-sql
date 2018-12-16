@@ -21,6 +21,8 @@
 namespace PSX\Sql\Tests\Console;
 
 use PSX\Sql\Console\GenerateCommand;
+use PSX\Sql\TableManager;
+use PSX\Sql\Tests\TableTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
 /**
@@ -30,16 +32,18 @@ use Symfony\Component\Console\Tester\CommandTester;
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    http://phpsx.org
  */
-class GenerateCommandTest extends \PHPUnit_Extensions_Database_TestCase
+class GenerateCommandTest extends TableTestCase
 {
-    public function getDataSet()
-    {
-        return $this->createFlatXMLDataSet(__DIR__ . '/../table_fixture.xml');
-    }
+    /**
+     * @var \PSX\Sql\TableManagerInterface
+     */
+    protected $manager;
 
-    public function getConnection()
+    protected function setUp()
     {
-        return $this->createDefaultDBConnection(getConnection()->getWrappedConnection(), '');
+        parent::setUp();
+
+        $this->manager = new TableManager($this->connection);
     }
 
     public function testCommandPhp()

@@ -20,7 +20,9 @@
 
 namespace PSX\Sql\Tests;
 
+use PHPUnit\Framework\TestCase;
 use PSX\Sql\Builder;
+use PSX\Sql\Test\DatabaseTestCaseTrait;
 
 /**
  * ProviderTestCase
@@ -29,28 +31,25 @@ use PSX\Sql\Builder;
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    http://phpsx.org
  */
-abstract class ProviderTestCase extends \PHPUnit_Extensions_Database_TestCase
+abstract class ProviderTestCase extends TestCase
 {
-    /**
-     * @var \Doctrine\DBAL\Connection
-     */
-    protected $connection;
+    use DatabaseTestCaseTrait;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->connection = getConnection();
+        $this->setUpFixture();
     }
 
     public function getDataSet()
     {
-        return $this->createFlatXMLDataSet(__DIR__ . '/provider_fixture.xml');
+        return include __DIR__ . '/provider_fixture.php';
     }
 
     public function getConnection()
     {
-        return $this->createDefaultDBConnection(getConnection()->getWrappedConnection(), '');
+        return getConnection();
     }
 
     public function testBuild()
