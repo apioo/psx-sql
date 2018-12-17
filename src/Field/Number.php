@@ -31,6 +31,10 @@ class Number extends TransformFieldAbstract
 {
     protected function transform($value)
     {
+        if ($value === null) {
+            return null;
+        }
+
         return (float) $value;
     }
 }

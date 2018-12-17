@@ -31,6 +31,10 @@ class Json extends TransformFieldAbstract
 {
     protected function transform($value)
     {
+        if ($value === null) {
+            return null;
+        }
+
         return json_decode($value);
     }
 }
