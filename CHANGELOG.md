@@ -1,4 +1,8 @@
 
+### 2.1.4 (2018-12-17)
+
+* Field handle null values
+
 ### 2.1.3 (2018-12-15)
 
 * Upgrade PHPUnit to 6.0
