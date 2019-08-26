@@ -61,6 +61,6 @@ class MigrateCommandTest extends TableTestCase
         $schema   = $connection->getSchemaManager()->createSchema();
         $newTable = $schema->getTable('psx_table_command_test');
 
-        $this->assertEquals($oldTable, $newTable);
+        $this->assertEquals($oldTable->getColumns(), $newTable->getColumns());
     }
 }
