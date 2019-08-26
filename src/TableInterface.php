@@ -48,7 +48,7 @@ interface TableInterface extends TableQueryInterface, TableManipulationInterface
     const TYPE_DATE       = 0x700000;
     const TYPE_DATETIME   = 0x800000;
     const TYPE_TIME       = 0x900000;
-    const TYPE_INTERVAL   = 0x2000000;
+    const TYPE_INTERVAL   = 0x4000000;
 
     // string
     const TYPE_VARCHAR    = 0xA00000;
