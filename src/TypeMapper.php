@@ -41,6 +41,7 @@ class TypeMapper
         TableInterface::TYPE_FLOAT    => Type::FLOAT,
         TableInterface::TYPE_DATE     => Type::DATE,
         TableInterface::TYPE_DATETIME => Type::DATETIME,
+        TableInterface::TYPE_INTERVAL => Type::DATEINTERVAL,
         TableInterface::TYPE_TIME     => Type::TIME,
         TableInterface::TYPE_VARCHAR  => Type::STRING,
         TableInterface::TYPE_TEXT     => Type::TEXT,
