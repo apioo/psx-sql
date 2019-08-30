@@ -52,6 +52,11 @@ class Fixture
             foreach ($tables as $table) {
                 $connection->executeQuery('TRUNCATE ' . $table . ' RESTART IDENTITY CASCADE');
             }
+        } elseif ($platform instanceof Platforms\SqlitePlatform) {
+            foreach ($tables as $table) {
+                $connection->executeQuery('DELETE FROM ' . $table . ' WHERE 1=1');
+                $connection->executeQuery('DELETE FROM sqlite_sequence WHERE name="' . $table . '"');
+            }
         } else {
             // for all other platforms we simply try to delete all data using
             // standard SQL ignoring potential foreign key problems
