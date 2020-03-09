@@ -80,6 +80,8 @@ class MigrateCommand extends Command
         }
 
         $output->writeln('Migrated table ' . $table->getName() . ' successful');
+
+        return 0;
     }
 
     protected function createTable(Schema $schema, TableInterface $source)

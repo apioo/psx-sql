@@ -83,5 +83,7 @@ class GenerateCommand extends Command
         }
 
         $output->write($response);
+
+        return 0;
     }
 }
