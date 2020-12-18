@@ -30,10 +30,12 @@ namespace PSX\Sql;
 interface TableManagerInterface
 {
     /**
-     * Returns an table
+     * Returns a table
      *
      * @param string $tableName
-     * @return \PSX\Sql\TableInterface
+     * @template T of \PSX\Sql\TableInterface
+     * @psalm-param class-string<T> $tableName
+     * @return T
      */
-    public function getTable($tableName);
+    public function getTable(string $tableName): TableInterface;
 }

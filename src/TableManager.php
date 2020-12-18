@@ -36,14 +36,17 @@ class TableManager implements TableManagerInterface
     /**
      * @var \Doctrine\DBAL\Connection
      */
-    protected $connection;
+    private $connection;
 
     /**
      * @var \PSX\Sql\Table\ReaderInterface
      */
-    protected $reader;
+    private $reader;
 
-    protected $_container;
+    /**
+     * @var array
+     */
+    private $container;
 
     /**
      * @param \Doctrine\DBAL\Connection $connection
@@ -58,38 +61,37 @@ class TableManager implements TableManagerInterface
     /**
      * @return \Doctrine\DBAL\Connection
      */
-    public function getConnection()
+    public function getConnection(): Connection
     {
         return $this->connection;
     }
 
     /**
-     * @param string $tableName
-     * @return \PSX\Sql\TableInterface
+     * @inheritDoc
      */
-    public function getTable($tableName)
+    public function getTable(string $tableName): TableInterface
     {
-        if (isset($this->_container[$tableName])) {
-            return $this->_container[$tableName];
+        if (isset($this->container[$tableName])) {
+            return $this->container[$tableName];
         } else {
             if ($this->reader === null) {
                 // we assume that $tableName is a class name of a
                 // TableInterface implementation
                 if (class_exists($tableName)) {
-                    $this->_container[$tableName] = new $tableName($this);
+                    $this->container[$tableName] = new $tableName($this);
                 } else {
                     throw new InvalidArgumentException('Table must be a class implementing the PSX\Sql\TableInterface');
                 }
             } else {
                 $definition = $this->reader->getTableDefinition($tableName);
 
-                $this->_container[$tableName] = new Table($this,
+                $this->container[$tableName] = new Table($this,
                     $definition->getName(),
                     $definition->getColumns()
                 );
             }
         }
 
-        return $this->_container[$tableName];
+        return $this->container[$tableName];
     }
 }
