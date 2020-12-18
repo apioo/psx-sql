@@ -65,7 +65,7 @@ class Condition extends ExpressionAbstract implements Countable
      * @param string $conjunction
      * @return \PSX\Sql\Condition
      */
-    public function add($column, $operator, $value, $conjunction = 'AND')
+    public function add(string $column, string $operator, $value, $conjunction = 'AND'): self
     {
         if (!in_array($operator, self::$arithmeticOperator)) {
             throw new InvalidArgumentException('Invalid arithmetic operator (allowed: ' . implode(', ', self::$arithmeticOperator) . ')');
@@ -96,7 +96,7 @@ class Condition extends ExpressionAbstract implements Countable
      * @param string $conjunction
      * @return \PSX\Sql\Condition
      */
-    public function equals($column, $value, $conjunction = 'AND')
+    public function equals(string $column, $value, $conjunction = 'AND'): self
     {
         return $this->addExpression(new Condition\Basic($column, '=', $value, $conjunction));
     }
@@ -109,7 +109,7 @@ class Condition extends ExpressionAbstract implements Countable
      * @param string $conjunction
      * @return \PSX\Sql\Condition
      */
-    public function notEquals($column, $value, $conjunction = 'AND')
+    public function notEquals(string $column, $value, $conjunction = 'AND'): self
     {
         return $this->addExpression(new Condition\Basic($column, '!=', $value, $conjunction));
     }
@@ -122,7 +122,7 @@ class Condition extends ExpressionAbstract implements Countable
      * @param string $conjunction
      * @return \PSX\Sql\Condition
      */
-    public function greater($column, $value, $conjunction = 'AND')
+    public function greater(string $column, $value, $conjunction = 'AND'): self
     {
         return $this->addExpression(new Condition\Basic($column, '>', $value, $conjunction));
     }
@@ -135,7 +135,7 @@ class Condition extends ExpressionAbstract implements Countable
      * @param string $conjunction
      * @return \PSX\Sql\Condition
      */
-    public function greaterThen($column, $value, $conjunction = 'AND')
+    public function greaterThen(string $column, $value, $conjunction = 'AND'): self
     {
         return $this->addExpression(new Condition\Basic($column, '>=', $value, $conjunction));
     }
@@ -148,7 +148,7 @@ class Condition extends ExpressionAbstract implements Countable
      * @param string $conjunction
      * @return \PSX\Sql\Condition
      */
-    public function lower($column, $value, $conjunction = 'AND')
+    public function lower(string $column, $value, $conjunction = 'AND'): self
     {
         return $this->addExpression(new Condition\Basic($column, '<', $value, $conjunction));
     }
@@ -161,7 +161,7 @@ class Condition extends ExpressionAbstract implements Countable
      * @param string $conjunction
      * @return \PSX\Sql\Condition
      */
-    public function lowerThen($column, $value, $conjunction = 'AND')
+    public function lowerThen(string $column, $value, $conjunction = 'AND'): self
     {
         return $this->addExpression(new Condition\Basic($column, '<=', $value, $conjunction));
     }
@@ -174,7 +174,7 @@ class Condition extends ExpressionAbstract implements Countable
      * @param string $conjunction
      * @return \PSX\Sql\Condition
      */
-    public function like($column, $value, $conjunction = 'AND')
+    public function like(string $column, $value, $conjunction = 'AND'): self
     {
         return $this->addExpression(new Condition\Basic($column, 'LIKE', $value, $conjunction));
     }
@@ -187,7 +187,7 @@ class Condition extends ExpressionAbstract implements Countable
      * @param string $conjunction
      * @return \PSX\Sql\Condition
      */
-    public function notLike($column, $value, $conjunction = 'AND')
+    public function notLike(string $column, $value, $conjunction = 'AND'): self
     {
         return $this->addExpression(new Condition\Basic($column, 'NOT LIKE', $value, $conjunction));
     }
@@ -201,7 +201,7 @@ class Condition extends ExpressionAbstract implements Countable
      * @param string $conjunction
      * @return \PSX\Sql\Condition
      */
-    public function between($column, $left, $right, $conjunction = 'AND')
+    public function between(string $column, $left, $right, $conjunction = 'AND'): self
     {
         return $this->addExpression(new Condition\Between($column, $left, $right, $conjunction));
     }
@@ -214,7 +214,7 @@ class Condition extends ExpressionAbstract implements Countable
      * @param string $conjunction
      * @return \PSX\Sql\Condition
      */
-    public function in($column, array $values, $conjunction = 'AND')
+    public function in(string $column, array $values, $conjunction = 'AND'): self
     {
         return $this->addExpression(new Condition\In($column, $values, $conjunction));
     }
@@ -226,7 +226,7 @@ class Condition extends ExpressionAbstract implements Countable
      * @param string $conjunction
      * @return \PSX\Sql\Condition
      */
-    public function nil($column, $conjunction = 'AND')
+    public function nil(string $column, $conjunction = 'AND'): self
     {
         return $this->addExpression(new Condition\Nil($column, $conjunction));
     }
@@ -238,7 +238,7 @@ class Condition extends ExpressionAbstract implements Countable
      * @param string $conjunction
      * @return \PSX\Sql\Condition
      */
-    public function notNil($column, $conjunction = 'AND')
+    public function notNil(string $column, $conjunction = 'AND'): self
     {
         return $this->addExpression(new Condition\NotNil($column, $conjunction));
     }
@@ -251,7 +251,7 @@ class Condition extends ExpressionAbstract implements Countable
      * @param string $conjunction
      * @return \PSX\Sql\Condition
      */
-    public function raw($statment, array $values = array(), $conjunction = 'AND')
+    public function raw(string $statment, array $values = array(), $conjunction = 'AND'): self
     {
         return $this->addExpression(new Condition\Raw($statment, $values, $conjunction));
     }
@@ -264,7 +264,7 @@ class Condition extends ExpressionAbstract implements Countable
      * @param string $conjunction
      * @return \PSX\Sql\Condition
      */
-    public function regexp($column, $regexp, $conjunction = 'AND')
+    public function regexp(string $column, string $regexp, $conjunction = 'AND'): self
     {
         return $this->addExpression(new Condition\Regexp($column, $regexp, $conjunction));
     }
@@ -275,7 +275,7 @@ class Condition extends ExpressionAbstract implements Countable
      * @param \PSX\Sql\Condition\ExpressionInterface $expr
      * @return \PSX\Sql\Condition
      */
-    public function addExpression(ExpressionInterface $expr)
+    public function addExpression(ExpressionInterface $expr): self
     {
         $this->expressions[] = $expr;
 
@@ -288,7 +288,7 @@ class Condition extends ExpressionAbstract implements Countable
      * @param boolean $isInverse
      * @return \PSX\Sql\Condition
      */
-    public function setInverse($isInverse)
+    public function setInverse(bool $isInverse): self
     {
         $this->isInverse = $isInverse;
 
@@ -300,7 +300,7 @@ class Condition extends ExpressionAbstract implements Countable
      *
      * @return integer
      */
-    public function count()
+    public function count(): int
     {
         return count($this->expressions);
     }
@@ -311,7 +311,7 @@ class Condition extends ExpressionAbstract implements Countable
      * @param \PSX\Sql\Condition $condition
      * @return \PSX\Sql\Condition
      */
-    public function merge(Condition $condition)
+    public function merge(Condition $condition): self
     {
         $this->expressions = array_merge($this->expressions, $condition->toArray());
 
@@ -340,7 +340,7 @@ class Condition extends ExpressionAbstract implements Countable
      *
      * @param string $column
      */
-    public function remove($column)
+    public function remove(string $column): void
     {
         foreach ($this->expressions as $key => $expr) {
             if ($expr->getColumn() == $column) {
@@ -354,9 +354,9 @@ class Condition extends ExpressionAbstract implements Countable
      *
      * @return void
      */
-    public function removeAll()
+    public function removeAll(): void
     {
-        $this->expressions = array();
+        $this->expressions = [];
     }
 
     /**
@@ -364,7 +364,7 @@ class Condition extends ExpressionAbstract implements Countable
      *
      * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         return $this->expressions;
     }
@@ -374,7 +374,7 @@ class Condition extends ExpressionAbstract implements Countable
      *
      * @return boolean
      */
-    public function hasCondition()
+    public function hasCondition(): bool
     {
         return count($this->expressions) > 0;
     }
@@ -383,7 +383,7 @@ class Condition extends ExpressionAbstract implements Countable
      * @param \Doctrine\DBAL\Platforms\AbstractPlatform $platform
      * @return string
      */
-    public function getStatment(AbstractPlatform $platform = null)
+    public function getStatment(AbstractPlatform $platform = null): string
     {
         if ($platform === null) {
             $platform = new MySqlPlatform();
@@ -398,7 +398,7 @@ class Condition extends ExpressionAbstract implements Countable
      * @param \Doctrine\DBAL\Platforms\AbstractPlatform $platform
      * @return string
      */
-    public function getExpression(AbstractPlatform $platform)
+    public function getExpression(AbstractPlatform $platform): string
     {
         $len = count($this->expressions);
         $con = '';
@@ -423,9 +423,9 @@ class Condition extends ExpressionAbstract implements Countable
      *
      * @return array
      */
-    public function getValues()
+    public function getValues(): array
     {
-        $params = array();
+        $params = [];
         foreach ($this->expressions as $expr) {
             $values = $expr->getValues();
             foreach ($values as $value) {
@@ -440,9 +440,9 @@ class Condition extends ExpressionAbstract implements Countable
         return $params;
     }
 
-    public function getArray()
+    public function getArray(): array
     {
-        $result = array();
+        $result = [];
         foreach ($this->expressions as $expr) {
             if ($expr instanceof Condition\In) {
                 $result[$expr->getColumn()] = $expr->getValues();
@@ -456,7 +456,7 @@ class Condition extends ExpressionAbstract implements Countable
         return $result;
     }
 
-    public static function fromCriteria(array $criteria)
+    public static function fromCriteria(array $criteria): self
     {
         $condition = new self();
 
