@@ -322,9 +322,9 @@ class Condition extends ExpressionAbstract implements Countable
      * Returns an expression by the column name or null
      *
      * @param string $column
-     * @return \PSX\Sql\Condition\ExpressionInterface
+     * @return \PSX\Sql\Condition\ExpressionInterface|null
      */
-    public function get($column)
+    public function get(string $column): ?ExpressionInterface
     {
         foreach ($this->expressions as $expr) {
             if ($expr->getColumn() == $column) {
