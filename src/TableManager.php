@@ -69,7 +69,7 @@ class TableManager implements TableManagerInterface
     /**
      * @inheritDoc
      */
-    public function getTable(string $tableName): TableInterface
+    public function getTable(string $tableName)
     {
         if (isset($this->container[$tableName])) {
             return $this->container[$tableName];

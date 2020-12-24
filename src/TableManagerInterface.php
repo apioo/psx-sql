@@ -33,9 +33,9 @@ interface TableManagerInterface
      * Returns a table
      *
      * @param string $tableName
-     * @template T of \PSX\Sql\TableInterface
+     * @template T
      * @psalm-param class-string<T> $tableName
      * @return T
      */
-    public function getTable(string $tableName): TableInterface;
+    public function getTable(string $tableName);
 }
