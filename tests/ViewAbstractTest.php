@@ -36,7 +36,7 @@ class ViewAbstractTest extends TableTestCase
      */
     protected $manager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         

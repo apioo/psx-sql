@@ -34,7 +34,7 @@ abstract class TableTestCase extends TestCase
 {
     use DatabaseTestCaseTrait;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
