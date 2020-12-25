@@ -66,7 +66,7 @@ trait TableManipulationTrait
         if (!empty($fields)) {
             $pk = $this->getPrimaryKey();
 
-            if (isset($fields[$pk])) {
+            if ($pk !== null && isset($fields[$pk])) {
                 $condition = [$pk => $fields[$pk]];
             } else {
                 throw new RuntimeException('No primary key set');
@@ -89,7 +89,7 @@ trait TableManipulationTrait
         if (!empty($fields)) {
             $pk = $this->getPrimaryKey();
 
-            if (isset($fields[$pk])) {
+            if ($pk !== null && isset($fields[$pk])) {
                 $condition = [$pk => $fields[$pk]];
             } else {
                 throw new RuntimeException('No primary key set');
