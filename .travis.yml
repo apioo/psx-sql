@@ -11,6 +11,7 @@ install:
 before_script:
   - if [ $DB = 'mysql' ]; then mysql -e 'create database psx;'; fi;
 script:
+  - vendor/bin/psalm
   - vendor/bin/phpunit
 env:
   - DB=mysql
