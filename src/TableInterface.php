@@ -98,7 +98,7 @@ interface TableInterface extends TableQueryInterface, TableManipulationInterface
      * N: Whether the column can be NULL
      * U: Whether the value is unsigned
      *
-     * @return array
+     * @return array<string, int>
      */
     public function getColumns();
 
@@ -114,7 +114,7 @@ interface TableInterface extends TableQueryInterface, TableManipulationInterface
     /**
      * Returns the name of the primary key column
      *
-     * @return string
+     * @return string|null
      */
     public function getPrimaryKey();
 

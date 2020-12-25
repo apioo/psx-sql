@@ -37,7 +37,7 @@ class Entity extends DBALAbstract implements ProviderEntityInterface
         $parameters = ParameterResolver::resolve($this->parameters, $context);
         $types      = self::getTypes($parameters);
 
-        return $this->connection->fetchAssoc(
+        return (array) $this->connection->fetchAssoc(
             $this->sql,
             $parameters,
             $types

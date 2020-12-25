@@ -70,7 +70,7 @@ trait TableQueryTrait
             $sortBy = $this->getPrimaryKey();
         }
 
-        list($sql, $parameters) = $this->getQuery(
+        [$sql, $parameters] = $this->getQuery(
             $this->getName(), 
             $columns, 
             $startIndex, 
@@ -127,7 +127,7 @@ trait TableQueryTrait
      */
     public function getCount(Condition $condition = null)
     {
-        list($sql, $parameters) = $this->getQueryCount(
+        [$sql, $parameters] = $this->getQueryCount(
             $this->getName(),
             $condition
         );
@@ -167,7 +167,7 @@ trait TableQueryTrait
         if (substr($method, 0, 8) == 'getOneBy') {
             $column = lcfirst(substr($method, 8));
             $value  = isset($arguments[0]) ? $arguments[0] : null;
-            $field  = isset($arguments[1]) ? $arguments[1] : null;
+            $fields = isset($arguments[1]) ? $arguments[1] : null;
 
             if (!empty($value)) {
                 $condition = new Condition(array($column, '=', $value));
@@ -175,16 +175,24 @@ trait TableQueryTrait
                 throw new InvalidArgumentException('Value required');
             }
 
-            return $this->getOneBy($condition, $field);
+            if ($fields !== null && !$fields instanceof Fields) {
+                throw new InvalidArgumentException('Invalid fields provided must be an instance of Fields');
+            }
+
+            return $this->getOneBy($condition, $fields);
         } elseif (substr($method, 0, 5) == 'getBy') {
             $column = lcfirst(substr($method, 5));
             $value  = isset($arguments[0]) ? $arguments[0] : null;
-            $field  = isset($arguments[1]) ? $arguments[1] : null;
+            $fields = isset($arguments[1]) ? $arguments[1] : null;
 
             if (!empty($value)) {
                 $condition = new Condition(array($column, '=', $value));
             } else {
                 throw new InvalidArgumentException('Value required');
+            }
+
+            if ($fields !== null && !$fields instanceof Fields) {
+                throw new InvalidArgumentException('Invalid fields provided must be an instance of Fields');
             }
 
             $startIndex = isset($arguments[2]) ? $arguments[2] : null;
@@ -192,7 +200,7 @@ trait TableQueryTrait
             $sortBy     = isset($arguments[4]) ? $arguments[4] : null;
             $sortOrder  = isset($arguments[5]) ? $arguments[5] : null;
 
-            return $this->getBy($condition, $field, $startIndex, $count, $sortBy, $sortOrder);
+            return $this->getBy($condition, $fields, $startIndex, $count, $sortBy, $sortOrder);
         } else {
             throw new BadMethodCallException('Undefined method ' . $method);
         }
