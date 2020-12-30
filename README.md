@@ -3,12 +3,16 @@ PSX Sql
 
 ## About
 
-The SQL library helps to manage data from relational databases. It is designed 
-to build complex API responses from SQL queries. It has a simple table concept 
-where a table class represents a table on your database. The table knows about
-the available columns of the table thus it can provide basic CRUD operations.
-The strength of this library is the ability to build complex JSON responses 
-based on raw SQL queries.
+In traditional ORMs you write a class add specific metadata and generate based on this class your tables, this means our
+source code defines how a table should look. This library thinks the other way around (database first), this means you
+first build your database schema i.e. through a tool like doctrine migrations and then you can use this library to
+automatically generate all repository and model classes based on the table schema. This has the great advantage that we
+can generate completely typed repositories. We automatically generate a class for each row (entity) and a repository
+which accepts this row. This concept is not new and the Java world has i.e. jOOQ which also follows this idea. It of
+course means also that you need to regenerate your classes if you change your schema.
+
+## Generation
+
 
 ## Basic usage
 
