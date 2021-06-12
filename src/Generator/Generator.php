@@ -32,6 +32,8 @@ use PSX\DateTime\Date;
 use PSX\DateTime\DateTime;
 use PSX\DateTime\Time;
 use PSX\Sql\TableAbstract;
+use PSX\Sql\TableInterface;
+use PSX\Sql\TypeMapper;
 
 /**
  * @author  Christoph Kappestein <christoph.kappestein@gmail.com>
@@ -87,7 +89,7 @@ class Generator
                 $tableName = substr($tableName, strlen($this->prefix));
             }
 
-            $modelClassName = $this->normalizeName($tableName);
+            $modelClassName = $this->normalizeName($tableName) . 'Row';
             $repositoryClassName = $this->normalizeName($tableName) . 'Table';
 
             $class = $this->generateModel($modelClassName, $table);
@@ -101,16 +103,20 @@ class Generator
     private function generateModel(string $className, Table $table)
     {
         $class = $this->factory->class($className);
+        $class->implement('\\JsonSerializable');
 
+        $serialize = [];
         $columns = $table->getColumns();
         foreach ($columns as $column) {
             $name = lcfirst($this->normalizeName($column->getName()));
             $type = $this->getTypeForColumn($column);
-            
+
+            $serialize[$name] = $name;
+
             // property
             $prop = $this->factory->property($name);
-            $prop->makeProtected();
-            $prop->setDocComment($this->buildComment(['var' => $type !== null ? $type . '|null' : 'mixed']));
+            $prop->makePrivate();
+            $prop->setType($type !== null ? '?' . $type : 'mixed');
             $class->addStmt($prop);
 
             // setter
@@ -122,7 +128,6 @@ class Generator
             $setter = $this->factory->method('set' . ucfirst($name));
             $setter->setReturnType('void');
             $setter->makePublic();
-            $setter->setDocComment($this->buildComment(['param' => ($type !== null ? $type . '|null' : 'mixed') . ' $' . $name]));
             $setter->addParam($param);
             $setter->addStmt(new Node\Expr\Assign(
                 new Node\Expr\PropertyFetch(new Node\Expr\Variable('this'), $name),
@@ -138,14 +143,48 @@ class Generator
                 $setter->setReturnType('void');
             }
             $getter->makePublic();
-            $getter->setDocComment($this->buildComment(['return' => $type !== null ? $type . '|null' : 'mixed']));
             $getter->addStmt(new Node\Stmt\Return_(
                 new Node\Expr\PropertyFetch(new Node\Expr\Variable('this'), $name)
             ));
             $class->addStmt($getter);
         }
 
+        $this->buildJsonSerialize($class, $serialize);
+
         return $class;
+    }
+
+
+    private function buildJsonSerialize(\PhpParser\Builder\Class_ $class, array $properties)
+    {
+        if (empty($properties)) {
+            return;
+        }
+
+        $items = [];
+        foreach ($properties as $name => $key) {
+            $items[] = new Node\Expr\ArrayItem(new Node\Expr\PropertyFetch(new Node\Expr\Variable('this'), $name), new Node\Scalar\String_($key));
+        }
+
+        $closure = new Node\Expr\Closure([
+            'static' => true,
+            'params' => [new Node\Expr\Variable('value')],
+            'returnType' => 'bool',
+            'stmts' => [
+                new Node\Stmt\Return_(new Node\Expr\BinaryOp\NotIdentical(new Node\Expr\Variable('value'), new Node\Expr\ConstFetch(new Node\Name('null'))))
+            ],
+        ]);
+
+        $filter = new Node\Expr\FuncCall(new Node\Name('array_filter'), [
+            new Node\Arg(new Node\Expr\Array_($items)),
+            new Node\Arg($closure)
+        ]);
+
+        $serialize = $this->factory->method('jsonSerialize');
+        $serialize->makePublic();
+        $serialize->addStmt(new Node\Stmt\Return_(new Node\Expr\Cast\Object_($filter)));
+
+        $class->addStmt($serialize);
     }
 
     private function generateRepository(string $className, string $modelClassName, Table $table)
@@ -157,7 +196,7 @@ class Generator
 
         // constants
         foreach ($columns as $column) {
-            $constName = strtoupper($column->getName());
+            $constName = 'COLUMN_' . strtoupper($column->getName());
             $class->addStmt(new Node\Stmt\ClassConst([new Node\Const_($constName, new Node\Scalar\String_($column->getName()))], Class_::MODIFIER_PUBLIC));
         }
 
@@ -170,9 +209,9 @@ class Generator
         // get columns method
         $items = [];
         foreach ($columns as $column) {
-            $columnType = 0; // @TODO get column type
+            $columnType = $this->getType($column);
 
-            $constName = strtoupper($column->getName());
+            $constName = 'COLUMN_' . strtoupper($column->getName());
             $items[] = new Node\Expr\ArrayItem(
                 new Node\Scalar\LNumber($columnType, ['kind' => Node\Scalar\LNumber::KIND_HEX]),
                 new Node\Expr\ClassConstFetch(new Node\Name('self'), $constName)
@@ -241,7 +280,7 @@ class Generator
         $type = $column->getType();
 
         if ($type instanceof Types\ArrayType) {
-            return null;
+            return 'array';
         } elseif ($type instanceof Types\BigIntType) {
             return 'int';
         } elseif ($type instanceof Types\BinaryType) {
@@ -281,5 +320,26 @@ class Generator
         } else {
             return 'string';
         }
+    }
+
+    private function getType(Column $column)
+    {
+        $type = 0;
+
+        if ($column->getLength() > 0) {
+            $type+= $column->getLength();
+        }
+
+        $type = $type | TypeMapper::getTypeByDoctrineType($column->getType()->getName());
+
+        if (!$column->getNotnull()) {
+            $type = $type | TableInterface::IS_NULL;
+        }
+
+        if ($column->getAutoincrement()) {
+            $type = $type | TableInterface::AUTO_INCREMENT;
+        }
+
+        return $type;
     }
 }
