@@ -69,7 +69,7 @@ class TableManager implements TableManagerInterface
     /**
      * @inheritDoc
      */
-    public function getTable(string $tableName): TableInterface
+    public function getTable(string $tableName)
     {
         if (isset($this->container[$tableName])) {
             return $this->container[$tableName];
@@ -77,10 +77,11 @@ class TableManager implements TableManagerInterface
 
         if ($this->reader === null) {
             // we assume that $tableName is a class name of a TableInterface implementation
-            $table = new $tableName($this);
-            if (!$table instanceof TableInterface) {
-                throw new InvalidArgumentException('Table must be a class implementing the PSX\Sql\TableInterface');
+            if (!class_exists($tableName)) {
+                throw new InvalidArgumentException('Provided table class does not exist');
             }
+
+            $table = new $tableName($this);
 
             $this->container[$tableName] = $table;
         } else {

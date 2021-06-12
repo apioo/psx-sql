@@ -35,6 +35,7 @@ interface TableManagerInterface
      * @param string $tableName
      * @template T of TableInterface
      * @psalm-param class-string<T> $tableName
+     * @return TableInterface
      */
-    public function getTable(string $tableName): TableInterface;
+    public function getTable(string $tableName);
 }
