@@ -41,9 +41,10 @@ trait TableQueryTrait
      * @param integer $sortOrder
      * @param Condition|null $condition
      * @param Fields|null $fields
+     * @param \Closure|null $hydrator
      * @return \PSX\Record\Record[]
      */
-    public function getAll($startIndex = null, $count = null, $sortBy = null, $sortOrder = null, Condition $condition = null, Fields $fields = null)
+    public function getAll($startIndex = null, $count = null, $sortBy = null, $sortOrder = null, Condition $condition = null, Fields $fields = null, ?\Closure $hydrator = null)
     {
         $startIndex = $startIndex !== null ? (int) $startIndex : 0;
         $count      = !empty($count)       ? (int) $count      : $this->limit();
@@ -80,7 +81,7 @@ trait TableQueryTrait
             $condition
         );
 
-        return $this->project($sql, $parameters);
+        return $this->project($sql, $parameters, null, $hydrator);
     }
 
     /**
@@ -248,7 +249,7 @@ trait TableQueryTrait
         return $this->convertBuilder($builder, $condition);
     }
 
-    protected function project($sql, array $params = array(), array $columns = null)
+    protected function project($sql, array $params = array(), array $columns = null, ?\Closure $hydrator = null)
     {
         $result  = array();
         $columns = $columns === null ? $this->getColumns() : $columns;
@@ -264,7 +265,11 @@ trait TableQueryTrait
                 $row[$key] = $value;
             }
 
-            $result[] = new Record($name, $row);
+            if ($hydrator instanceof \Closure) {
+                $result[] = $hydrator($row);
+            } else {
+                $result[] = new Record($name, $row);
+            }
         }
 
         $stmt->closeCursor();

@@ -31,6 +31,7 @@ use PhpParser\Node;
 use PSX\DateTime\Date;
 use PSX\DateTime\DateTime;
 use PSX\DateTime\Time;
+use PSX\Sql\Condition;
 use PSX\Sql\TableAbstract;
 use PSX\Sql\TableInterface;
 use PSX\Sql\TypeMapper;
@@ -187,7 +188,7 @@ class Generator
         $class->addStmt($serialize);
     }
 
-    private function generateRepository(string $className, string $modelClassName, Table $table)
+    private function generateRepository(string $className, string $rowClass, Table $table)
     {
         $class = $this->factory->class($className);
         $class->extend('\\' . TableAbstract::class);
@@ -218,20 +219,81 @@ class Generator
             );
         }
 
-        $columns = $this->factory->method('getColumns');
-        $columns->makePublic();
-        $columns->addStmt(new Node\Stmt\Return_(new Node\Expr\Array_($items)));
-        $class->addStmt($columns);
-
-        // add create/update/delete methods
+        $getColumns = $this->factory->method('getColumns');
+        $getColumns->makePublic();
+        $getColumns->addStmt(new Node\Stmt\Return_(new Node\Expr\Array_($items)));
+        $class->addStmt($getColumns);
 
         // add find methods
-        // @TODO add find methods for all columns
-        
-        // add insert/update/delete methods
-        // @TODO add insert/update/delete methods
+        foreach ($columns as $column) {
+            $this->buildFindBy($class, $column);
+        }
+
+        $this->buildHydrateRow($class, $rowClass, $columns);
 
         return $class;
+    }
+
+    private function buildFindBy(\PhpParser\Builder\Class_ $class, Column $column)
+    {
+        $methodName = 'findBy' . ucfirst($this->normalizeName($column->getName()));
+        $propertyName = ucfirst($this->normalizeName($column->getName()));
+
+        $hydrator = new Node\Expr\Closure();
+        $hydrator->params = [
+            new Node\Param(new Node\Expr\Variable('row'), null, new Node\Identifier('array'))
+        ];
+        $hydrator->stmts = [
+            new Node\Stmt\Return_(new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('newRow'), [
+                new Node\Arg(new Node\Expr\Variable('row'))
+            ]))
+        ];
+
+        $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('getAll'), [
+            new Node\Arg(new Node\Expr\Variable('startIndex')),
+            new Node\Arg(new Node\Expr\Variable('count')),
+            new Node\Arg(new Node\Expr\Variable('sortBy')),
+            new Node\Arg(new Node\Expr\Variable('sortOrder')),
+            new Node\Arg(new Node\Expr\Variable('condition')),
+            new Node\Expr\ConstFetch(new Node\Name('null')),
+            new Node\Arg($hydrator),
+        ]);
+
+        $type = $this->getTypeForColumn($column);
+
+        $findBy = $this->factory->method($methodName);
+        $findBy->makePublic();
+        $findBy->addParam(new Node\Param(new Node\Expr\Variable('value'), null, $type !== null ? new Node\Identifier($type) : null));
+        $findBy->addParam(new Node\Param(new Node\Expr\Variable('startIndex'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('int'))));
+        $findBy->addParam(new Node\Param(new Node\Expr\Variable('count'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('int'))));
+        $findBy->addParam(new Node\Param(new Node\Expr\Variable('sortBy'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('string'))));
+        $findBy->addParam(new Node\Param(new Node\Expr\Variable('sortOrder'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('int'))));
+        $findBy->addStmt(new Node\Stmt\Expression(new Node\Expr\Assign(new Node\Expr\Variable('condition'), new Node\Expr\New_(new Node\Name('\\' . Condition::class)))));
+        $findBy->addStmt(new Node\Stmt\Expression(new Node\Expr\MethodCall(new Node\Expr\Variable('condition'), new Node\Identifier($this->getOperatorForColumn($column)), [
+            new Node\Arg(new Node\Scalar\String_($column->getName())),
+            new Node\Arg(new Node\Expr\Variable('value'))
+        ])));
+        $findBy->addStmt(new Node\Stmt\Return_($methodCall));
+        $class->addStmt($findBy);
+    }
+
+    private function buildHydrateRow(\PhpParser\Builder\Class_ $class, string $rowClass, array $columns)
+    {
+        $newRow = $this->factory->method('newRow');
+        $newRow->makePublic();
+        $newRow->setReturnType(new Node\Name($rowClass));
+        $newRow->addParam(new Node\Param(new Node\Expr\Variable('row'), null, new Node\Identifier('array')));
+        $newRow->addStmt(new Node\Stmt\Expression(new Node\Expr\Assign(new Node\Expr\Variable('result'), new Node\Expr\New_(new Node\Name($rowClass)))));
+
+        foreach ($columns as $column) {
+            $propertyName = ucfirst($this->normalizeName($column->getName()));
+            $newRow->addStmt(new Node\Stmt\Expression(new Node\Expr\MethodCall(new Node\Expr\Variable('result'), new Node\Identifier('set' . $propertyName), [
+                new Node\Arg(new Node\Expr\ArrayDimFetch(new Node\Expr\Variable('row'), new Node\Scalar\String_($column->getName())))
+            ])));
+        }
+
+        $newRow->addStmt(new Node\Stmt\Return_(new Node\Expr\Variable('result')));
+        $class->addStmt($newRow);
     }
 
     private function normalizeName(string $name): string
@@ -280,7 +342,7 @@ class Generator
         $type = $column->getType();
 
         if ($type instanceof Types\ArrayType) {
-            return 'array';
+            return null;
         } elseif ($type instanceof Types\BigIntType) {
             return 'int';
         } elseif ($type instanceof Types\BinaryType) {
@@ -320,6 +382,19 @@ class Generator
         } else {
             return 'string';
         }
+    }
+
+    private function getOperatorForColumn(Column $column): string
+    {
+        $type = $column->getType();
+
+        if ($type instanceof Types\StringType) {
+            return 'like';
+        } elseif ($type instanceof Types\TextType) {
+            return 'like';
+        }
+
+        return 'equals';
     }
 
     private function getType(Column $column)
