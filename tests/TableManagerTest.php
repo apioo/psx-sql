@@ -58,11 +58,10 @@ class TableManagerTest extends TableTestCase
         $this->assertEquals(['id', 'userId', 'title', 'date'], array_keys($table->getColumns()));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testGetTableInvalidTable()
     {
+        $this->expectException(\InvalidArgumentException::class);
+
         $manager = new TableManager(getConnection());
         $manager->getTable('PSX\Sql\FooTable');
     }

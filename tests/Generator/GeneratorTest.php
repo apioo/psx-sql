@@ -43,9 +43,10 @@ class GeneratorTest extends TableTestCase
         $generator = new Generator($this->connection, 'Acme\Foo', 'psx_');
 
         foreach ($generator->generate() as $className => $source) {
-            file_put_contents(__DIR__ . '/resource/' . $className . '.php', '<?php' . "\n\n" . $source);
+            $file = __DIR__ . '/resource/' . $className . '.php';
+            file_put_contents($file, '<?php' . "\n\n" . $source);
 
-            //$this->assertEquals([], $result);
+            $this->assertFileExists($file);
         }
     }
 }
