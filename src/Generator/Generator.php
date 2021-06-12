@@ -111,7 +111,7 @@ class Generator
             $name = lcfirst($this->normalizeName($column->getName()));
             $type = $this->getTypeForColumn($column);
 
-            $serialize[$name] = $name;
+            $serialize[$name] = $column->getName();
 
             // property
             $prop = $this->factory->property($name);
@@ -182,7 +182,7 @@ class Generator
 
         $serialize = $this->factory->method('jsonSerialize');
         $serialize->makePublic();
-        $serialize->addStmt(new Node\Stmt\Return_(new Node\Expr\Cast\Object_($filter)));
+        $serialize->addStmt(new Node\Stmt\Return_($filter));
 
         $class->addStmt($serialize);
     }

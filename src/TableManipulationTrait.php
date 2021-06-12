@@ -150,6 +150,8 @@ trait TableManipulationTrait
             return (array) $record;
         } elseif ($record instanceof \ArrayObject) {
             return $record->getArrayCopy();
+        } elseif ($record instanceof \JsonSerializable) {
+            return $record->jsonSerialize();
         } elseif (is_array($record)) {
             return $record;
         } else {
