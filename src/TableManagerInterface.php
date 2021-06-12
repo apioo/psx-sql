@@ -33,7 +33,7 @@ interface TableManagerInterface
      * Returns a table
      *
      * @param string $tableName
-     * @template T of TableInterface
+     * @template T
      * @psalm-param class-string<T> $tableName
      * @return TableInterface
      */
