@@ -11,9 +11,6 @@ can generate completely typed repositories. We automatically generate a class fo
 which accepts this row. This concept is not new and the Java world has i.e. jOOQ which also follows this idea. It of
 course means also that you need to regenerate your classes if you change your schema.
 
-## Generation
-
-
 ## Basic usage
 
 The following are basic examples how you can work with a table class
@@ -29,91 +26,172 @@ use PSX\Sql\TableManager;
 $connection   = null; // a doctrine DBAL connection
 $tableManager = new TableManager($connection);
 
-$table = $tableManager->getTable(Acme\Table\News::class);
+/** @var \PSX\Sql\Tests\Generator\SqlTableTestTable $table */
+$table = $tableManager->getTable(\PSX\Sql\Tests\Generator\SqlTableTestTable::class);
 
-// returns by default 16 entries from the table ordered by the primary column 
-// descending. The default settings can be overriden in the table class
-$table->getAll();
+// returns by default 16 entries from the table ordered by the primary column descending
+$table->findAll();
 
 // returns 12 entries starting at index 0
-$table->getAll(0, 12);
+$table->findAll(0, 12);
 
 // orders the entries after the column "id" descending
-$table->getAll(0, 12, 'id', Sql::SORT_DESC);
+$table->findAll(0, 12, 'id', Sql::SORT_DESC);
 
 // adds a condition to select only the rows where the title contains "foo"
-$condition = new Condition();
-$condition->like('title', '%foo%');
-$table->getAll(0, 12, 'id', Sql::SORT_DESC, $condition);
-
-// adds a blacklist so that the column "password" gets not returned
-$table->getAll(0, 12, 'id', Sql::SORT_DESC, null, Fields::blacklist(['password']));
-
-// returns all columns which match the provided condition
-$table->getBy(new Condition(['userId', '=', 1]));
-
-// it is also possible to use a magic method which adds a ['userId', '=', 1]
-// condition
-$table->getByUserId(1);
-
-// returns a single row matching the provided condition
-$table->getOneBy(new Condition(['userId', '=', 1]));
-
-// it is also possible to use a magic method
-$table->getOneByUserId(1);
+$table->findByTitle('%foo%', 0, 12, 'id', Sql::SORT_DESC);
 
 // returns a complete row by the primary key
-$table->get(1);
+$table->findOneById(1);
 
-// returns the count of entries in the table. It is also possible to provide a
-// condition
+// returns a all rows which match the specified title
+$table->findByTitle('foo%');
+
+// returns the count of entries in the table. It is also possible to provide a condition
 $table->getCount();
 
-// creates a new row on the table
-$table->create([
-   'title' => 'foo'
-]);
+// creates a new row
+$row = new \PSX\Sql\Tests\Generator\SqlTableTestRow();
+$row->setTitle('foo');
+$table->create($row);
 
-// updates a row. The array must contains the primary key column
-$table->update([
-    'id'    => 1,
-    'title' => 'bar',
-]);
+// updates a row
+$row = new \PSX\Sql\Tests\Generator\SqlTableTestRow();
+$row->setId(1);
+$row->setTitle('bar');
+$table->update($row);
 
-// deletes a row. The array must contains the primary key column
-$table->delete([
-   'id'    => 1,
-]);
+// deletes a row
+$row = new \PSX\Sql\Tests\Generator\SqlTableTestRow();
+$row->setId(1);
+$table->delete($row);
 
 ```
 
 ## Table
 
-The following is an example of a table class.
+The following is an example of a generated table class.
 
 ```php
 <?php
 
-namespace Acme\Table;
+namespace PSX\Sql\Tests\Generator;
 
-use PSX\Sql\TableAbstract;
-use PSX\Sql\TableInterface;
-
-class AcmeTable extends TableAbstract
+class SqlTableTestTable extends \PSX\Sql\TableAbstract
 {
+    public const COLUMN_ID = 'id';
+    public const COLUMN_TITLE = 'title';
+    public const COLUMN_DATE = 'date';
     public function getName()
     {
-        return 'acme_table';
+        return 'psx_sql_table_test';
     }
-
     public function getColumns()
     {
-        return array(
-            'id'     => TableInterface::TYPE_INT | 10 | TableInterface::PRIMARY_KEY | TableInterface::AUTO_INCREMENT,
-            'userId' => TableInterface::TYPE_INT | 10,
-            'title'  => TableInterface::TYPE_VARCHAR | 32,
-            'date'   => TableInterface::TYPE_DATETIME,
-        );
+        return array(self::COLUMN_ID => 0x30200000, self::COLUMN_TITLE => 0xa00020, self::COLUMN_DATE => 0x800000);
+    }
+    /**
+     * @return \PSX\Sql\Tests\Generator\SqlTableTestRow[]
+     */
+    public function findAll(?int $startIndex = null, ?int $count = null, ?string $sortBy = null, ?int $sortOrder = null)
+    {
+        return $this->getAll($startIndex, $count, $sortBy, $sortOrder, null, null);
+    }
+    /**
+     * @return \PSX\Sql\Tests\Generator\SqlTableTestRow[]
+     */
+    public function findById(int $value, ?int $startIndex = null, ?int $count = null, ?string $sortBy = null, ?int $sortOrder = null)
+    {
+        $condition = new \PSX\Sql\Condition();
+        $condition->equals('id', $value);
+        return $this->getBy($condition, null, $startIndex, $count, $sortBy, $sortOrder);
+    }
+    /**
+     * @return \PSX\Sql\Tests\Generator\SqlTableTestRow
+     */
+    public function findOneById(int $value)
+    {
+        $condition = new \PSX\Sql\Condition();
+        $condition->equals('id', $value);
+        return $this->getOneBy($condition, null);
+    }
+    /**
+     * @return \PSX\Sql\Tests\Generator\SqlTableTestRow[]
+     */
+    public function findByTitle(string $value, ?int $startIndex = null, ?int $count = null, ?string $sortBy = null, ?int $sortOrder = null)
+    {
+        $condition = new \PSX\Sql\Condition();
+        $condition->like('title', $value);
+        return $this->getBy($condition, null, $startIndex, $count, $sortBy, $sortOrder);
+    }
+    /**
+     * @return \PSX\Sql\Tests\Generator\SqlTableTestRow
+     */
+    public function findOneByTitle(string $value)
+    {
+        $condition = new \PSX\Sql\Condition();
+        $condition->like('title', $value);
+        return $this->getOneBy($condition, null);
+    }
+    /**
+     * @return \PSX\Sql\Tests\Generator\SqlTableTestRow[]
+     */
+    public function findByDate(\DateTime $value, ?int $startIndex = null, ?int $count = null, ?string $sortBy = null, ?int $sortOrder = null)
+    {
+        $condition = new \PSX\Sql\Condition();
+        $condition->equals('date', $value);
+        return $this->getBy($condition, null, $startIndex, $count, $sortBy, $sortOrder);
+    }
+    /**
+     * @return \PSX\Sql\Tests\Generator\SqlTableTestRow
+     */
+    public function findOneByDate(\DateTime $value)
+    {
+        $condition = new \PSX\Sql\Condition();
+        $condition->equals('date', $value);
+        return $this->getOneBy($condition, null);
+    }
+    protected function getRecordClass() : string
+    {
+        return '\\PSX\\Sql\\Tests\\Generator\\SqlTableTestRow';
+    }
+}
+```
+
+## Row
+
+The following is an example of a generated table row.
+
+```php
+<?php
+
+namespace PSX\Sql\Tests\Generator;
+
+class SqlTableTestRow extends \PSX\Record\Record
+{
+    public function setId(?int $id) : void
+    {
+        $this->setProperty('id', $id);
+    }
+    public function getId() : ?int
+    {
+        return $this->getProperty('id');
+    }
+    public function setTitle(?string $title) : void
+    {
+        $this->setProperty('title', $title);
+    }
+    public function getTitle() : ?string
+    {
+        return $this->getProperty('title');
+    }
+    public function setDate(?\DateTime $date) : void
+    {
+        $this->setProperty('date', $date);
+    }
+    public function getDate() : ?\DateTime
+    {
+        return $this->getProperty('date');
     }
 }
 ```
@@ -121,7 +199,7 @@ class AcmeTable extends TableAbstract
 ## Views
 
 It is also possible to build view classes which is not based on a specific 
-table. Instead you can build complex aggregated result sets.
+table.
 
 ```php
 <?php
@@ -197,13 +275,4 @@ The `getNestedResult` method could produce the following json response
         }
     ]
 }
-```
-
-## Generation
-
-The library contains also a Symfony-Command to generate a table class from an
-actual table.
-
-```
-sql:generate acme_news > AcmeTable.php
 ```
