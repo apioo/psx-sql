@@ -255,7 +255,7 @@ class Generator
             new Node\Arg(new Node\Expr\Variable('sortBy')),
             new Node\Arg(new Node\Expr\Variable('sortOrder')),
             new Node\Arg(new Node\Expr\Variable('condition')),
-            new Node\Expr\ConstFetch(new Node\Name('null')),
+            new Node\Arg(new Node\Expr\ConstFetch(new Node\Name('null'))),
             new Node\Arg($hydrator),
         ]);
 
