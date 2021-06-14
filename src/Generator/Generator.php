@@ -159,13 +159,14 @@ class Generator
         $this->buildConstants($class, $table);
         $this->buildGetName($class, $table);
         $this->buildGetColumns($class, $table);
-        $this->buildGetRecordClass($class, $rowClass);
 
         $this->buildFindAll($class);
         foreach ($table->getColumns() as $column) {
             $this->buildFindBy($class, $column);
             $this->buildFindOneBy($class, $column);
         }
+
+        $this->buildGetRecordClass($class, $rowClass);
 
         return $class;
     }
