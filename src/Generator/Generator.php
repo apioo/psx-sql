@@ -153,6 +153,12 @@ class Generator
 
     private function generateRepository(string $className, string $rowClass, Table $table)
     {
+        if ($this->namespace !== null) {
+            $rowClass = '\\' . $this->namespace . '\\' . $rowClass;
+        } else {
+            $rowClass = '\\' . $rowClass;
+        }
+
         $class = $this->factory->class($className);
         $class->extend('\\' . TableAbstract::class);
 
@@ -160,10 +166,10 @@ class Generator
         $this->buildGetName($class, $table);
         $this->buildGetColumns($class, $table);
 
-        $this->buildFindAll($class);
+        $this->buildFindAll($class, $rowClass);
         foreach ($table->getColumns() as $column) {
-            $this->buildFindBy($class, $column);
-            $this->buildFindOneBy($class, $column);
+            $this->buildFindBy($class, $column, $rowClass);
+            $this->buildFindOneBy($class, $column, $rowClass);
         }
 
         $this->buildGetRecordClass($class, $rowClass);
@@ -171,7 +177,7 @@ class Generator
         return $class;
     }
 
-    private function buildFindAll(\PhpParser\Builder\Class_ $class)
+    private function buildFindAll(\PhpParser\Builder\Class_ $class, string $rowClass)
     {
         $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('getAll'), [
             new Node\Arg(new Node\Expr\Variable('startIndex')),
@@ -182,17 +188,18 @@ class Generator
             new Node\Arg(new Node\Expr\ConstFetch(new Node\Name('null'))),
         ]);
 
-        $findBy = $this->factory->method('findAll');
-        $findBy->makePublic();
-        $findBy->addParam(new Node\Param(new Node\Expr\Variable('startIndex'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('int'))));
-        $findBy->addParam(new Node\Param(new Node\Expr\Variable('count'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('int'))));
-        $findBy->addParam(new Node\Param(new Node\Expr\Variable('sortBy'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('string'))));
-        $findBy->addParam(new Node\Param(new Node\Expr\Variable('sortOrder'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('int'))));
-        $findBy->addStmt(new Node\Stmt\Return_($methodCall));
-        $class->addStmt($findBy);
+        $findAll = $this->factory->method('findAll');
+        $findAll->makePublic();
+        $findAll->setDocComment($this->buildComment(['return' => $rowClass . '[]']));
+        $findAll->addParam(new Node\Param(new Node\Expr\Variable('startIndex'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('int'))));
+        $findAll->addParam(new Node\Param(new Node\Expr\Variable('count'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('int'))));
+        $findAll->addParam(new Node\Param(new Node\Expr\Variable('sortBy'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('string'))));
+        $findAll->addParam(new Node\Param(new Node\Expr\Variable('sortOrder'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('int'))));
+        $findAll->addStmt(new Node\Stmt\Return_($methodCall));
+        $class->addStmt($findAll);
     }
 
-    private function buildFindBy(\PhpParser\Builder\Class_ $class, Column $column)
+    private function buildFindBy(\PhpParser\Builder\Class_ $class, Column $column, string $rowClass)
     {
         $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('getBy'), [
             new Node\Arg(new Node\Expr\Variable('condition')),
@@ -207,6 +214,7 @@ class Generator
 
         $findBy = $this->factory->method('findBy' . ucfirst($this->normalizeName($column->getName())));
         $findBy->makePublic();
+        $findBy->setDocComment($this->buildComment(['return' => $rowClass . '[]']));
         $findBy->addParam(new Node\Param(new Node\Expr\Variable('value'), null, $type !== null ? new Node\Identifier($type) : null));
         $findBy->addParam(new Node\Param(new Node\Expr\Variable('startIndex'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('int'))));
         $findBy->addParam(new Node\Param(new Node\Expr\Variable('count'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('int'))));
@@ -221,7 +229,7 @@ class Generator
         $class->addStmt($findBy);
     }
 
-    private function buildFindOneBy(\PhpParser\Builder\Class_ $class, Column $column)
+    private function buildFindOneBy(\PhpParser\Builder\Class_ $class, Column $column, string $rowClass)
     {
         $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('getOneBy'), [
             new Node\Arg(new Node\Expr\Variable('condition')),
@@ -230,16 +238,17 @@ class Generator
 
         $type = $this->getTypeForColumn($column);
 
-        $findBy = $this->factory->method('findOneBy' . ucfirst($this->normalizeName($column->getName())));
-        $findBy->makePublic();
-        $findBy->addParam(new Node\Param(new Node\Expr\Variable('value'), null, $type !== null ? new Node\Identifier($type) : null));
-        $findBy->addStmt(new Node\Stmt\Expression(new Node\Expr\Assign(new Node\Expr\Variable('condition'), new Node\Expr\New_(new Node\Name('\\' . Condition::class)))));
-        $findBy->addStmt(new Node\Stmt\Expression(new Node\Expr\MethodCall(new Node\Expr\Variable('condition'), new Node\Identifier($this->getOperatorForColumn($column)), [
+        $findOneBy = $this->factory->method('findOneBy' . ucfirst($this->normalizeName($column->getName())));
+        $findOneBy->makePublic();
+        $findOneBy->setDocComment($this->buildComment(['return' => $rowClass]));
+        $findOneBy->addParam(new Node\Param(new Node\Expr\Variable('value'), null, $type !== null ? new Node\Identifier($type) : null));
+        $findOneBy->addStmt(new Node\Stmt\Expression(new Node\Expr\Assign(new Node\Expr\Variable('condition'), new Node\Expr\New_(new Node\Name('\\' . Condition::class)))));
+        $findOneBy->addStmt(new Node\Stmt\Expression(new Node\Expr\MethodCall(new Node\Expr\Variable('condition'), new Node\Identifier($this->getOperatorForColumn($column)), [
             new Node\Arg(new Node\Scalar\String_($column->getName())),
             new Node\Arg(new Node\Expr\Variable('value'))
         ])));
-        $findBy->addStmt(new Node\Stmt\Return_($methodCall));
-        $class->addStmt($findBy);
+        $findOneBy->addStmt(new Node\Stmt\Return_($methodCall));
+        $class->addStmt($findOneBy);
     }
 
     private function buildConstants(\PhpParser\Builder\Class_ $class, Table $table)
@@ -282,16 +291,10 @@ class Generator
 
     private function buildGetRecordClass(\PhpParser\Builder\Class_ $class, string $rowClass)
     {
-        if ($this->namespace !== null) {
-            $className = '\\' . $this->namespace . '\\' . $rowClass;
-        } else {
-            $className = '\\' . $rowClass;
-        }
-
         $getRecordClass = $this->factory->method('getRecordClass');
         $getRecordClass->makeProtected();
         $getRecordClass->setReturnType(new Node\Name('string'));
-        $getRecordClass->addStmt(new Node\Stmt\Return_(new Node\Scalar\String_($className)));
+        $getRecordClass->addStmt(new Node\Stmt\Return_(new Node\Scalar\String_($rowClass)));
         $class->addStmt($getRecordClass);
     }
 
@@ -351,7 +354,7 @@ class Generator
         } elseif ($type instanceof Types\BooleanType) {
             return 'bool';
         } elseif ($type instanceof Types\DateType) {
-            return '\\' . Date::class;
+            return '\\' . \DateTime::class;
         } elseif ($type instanceof Types\DateTimeType) {
             return '\\' . \DateTime::class;
         } elseif ($type instanceof Types\DateTimeTzType) {
@@ -377,7 +380,7 @@ class Generator
         } elseif ($type instanceof Types\TextType) {
             return 'string';
         } elseif ($type instanceof Types\TimeType) {
-            return '\\' . Time::class;
+            return '\\' . \DateTime::class;
         } else {
             return 'string';
         }

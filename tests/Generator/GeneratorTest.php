@@ -20,6 +20,8 @@
 
 namespace PSX\Sql\Tests\Generator;
 
+use PSX\DateTime\Date;
+use PSX\DateTime\DateTime;
 use PSX\Sql\Generator\Generator;
 use PSX\Sql\TableManager;
 use PSX\Sql\Tests\TableTestCase;
@@ -62,5 +64,24 @@ class GeneratorTest extends TableTestCase
         $row = $repository->findOneById(1);
 
         $this->assertInstanceOf(TableCommandTestRow::class, $row);
+        $this->assertSame(1, $row->getId());
+        $this->assertSame(['foo' => 'bar'], $row->getColArray());
+        $this->assertSame(68719476735, $row->getColBigint());
+        $this->assertSame('foo', stream_get_contents($row->getColBinary()));
+        $this->assertSame('foobar', stream_get_contents($row->getColBlob()));
+        $this->assertSame(true, $row->getColBoolean());
+        $this->assertInstanceOf(\DateTime::class, $row->getColDate());
+        $this->assertInstanceOf(\DateTime::class, $row->getColDatetime());
+        $this->assertInstanceOf(\DateTime::class, $row->getColDatetimetz());
+        $this->assertSame(10.0, $row->getColDecimal());
+        $this->assertSame(10.37, $row->getColFloat());
+        $this->assertSame('ebe865da-4982-4353-bc44-dcdf7239e386', $row->getColGuid());
+        $this->assertSame(2147483647, $row->getColInteger());
+        $this->assertEquals((object) ['foo' => 'bar'], $row->getColJson());
+        $this->assertEquals((object) ['foo' => 'bar'], $row->getColObject());
+        $this->assertSame(255, $row->getColSmallint());
+        $this->assertSame('foobar', $row->getColString());
+        $this->assertSame('foobar', $row->getColText());
+        $this->assertInstanceOf(\DateTime::class, $row->getColTime());
     }
 }
