@@ -41,10 +41,9 @@ trait TableQueryTrait
      * @param integer $sortOrder
      * @param Condition|null $condition
      * @param Fields|null $fields
-     * @param \Closure|null $hydrator
      * @return \PSX\Record\Record[]
      */
-    public function getAll($startIndex = null, $count = null, $sortBy = null, $sortOrder = null, Condition $condition = null, Fields $fields = null, ?\Closure $hydrator = null)
+    public function getAll($startIndex = null, $count = null, $sortBy = null, $sortOrder = null, Condition $condition = null, Fields $fields = null)
     {
         $startIndex = $startIndex !== null ? (int) $startIndex : 0;
         $count      = !empty($count)       ? (int) $count      : $this->limit();
@@ -81,7 +80,7 @@ trait TableQueryTrait
             $condition
         );
 
-        return $this->project($sql, $parameters, null, $hydrator);
+        return $this->project($sql, $parameters);
     }
 
     /**
@@ -249,12 +248,13 @@ trait TableQueryTrait
         return $this->convertBuilder($builder, $condition);
     }
 
-    protected function project($sql, array $params = array(), array $columns = null, ?\Closure $hydrator = null)
+    protected function project($sql, array $params = array(), array $columns = null)
     {
         $result  = array();
         $columns = $columns === null ? $this->getColumns() : $columns;
         $stmt    = $this->connection->executeQuery($sql, $params ?: array());
         $name    = $this->getDisplayName();
+        $class   = $this->getRecordClass();
 
         while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
             foreach ($row as $key => $value) {
@@ -265,11 +265,7 @@ trait TableQueryTrait
                 $row[$key] = $value;
             }
 
-            if ($hydrator instanceof \Closure) {
-                $result[] = $hydrator($row);
-            } else {
-                $result[] = new Record($name, $row);
-            }
+            $result[] = new $class($name, $row);
         }
 
         $stmt->closeCursor();
@@ -300,6 +296,16 @@ trait TableQueryTrait
     {
         return $this->connection->createQueryBuilder()
             ->from($table, null);
+    }
+
+    /**
+     * Returns the default record class
+     *
+     * @return string
+     */
+    protected function getRecordClass(): string
+    {
+        return Record::class;
     }
 
     /**

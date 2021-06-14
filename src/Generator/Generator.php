@@ -31,6 +31,7 @@ use PhpParser\Node;
 use PSX\DateTime\Date;
 use PSX\DateTime\DateTime;
 use PSX\DateTime\Time;
+use PSX\Record\Record;
 use PSX\Sql\Condition;
 use PSX\Sql\TableAbstract;
 use PSX\Sql\TableInterface;
@@ -104,7 +105,7 @@ class Generator
     private function generateModel(string $className, Table $table)
     {
         $class = $this->factory->class($className);
-        $class->implement('\\JsonSerializable');
+        $class->extend('\\' . Record::class);
 
         $serialize = [];
         $columns = $table->getColumns();
@@ -113,12 +114,6 @@ class Generator
             $type = $this->getTypeForColumn($column);
 
             $serialize[$name] = $column->getName();
-
-            // property
-            $prop = $this->factory->property($name);
-            $prop->makePrivate();
-            $prop->setType($type !== null ? '?' . $type : 'mixed');
-            $class->addStmt($prop);
 
             // setter
             $param = $this->factory->param($name);
@@ -130,10 +125,10 @@ class Generator
             $setter->setReturnType('void');
             $setter->makePublic();
             $setter->addParam($param);
-            $setter->addStmt(new Node\Expr\Assign(
-                new Node\Expr\PropertyFetch(new Node\Expr\Variable('this'), $name),
-                new Node\Expr\Variable($name)
-            ));
+            $setter->addStmt(new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('setProperty'), [
+                new Node\Arg(new Node\Scalar\String_($column->getName())),
+                new Node\Arg(new Node\Expr\Variable($name)),
+            ]));
             $class->addStmt($setter);
 
             // getter
@@ -145,47 +140,15 @@ class Generator
             }
             $getter->makePublic();
             $getter->addStmt(new Node\Stmt\Return_(
-                new Node\Expr\PropertyFetch(new Node\Expr\Variable('this'), $name)
+                new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('getProperty'), [
+                    new Node\Arg(new Node\Scalar\String_($column->getName())),
+                ])
             ));
+
             $class->addStmt($getter);
         }
 
-        $this->buildJsonSerialize($class, $serialize);
-
         return $class;
-    }
-
-
-    private function buildJsonSerialize(\PhpParser\Builder\Class_ $class, array $properties)
-    {
-        if (empty($properties)) {
-            return;
-        }
-
-        $items = [];
-        foreach ($properties as $name => $key) {
-            $items[] = new Node\Expr\ArrayItem(new Node\Expr\PropertyFetch(new Node\Expr\Variable('this'), $name), new Node\Scalar\String_($key));
-        }
-
-        $closure = new Node\Expr\Closure([
-            'static' => true,
-            'params' => [new Node\Expr\Variable('value')],
-            'returnType' => 'bool',
-            'stmts' => [
-                new Node\Stmt\Return_(new Node\Expr\BinaryOp\NotIdentical(new Node\Expr\Variable('value'), new Node\Expr\ConstFetch(new Node\Name('null'))))
-            ],
-        ]);
-
-        $filter = new Node\Expr\FuncCall(new Node\Name('array_filter'), [
-            new Node\Arg(new Node\Expr\Array_($items)),
-            new Node\Arg($closure)
-        ]);
-
-        $serialize = $this->factory->method('jsonSerialize');
-        $serialize->makePublic();
-        $serialize->addStmt(new Node\Stmt\Return_($filter));
-
-        $class->addStmt($serialize);
     }
 
     private function generateRepository(string $className, string $rowClass, Table $table)
@@ -193,75 +156,55 @@ class Generator
         $class = $this->factory->class($className);
         $class->extend('\\' . TableAbstract::class);
 
-        $columns = $table->getColumns();
+        $this->buildConstants($class, $table);
+        $this->buildGetName($class, $table);
+        $this->buildGetColumns($class, $table);
+        $this->buildGetRecordClass($class, $rowClass);
 
-        // constants
-        foreach ($columns as $column) {
-            $constName = 'COLUMN_' . strtoupper($column->getName());
-            $class->addStmt(new Node\Stmt\ClassConst([new Node\Const_($constName, new Node\Scalar\String_($column->getName()))], Class_::MODIFIER_PUBLIC));
-        }
-
-        // get name method
-        $name = $this->factory->method('getName');
-        $name->makePublic();
-        $name->addStmt(new Node\Stmt\Return_(new Node\Scalar\String_($table->getName())));
-        $class->addStmt($name);
-
-        // get columns method
-        $items = [];
-        foreach ($columns as $column) {
-            $columnType = $this->getType($column);
-
-            $constName = 'COLUMN_' . strtoupper($column->getName());
-            $items[] = new Node\Expr\ArrayItem(
-                new Node\Scalar\LNumber($columnType, ['kind' => Node\Scalar\LNumber::KIND_HEX]),
-                new Node\Expr\ClassConstFetch(new Node\Name('self'), $constName)
-            );
-        }
-
-        $getColumns = $this->factory->method('getColumns');
-        $getColumns->makePublic();
-        $getColumns->addStmt(new Node\Stmt\Return_(new Node\Expr\Array_($items)));
-        $class->addStmt($getColumns);
-
-        // add find methods
-        foreach ($columns as $column) {
+        $this->buildFindAll($class);
+        foreach ($table->getColumns() as $column) {
             $this->buildFindBy($class, $column);
+            $this->buildFindOneBy($class, $column);
         }
-
-        $this->buildHydrateRow($class, $rowClass, $columns);
 
         return $class;
     }
 
-    private function buildFindBy(\PhpParser\Builder\Class_ $class, Column $column)
+    private function buildFindAll(\PhpParser\Builder\Class_ $class)
     {
-        $methodName = 'findBy' . ucfirst($this->normalizeName($column->getName()));
-        $propertyName = ucfirst($this->normalizeName($column->getName()));
-
-        $hydrator = new Node\Expr\Closure();
-        $hydrator->params = [
-            new Node\Param(new Node\Expr\Variable('row'), null, new Node\Identifier('array'))
-        ];
-        $hydrator->stmts = [
-            new Node\Stmt\Return_(new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('newRow'), [
-                new Node\Arg(new Node\Expr\Variable('row'))
-            ]))
-        ];
-
         $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('getAll'), [
             new Node\Arg(new Node\Expr\Variable('startIndex')),
             new Node\Arg(new Node\Expr\Variable('count')),
             new Node\Arg(new Node\Expr\Variable('sortBy')),
             new Node\Arg(new Node\Expr\Variable('sortOrder')),
+            new Node\Arg(new Node\Expr\ConstFetch(new Node\Name('null'))),
+            new Node\Arg(new Node\Expr\ConstFetch(new Node\Name('null'))),
+        ]);
+
+        $findBy = $this->factory->method('findAll');
+        $findBy->makePublic();
+        $findBy->addParam(new Node\Param(new Node\Expr\Variable('startIndex'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('int'))));
+        $findBy->addParam(new Node\Param(new Node\Expr\Variable('count'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('int'))));
+        $findBy->addParam(new Node\Param(new Node\Expr\Variable('sortBy'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('string'))));
+        $findBy->addParam(new Node\Param(new Node\Expr\Variable('sortOrder'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('int'))));
+        $findBy->addStmt(new Node\Stmt\Return_($methodCall));
+        $class->addStmt($findBy);
+    }
+
+    private function buildFindBy(\PhpParser\Builder\Class_ $class, Column $column)
+    {
+        $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('getBy'), [
             new Node\Arg(new Node\Expr\Variable('condition')),
             new Node\Arg(new Node\Expr\ConstFetch(new Node\Name('null'))),
-            new Node\Arg($hydrator),
+            new Node\Arg(new Node\Expr\Variable('startIndex')),
+            new Node\Arg(new Node\Expr\Variable('count')),
+            new Node\Arg(new Node\Expr\Variable('sortBy')),
+            new Node\Arg(new Node\Expr\Variable('sortOrder')),
         ]);
 
         $type = $this->getTypeForColumn($column);
 
-        $findBy = $this->factory->method($methodName);
+        $findBy = $this->factory->method('findBy' . ucfirst($this->normalizeName($column->getName())));
         $findBy->makePublic();
         $findBy->addParam(new Node\Param(new Node\Expr\Variable('value'), null, $type !== null ? new Node\Identifier($type) : null));
         $findBy->addParam(new Node\Param(new Node\Expr\Variable('startIndex'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('int'))));
@@ -277,23 +220,78 @@ class Generator
         $class->addStmt($findBy);
     }
 
-    private function buildHydrateRow(\PhpParser\Builder\Class_ $class, string $rowClass, array $columns)
+    private function buildFindOneBy(\PhpParser\Builder\Class_ $class, Column $column)
     {
-        $newRow = $this->factory->method('newRow');
-        $newRow->makePublic();
-        $newRow->setReturnType(new Node\Name($rowClass));
-        $newRow->addParam(new Node\Param(new Node\Expr\Variable('row'), null, new Node\Identifier('array')));
-        $newRow->addStmt(new Node\Stmt\Expression(new Node\Expr\Assign(new Node\Expr\Variable('result'), new Node\Expr\New_(new Node\Name($rowClass)))));
+        $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('getOneBy'), [
+            new Node\Arg(new Node\Expr\Variable('condition')),
+            new Node\Arg(new Node\Expr\ConstFetch(new Node\Name('null'))),
+        ]);
 
+        $type = $this->getTypeForColumn($column);
+
+        $findBy = $this->factory->method('findOneBy' . ucfirst($this->normalizeName($column->getName())));
+        $findBy->makePublic();
+        $findBy->addParam(new Node\Param(new Node\Expr\Variable('value'), null, $type !== null ? new Node\Identifier($type) : null));
+        $findBy->addStmt(new Node\Stmt\Expression(new Node\Expr\Assign(new Node\Expr\Variable('condition'), new Node\Expr\New_(new Node\Name('\\' . Condition::class)))));
+        $findBy->addStmt(new Node\Stmt\Expression(new Node\Expr\MethodCall(new Node\Expr\Variable('condition'), new Node\Identifier($this->getOperatorForColumn($column)), [
+            new Node\Arg(new Node\Scalar\String_($column->getName())),
+            new Node\Arg(new Node\Expr\Variable('value'))
+        ])));
+        $findBy->addStmt(new Node\Stmt\Return_($methodCall));
+        $class->addStmt($findBy);
+    }
+
+    private function buildConstants(\PhpParser\Builder\Class_ $class, Table $table)
+    {
+        $columns = $table->getColumns();
         foreach ($columns as $column) {
-            $propertyName = ucfirst($this->normalizeName($column->getName()));
-            $newRow->addStmt(new Node\Stmt\Expression(new Node\Expr\MethodCall(new Node\Expr\Variable('result'), new Node\Identifier('set' . $propertyName), [
-                new Node\Arg(new Node\Expr\ArrayDimFetch(new Node\Expr\Variable('row'), new Node\Scalar\String_($column->getName())))
-            ])));
+            $constName = 'COLUMN_' . strtoupper($column->getName());
+            $class->addStmt(new Node\Stmt\ClassConst([new Node\Const_($constName, new Node\Scalar\String_($column->getName()))], Class_::MODIFIER_PUBLIC));
+        }
+    }
+
+    private function buildGetName(\PhpParser\Builder\Class_ $class, Table $table)
+    {
+        $getName = $this->factory->method('getName');
+        $getName->makePublic();
+        $getName->addStmt(new Node\Stmt\Return_(new Node\Scalar\String_($table->getName())));
+        $class->addStmt($getName);
+    }
+
+    private function buildGetColumns(\PhpParser\Builder\Class_ $class, Table $table)
+    {
+        $primaryColumns = $table->getPrimaryKeyColumns();
+
+        $items = [];
+        foreach ($table->getColumns() as $column) {
+            $columnType = $this->getType($column, $primaryColumns);
+
+            $constName = 'COLUMN_' . strtoupper($column->getName());
+            $items[] = new Node\Expr\ArrayItem(
+                new Node\Scalar\LNumber($columnType, ['kind' => Node\Scalar\LNumber::KIND_HEX]),
+                new Node\Expr\ClassConstFetch(new Node\Name('self'), $constName)
+            );
         }
 
-        $newRow->addStmt(new Node\Stmt\Return_(new Node\Expr\Variable('result')));
-        $class->addStmt($newRow);
+        $getColumns = $this->factory->method('getColumns');
+        $getColumns->makePublic();
+        $getColumns->addStmt(new Node\Stmt\Return_(new Node\Expr\Array_($items)));
+        $class->addStmt($getColumns);
+    }
+
+    private function buildGetRecordClass(\PhpParser\Builder\Class_ $class, string $rowClass)
+    {
+        if ($this->namespace !== null) {
+            $className = '\\' . $this->namespace . '\\' . $rowClass;
+        } else {
+            $className = '\\' . $rowClass;
+        }
+
+        $getRecordClass = $this->factory->method('getRecordClass');
+        $getRecordClass->makeProtected();
+        $getRecordClass->setReturnType(new Node\Name('string'));
+        $getRecordClass->addStmt(new Node\Stmt\Return_(new Node\Scalar\String_($className)));
+        $class->addStmt($getRecordClass);
     }
 
     private function normalizeName(string $name): string
@@ -397,7 +395,7 @@ class Generator
         return 'equals';
     }
 
-    private function getType(Column $column)
+    private function getType(Column $column, ?array $primaryColumns)
     {
         $type = 0;
 
@@ -407,12 +405,16 @@ class Generator
 
         $type = $type | TypeMapper::getTypeByDoctrineType($column->getType()->getName());
 
-        if (!$column->getNotnull()) {
-            $type = $type | TableInterface::IS_NULL;
+        if ($primaryColumns !== null && in_array($column->getName(), $primaryColumns)) {
+            $type = $type | TableInterface::PRIMARY_KEY;
         }
 
         if ($column->getAutoincrement()) {
             $type = $type | TableInterface::AUTO_INCREMENT;
+        }
+
+        if (!$column->getNotnull()) {
+            $type = $type | TableInterface::IS_NULL;
         }
 
         return $type;

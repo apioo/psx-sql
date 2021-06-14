@@ -18,11 +18,11 @@
  * limitations under the License.
  */
 
-namespace PSX\Sql\Tests;
+namespace PSX\Sql\Tests\Generator;
 
-use PhpParser\Parser\Parser;
-use PhpParser\ParserFactory;
 use PSX\Sql\Generator\Generator;
+use PSX\Sql\TableManager;
+use PSX\Sql\Tests\TableTestCase;
 
 /**
  * GeneratorTest
@@ -38,15 +38,29 @@ class GeneratorTest extends TableTestCase
      */
     protected $manager;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->manager = new TableManager($this->connection);
+    }
+
     public function testGenerate()
     {
-        $generator = new Generator($this->connection, 'Acme\Foo', 'psx_');
+        $generator = new Generator($this->connection, 'PSX\Sql\Tests\Generator', 'psx_');
 
         foreach ($generator->generate() as $className => $source) {
-            $file = __DIR__ . '/resource/' . $className . '.php';
+            $file = __DIR__ . '/' . $className . '.php';
             file_put_contents($file, '<?php' . "\n\n" . $source);
 
             $this->assertFileExists($file);
         }
+
+        // test repository
+        /** @var TableCommandTestTable $repository */
+        $repository = $this->manager->getTable(TableCommandTestTable::class);
+        $row = $repository->findOneById(1);
+
+        $this->assertInstanceOf(TableCommandTestRow::class, $row);
     }
 }
