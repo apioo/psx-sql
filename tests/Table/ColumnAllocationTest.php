@@ -43,11 +43,10 @@ class ColumnAllocationTest extends TestCase
         $this->assertEquals('foo', $allocation->get('bar'));
     }
 
-    /**
-     * @expectedException \UnexpectedValueException
-     */
     public function testAllocationInvalidColumn()
     {
+        $this->expectException(\UnexpectedValueException::class);
+
         $allocation = new ColumnAllocation();
         $allocation->get('foo');
     }

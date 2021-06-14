@@ -668,27 +668,24 @@ trait TableQueryTestTrait
         $this->assertEquals('record', $obj->getDisplayName());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testGetOneByXXXMethodNoValue()
     {
+        $this->expectException(\InvalidArgumentException::class);
+
         $this->getTable()->getOneById();
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testGetByXXXMethodNoValue()
     {
+        $this->expectException(\InvalidArgumentException::class);
+
         $this->getTable()->getById();
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     */
     public function testInvalidMethodCall()
     {
+        $this->expectException(\BadMethodCallException::class);
+
         $this->getTable()->foobar();
     }
 }

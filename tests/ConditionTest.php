@@ -60,12 +60,11 @@ class ConditionTest extends TestCase
         $this->assertEquals(array('1'), $con->getValues());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Condition argument must be either an array or PSX\Sql\Condition\ExpressionInterface
-     */
     public function testConditionConstructorException()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Condition argument must be either an array or PSX\Sql\Condition\ExpressionInterface');
+
         new Condition('foo');
     }
 
@@ -96,20 +95,18 @@ class ConditionTest extends TestCase
         $this->assertEquals(array('1', 1, 2), $con->getValues());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testAddInvalidOperator()
     {
+        $this->expectException(\InvalidArgumentException::class);
+
         $con = new Condition();
         $con->add('id', 'foo', '1');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testAddInvalidConjunction()
     {
+        $this->expectException(\InvalidArgumentException::class);
+
         $con = new Condition();
         $con->add('id', '=', '1', 'foo');
     }
