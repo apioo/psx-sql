@@ -43,12 +43,12 @@ class Schema implements ReaderInterface
         $this->connection = $connection;
     }
 
-    public function getTableDefinition($tableName)
+    public function getTableDefinition($value)
     {
         $sm = $this->connection->getSchemaManager();
 
         // columns
-        $table   = $sm->listTableDetails($tableName);
+        $table   = $sm->listTableDetails($value);
         $columns = array();
 
         foreach ($table->getColumns() as $column) {
@@ -67,7 +67,7 @@ class Schema implements ReaderInterface
             }
         }
 
-        return new Definition($tableName, $columns);
+        return new Definition($value, $columns);
     }
 
     protected function getType(Column $column)

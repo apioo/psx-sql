@@ -61,11 +61,10 @@ trait TableManipulationTestTrait
         $this->assertInstanceOf('DateTime', $row->date);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testCreateEmpty()
     {
+        $this->expectException(\RuntimeException::class);
+
         $table = $this->getTable();
 
         if (!$table instanceof TableManipulationInterface) {
@@ -97,11 +96,10 @@ trait TableManipulationTestTrait
         $this->assertInstanceOf('DateTime', $row->date);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testUpdateEmpty()
     {
+        $this->expectException(\RuntimeException::class);
+
         $table = $this->getTable();
 
         if (!$table instanceof TableManipulationInterface) {
@@ -128,11 +126,10 @@ trait TableManipulationTestTrait
         $this->assertEmpty($row);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testDeleteEmpty()
     {
+        $this->expectException(\RuntimeException::class);
+
         $table = $this->getTable();
 
         if (!$table instanceof TableManipulationInterface) {
@@ -142,47 +139,42 @@ trait TableManipulationTestTrait
         $table->delete(array());
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testUpdateNoPrimaryKey()
     {
+        $this->expectException(\RuntimeException::class);
+
         $table = new Table($this->manager, 'psx_handler_comment', array('foo' => TableInterface::TYPE_VARCHAR));
         $table->update(array('foo' => 'bar'));
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testDeleteNoPrimaryKey()
     {
+        $this->expectException(\RuntimeException::class);
+
         $table = new Table($this->manager, 'psx_handler_comment', array('foo' => TableInterface::TYPE_VARCHAR));
         $table->delete(array('foo' => 'bar'));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testCreateInvalidData()
     {
+        $this->expectException(\InvalidArgumentException::class);
+
         $table = new Table($this->manager, 'psx_handler_comment', array('foo' => TableInterface::TYPE_VARCHAR));
         $table->create('foo');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testUpdateInvalidData()
     {
+        $this->expectException(\InvalidArgumentException::class);
+
         $table = new Table($this->manager, 'psx_handler_comment', array('foo' => TableInterface::TYPE_VARCHAR));
         $table->update('foo');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testDeleteInvalidData()
     {
+        $this->expectException(\InvalidArgumentException::class);
+
         $table = new Table($this->manager, 'psx_handler_comment', array('foo' => TableInterface::TYPE_VARCHAR));
         $table->delete('foo');
     }

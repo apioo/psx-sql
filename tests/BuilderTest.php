@@ -114,11 +114,10 @@ JSON;
         $this->assertJsonStringEqualsJsonString($expect, $result, $result);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testBuildUnknownFieldInContext()
     {
+        $this->expectException(\RuntimeException::class);
+
         $data = [
             'foo' => 'bar',
         ];

@@ -44,7 +44,7 @@ class TableManager implements TableManagerInterface
     private $reader;
 
     /**
-     * @var array
+     * @var TableInterface[]
      */
     private $container;
 
@@ -73,23 +73,24 @@ class TableManager implements TableManagerInterface
     {
         if (isset($this->container[$tableName])) {
             return $this->container[$tableName];
-        } else {
-            if ($this->reader === null) {
-                // we assume that $tableName is a class name of a
-                // TableInterface implementation
-                if (class_exists($tableName)) {
-                    $this->container[$tableName] = new $tableName($this);
-                } else {
-                    throw new InvalidArgumentException('Table must be a class implementing the PSX\Sql\TableInterface');
-                }
-            } else {
-                $definition = $this->reader->getTableDefinition($tableName);
+        }
 
-                $this->container[$tableName] = new Table($this,
-                    $definition->getName(),
-                    $definition->getColumns()
-                );
+        if ($this->reader === null) {
+            // we assume that $tableName is a class name of a TableInterface implementation
+            if (!class_exists($tableName)) {
+                throw new InvalidArgumentException('Provided table class does not exist');
             }
+
+            $table = new $tableName($this);
+
+            $this->container[$tableName] = $table;
+        } else {
+            $definition = $this->reader->getTableDefinition($tableName);
+
+            $this->container[$tableName] = new Table($this,
+                $definition->getName(),
+                $definition->getColumns()
+            );
         }
 
         return $this->container[$tableName];

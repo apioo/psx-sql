@@ -254,6 +254,7 @@ trait TableQueryTrait
         $columns = $columns === null ? $this->getColumns() : $columns;
         $stmt    = $this->connection->executeQuery($sql, $params ?: array());
         $name    = $this->getDisplayName();
+        $class   = $this->getRecordClass();
 
         while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
             foreach ($row as $key => $value) {
@@ -264,7 +265,7 @@ trait TableQueryTrait
                 $row[$key] = $value;
             }
 
-            $result[] = new Record($name, $row);
+            $result[] = new $class($name, $row);
         }
 
         $stmt->closeCursor();
@@ -295,6 +296,16 @@ trait TableQueryTrait
     {
         return $this->connection->createQueryBuilder()
             ->from($table, null);
+    }
+
+    /**
+     * Returns the default record class
+     *
+     * @return string
+     */
+    protected function getRecordClass(): string
+    {
+        return Record::class;
     }
 
     /**
