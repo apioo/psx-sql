@@ -22,6 +22,7 @@ namespace PSX\Sql\Tests\Generator;
 
 use PSX\DateTime\Date;
 use PSX\DateTime\DateTime;
+use PSX\Record\Record;
 use PSX\Sql\Generator\Generator;
 use PSX\Sql\TableManager;
 use PSX\Sql\Tests\TableTestCase;
@@ -63,8 +64,20 @@ class GeneratorTest extends TableTestCase
         $repository = $this->manager->getTable(TableCommandTestTable::class);
         $row = $repository->findOneById(1);
 
+        $this->assertEquals(1, $row->getId());
+        $this->assertRecord($row);
+
+        $affected = $repository->create($this->newRecord());
+        $row = $repository->findOneById($repository->getLastInsertId());
+
+        $this->assertEquals(1, $affected);
+        $this->assertEquals($repository->getLastInsertId(), $row->getId());
+        $this->assertRecord($row);
+    }
+
+    private function assertRecord(TableCommandTestRow $row)
+    {
         $this->assertInstanceOf(TableCommandTestRow::class, $row);
-        $this->assertSame(1, $row->getId());
         $this->assertSame(['foo' => 'bar'], $row->getColArray());
         $this->assertSame(68719476735, $row->getColBigint());
         $this->assertSame('foo', stream_get_contents($row->getColBinary()));
@@ -83,5 +96,30 @@ class GeneratorTest extends TableTestCase
         $this->assertSame('foobar', $row->getColString());
         $this->assertSame('foobar', $row->getColText());
         $this->assertInstanceOf(\DateTime::class, $row->getColTime());
+    }
+
+    private function newRecord(): TableCommandTestRow
+    {
+        $row = new TableCommandTestRow();
+        $row->setColArray(['foo' => 'bar']);
+        $row->setColBigint(68719476735);
+        $row->setColBinary('foo');
+        $row->setColBlob('foobar');
+        $row->setColBoolean(true);
+        $row->setColDate(new \DateTime());
+        $row->setColDatetime(new \DateTime());
+        $row->setColDatetimetz(new \DateTime());
+        $row->setColDecimal(10.0);
+        $row->setColFloat(10.37);
+        $row->setColGuid('ebe865da-4982-4353-bc44-dcdf7239e386');
+        $row->setColInteger(2147483647);
+        $row->setColJson((object) ['foo' => 'bar']);
+        $row->setColObject((object) ['foo' => 'bar']);
+        $row->setColSmallint(255);
+        $row->setColString('foobar');
+        $row->setColText('foobar');
+        $row->setColTime(new \DateTime());
+
+        return $row;
     }
 }

@@ -20,7 +20,7 @@
 
 namespace PSX\Sql;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 
 /**
  * Maps doctrine to psx types
@@ -32,56 +32,51 @@ use Doctrine\DBAL\Types\Type;
  */
 class TypeMapper
 {
-    protected static $mapping = array(
-        TableInterface::TYPE_SMALLINT => Type::SMALLINT,
-        TableInterface::TYPE_INT      => Type::INTEGER,
-        TableInterface::TYPE_BIGINT   => Type::BIGINT,
-        TableInterface::TYPE_BOOLEAN  => Type::BOOLEAN,
-        TableInterface::TYPE_DECIMAL  => Type::DECIMAL,
-        TableInterface::TYPE_FLOAT    => Type::FLOAT,
-        TableInterface::TYPE_DATE     => Type::DATE,
-        TableInterface::TYPE_DATETIME => Type::DATETIME,
-        TableInterface::TYPE_INTERVAL => Type::DATEINTERVAL,
-        TableInterface::TYPE_TIME     => Type::TIME,
-        TableInterface::TYPE_VARCHAR  => Type::STRING,
-        TableInterface::TYPE_TEXT     => Type::TEXT,
-        TableInterface::TYPE_BLOB     => Type::BLOB,
-        TableInterface::TYPE_BINARY   => Type::BINARY,
-        TableInterface::TYPE_ARRAY    => Type::TARRAY,
-        TableInterface::TYPE_OBJECT   => Type::OBJECT,
-        TableInterface::TYPE_JSON     => Type::JSON_ARRAY,
-        TableInterface::TYPE_GUID     => Type::GUID,
-    );
+    private const MAPPING = [
+        TableInterface::TYPE_SMALLINT => Types::SMALLINT,
+        TableInterface::TYPE_INT      => Types::INTEGER,
+        TableInterface::TYPE_BIGINT   => Types::BIGINT,
+        TableInterface::TYPE_BOOLEAN  => Types::BOOLEAN,
+        TableInterface::TYPE_DECIMAL  => Types::DECIMAL,
+        TableInterface::TYPE_FLOAT    => Types::FLOAT,
+        TableInterface::TYPE_DATE     => Types::DATE_MUTABLE,
+        TableInterface::TYPE_DATETIME => Types::DATETIME_MUTABLE,
+        TableInterface::TYPE_INTERVAL => Types::DATEINTERVAL,
+        TableInterface::TYPE_TIME     => Types::TIME_MUTABLE,
+        TableInterface::TYPE_VARCHAR  => Types::STRING,
+        TableInterface::TYPE_TEXT     => Types::TEXT,
+        TableInterface::TYPE_BLOB     => Types::BLOB,
+        TableInterface::TYPE_BINARY   => Types::BINARY,
+        TableInterface::TYPE_ARRAY    => Types::ARRAY,
+        TableInterface::TYPE_OBJECT   => Types::OBJECT,
+        TableInterface::TYPE_JSON     => Types::JSON,
+        TableInterface::TYPE_GUID     => Types::GUID,
+    ];
 
     /**
      * @param string $name
-     * @return integer
+     * @return int
      */
-    public static function getTypeByDoctrineType($name)
+    public static function getTypeByDoctrineType(string $name): int
     {
-        static $mapping;
-
-        if ($mapping === null) {
-            $mapping = array_flip(self::$mapping);
-        }
-
-        if (isset($mapping[$name])) {
-            return $mapping[$name];
+        $type = array_search($name, self::MAPPING);
+        if ($type !== false) {
+            return $type;
         } else {
             return TableInterface::TYPE_VARCHAR;
         }
     }
 
     /**
-     * @param integer $type
+     * @param int $type
      * @return string
      */
-    public static function getDoctrineTypeByType($type)
+    public static function getDoctrineTypeByType(int $type): string
     {
-        if (isset(self::$mapping[$type & 0xFF00000])) {
-            return self::$mapping[$type & 0xFF00000];
+        if (isset(self::MAPPING[$type & 0xFF00000])) {
+            return self::MAPPING[$type & 0xFF00000];
         } else {
-            return Type::STRING;
+            return Types::STRING;
         }
     }
 }

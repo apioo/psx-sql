@@ -44,56 +44,56 @@ function getConnection()
 
     $toSchema = new \Doctrine\DBAL\Schema\Schema();
     $table = $toSchema->createTable('psx_handler_comment');
-    $table->addColumn('id', 'integer', array('length' => 10, 'autoincrement' => true));
-    $table->addColumn('userId', 'integer', array('length' => 10));
-    $table->addColumn('title', 'string', array('length' => 32));
-    $table->addColumn('date', 'datetime');
+    $table->addColumn('id', \Doctrine\DBAL\Types\Types::INTEGER, ['length' => 10, 'autoincrement' => true]);
+    $table->addColumn('userId', \Doctrine\DBAL\Types\Types::INTEGER, ['length' => 10]);
+    $table->addColumn('title', \Doctrine\DBAL\Types\Types::STRING, ['length' => 32]);
+    $table->addColumn('date', \Doctrine\DBAL\Types\Types::DATETIME_MUTABLE);
     $table->setPrimaryKey(array('id'));
 
     $table = $toSchema->createTable('psx_sql_table_test');
-    $table->addColumn('id', 'integer', array('length' => 10, 'autoincrement' => true));
-    $table->addColumn('title', 'string', array('length' => 32));
-    $table->addColumn('date', 'datetime');
+    $table->addColumn('id', \Doctrine\DBAL\Types\Types::INTEGER, ['length' => 10, 'autoincrement' => true]);
+    $table->addColumn('title', \Doctrine\DBAL\Types\Types::STRING, ['length' => 32]);
+    $table->addColumn('date', \Doctrine\DBAL\Types\Types::DATETIME_MUTABLE);
     $table->setPrimaryKey(array('id'));
 
     $table = $toSchema->createTable('psx_table_command_test');
-    $table->addColumn('id', 'integer', array('length' => 10, 'autoincrement' => true));
-    $table->addColumn('col_bigint', 'bigint');
-    $table->addColumn('col_binary', 'binary');
-    $table->addColumn('col_blob', 'blob');
-    $table->addColumn('col_boolean', 'boolean');
-    $table->addColumn('col_datetime', 'datetime');
-    $table->addColumn('col_datetimetz', 'datetimetz');
-    $table->addColumn('col_date', 'date');
-    $table->addColumn('col_decimal', 'decimal');
-    $table->addColumn('col_float', 'float');
-    $table->addColumn('col_integer', 'integer');
-    $table->addColumn('col_smallint', 'smallint');
-    $table->addColumn('col_text', 'text');
-    $table->addColumn('col_time', 'time');
-    $table->addColumn('col_string', 'string');
-    $table->addColumn('col_array', 'array');
-    $table->addColumn('col_object', 'object');
-    $table->addColumn('col_json', 'json_array');
-    $table->addColumn('col_guid', 'guid');
+    $table->addColumn('id', \Doctrine\DBAL\Types\Types::INTEGER, ['length' => 10, 'autoincrement' => true]);
+    $table->addColumn('col_bigint', \Doctrine\DBAL\Types\Types::BIGINT);
+    $table->addColumn('col_binary', \Doctrine\DBAL\Types\Types::BINARY);
+    $table->addColumn('col_blob', \Doctrine\DBAL\Types\Types::BLOB);
+    $table->addColumn('col_boolean', \Doctrine\DBAL\Types\Types::BOOLEAN);
+    $table->addColumn('col_datetime', \Doctrine\DBAL\Types\Types::DATETIME_MUTABLE);
+    $table->addColumn('col_datetimetz', \Doctrine\DBAL\Types\Types::DATETIMETZ_MUTABLE);
+    $table->addColumn('col_date', \Doctrine\DBAL\Types\Types::DATE_MUTABLE);
+    $table->addColumn('col_decimal', \Doctrine\DBAL\Types\Types::DECIMAL);
+    $table->addColumn('col_float', \Doctrine\DBAL\Types\Types::FLOAT);
+    $table->addColumn('col_integer', \Doctrine\DBAL\Types\Types::INTEGER);
+    $table->addColumn('col_smallint', \Doctrine\DBAL\Types\Types::SMALLINT);
+    $table->addColumn('col_text', \Doctrine\DBAL\Types\Types::TEXT);
+    $table->addColumn('col_time', \Doctrine\DBAL\Types\Types::TIME_MUTABLE);
+    $table->addColumn('col_string', \Doctrine\DBAL\Types\Types::STRING);
+    $table->addColumn('col_array', \Doctrine\DBAL\Types\Types::ARRAY);
+    $table->addColumn('col_object', \Doctrine\DBAL\Types\Types::OBJECT);
+    $table->addColumn('col_json', \Doctrine\DBAL\Types\Types::JSON);
+    $table->addColumn('col_guid', \Doctrine\DBAL\Types\Types::GUID);
     $table->setPrimaryKey(array('id'));
 
     $table = $toSchema->createTable('psx_sql_provider_news');
-    $table->addColumn('id', 'integer', array('length' => 10, 'autoincrement' => true));
-    $table->addColumn('authorId', 'integer', array('length' => 10));
-    $table->addColumn('title', 'string', array('length' => 32));
-    $table->addColumn('createDate', 'datetime');
+    $table->addColumn('id', \Doctrine\DBAL\Types\Types::INTEGER, ['length' => 10, 'autoincrement' => true]);
+    $table->addColumn('authorId', \Doctrine\DBAL\Types\Types::INTEGER, ['length' => 10]);
+    $table->addColumn('title', \Doctrine\DBAL\Types\Types::STRING, ['length' => 32]);
+    $table->addColumn('createDate', \Doctrine\DBAL\Types\Types::DATETIME_MUTABLE);
     $table->setPrimaryKey(array('id'));
 
     $table = $toSchema->createTable('psx_sql_provider_author');
-    $table->addColumn('id', 'integer', array('length' => 10, 'autoincrement' => true));
-    $table->addColumn('name', 'string', array('length' => 64));
-    $table->addColumn('uri', 'string', array('length' => 64));
+    $table->addColumn('id', \Doctrine\DBAL\Types\Types::INTEGER, ['length' => 10, 'autoincrement' => true]);
+    $table->addColumn('name', \Doctrine\DBAL\Types\Types::STRING, ['length' => 64]);
+    $table->addColumn('uri', \Doctrine\DBAL\Types\Types::STRING, ['length' => 64]);
     $table->setPrimaryKey(array('id'));
 
     $queries = $fromSchema->getMigrateToSql($toSchema, $connection->getDatabasePlatform());
     foreach ($queries as $query) {
-        $connection->query($query);
+        $connection->executeQuery($query);
     }
 
     return $connection;
