@@ -20,7 +20,7 @@
 
 namespace PSX\Sql\Tests;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use PHPUnit\Framework\TestCase;
 use PSX\Sql\TableInterface;
 use PSX\Sql\TypeMapper;
@@ -35,23 +35,23 @@ use PSX\Sql\TypeMapper;
 class TypeMapperTest extends TestCase
 {
     protected $types = array(
-        TableInterface::TYPE_SMALLINT => Type::SMALLINT,
-        TableInterface::TYPE_INT      => Type::INTEGER,
-        TableInterface::TYPE_BIGINT   => Type::BIGINT,
-        TableInterface::TYPE_BOOLEAN  => Type::BOOLEAN,
-        TableInterface::TYPE_DECIMAL  => Type::DECIMAL,
-        TableInterface::TYPE_FLOAT    => Type::FLOAT,
-        TableInterface::TYPE_DATE     => Type::DATE,
-        TableInterface::TYPE_DATETIME => Type::DATETIME,
-        TableInterface::TYPE_TIME     => Type::TIME,
-        TableInterface::TYPE_VARCHAR  => Type::STRING,
-        TableInterface::TYPE_TEXT     => Type::TEXT,
-        TableInterface::TYPE_BLOB     => Type::BLOB,
-        TableInterface::TYPE_BINARY   => Type::BINARY,
-        TableInterface::TYPE_ARRAY    => Type::TARRAY,
-        TableInterface::TYPE_OBJECT   => Type::OBJECT,
-        TableInterface::TYPE_JSON     => Type::JSON_ARRAY,
-        TableInterface::TYPE_GUID     => Type::GUID,
+        TableInterface::TYPE_SMALLINT => Types::SMALLINT,
+        TableInterface::TYPE_INT      => Types::INTEGER,
+        TableInterface::TYPE_BIGINT   => Types::BIGINT,
+        TableInterface::TYPE_BOOLEAN  => Types::BOOLEAN,
+        TableInterface::TYPE_DECIMAL  => Types::DECIMAL,
+        TableInterface::TYPE_FLOAT    => Types::FLOAT,
+        TableInterface::TYPE_DATE     => Types::DATE_MUTABLE,
+        TableInterface::TYPE_DATETIME => Types::DATETIME_MUTABLE,
+        TableInterface::TYPE_TIME     => Types::TIME_MUTABLE,
+        TableInterface::TYPE_VARCHAR  => Types::STRING,
+        TableInterface::TYPE_TEXT     => Types::TEXT,
+        TableInterface::TYPE_BLOB     => Types::BLOB,
+        TableInterface::TYPE_BINARY   => Types::BINARY,
+        TableInterface::TYPE_ARRAY    => Types::ARRAY,
+        TableInterface::TYPE_OBJECT   => Types::OBJECT,
+        TableInterface::TYPE_JSON     => Types::JSON,
+        TableInterface::TYPE_GUID     => Types::GUID,
     );
 
     public function testGetTypeByDoctrineType()
