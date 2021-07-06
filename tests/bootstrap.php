@@ -18,7 +18,7 @@ function getConnection()
             $params = [
                 'dbname'   => 'psx',
                 'user'     => 'root',
-                'password' => '',
+                'password' => 'test1234',
                 'host'     => 'localhost',
                 'driver'   => 'pdo_mysql',
             ];
