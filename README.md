@@ -1,5 +1,5 @@
-PSX Sql
-===
+
+# Sql
 
 ## About
 
