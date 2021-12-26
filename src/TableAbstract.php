@@ -28,11 +28,22 @@ use Doctrine\DBAL\Connection;
  * @author  Christoph Kappestein <christoph.kappestein@gmail.com>
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    https://phpsx.org
+ *
+ * @template T
+ * @implements TableInterface<T>
  */
 abstract class TableAbstract implements TableInterface
 {
+    /**
+     * @use TableQueryTrait<T>
+     */
     use TableQueryTrait;
+
+    /**
+     * @use TableManipulationTrait<T>
+     */
     use TableManipulationTrait;
+
     use ViewTrait;
 
     protected Connection $connection;
@@ -55,9 +66,9 @@ abstract class TableAbstract implements TableInterface
         return $pos !== false ? substr($name, $pos + 1) : $name;
     }
 
-    public function getPrimaryKey(): ?string
+    public function getPrimaryKeys(): array
     {
-        return $this->getFirstColumnWithAttr(self::PRIMARY_KEY);
+        return $this->getColumnsWithAttribute(self::PRIMARY_KEY);
     }
 
     public function hasColumn(string $column): bool
@@ -82,17 +93,16 @@ abstract class TableAbstract implements TableInterface
         $this->connection->rollBack();
     }
 
-    protected function getFirstColumnWithAttr(int $searchAttr): ?string
+    protected function getColumnsWithAttribute(int $searchAttribute): array
     {
-        $columns = $this->getColumns();
-
-        foreach ($columns as $column => $attr) {
-            if ($attr & $searchAttr) {
-                return $column;
+        $result = [];
+        foreach ($this->getColumns() as $column => $attribute) {
+            if ($attribute & $searchAttribute) {
+                $result[] = $column;
             }
         }
 
-        return null;
+        return $result;
     }
 
     /**
@@ -101,9 +111,8 @@ abstract class TableAbstract implements TableInterface
     protected function unserializeType(mixed $value, int $type): mixed
     {
         if ($type === self::TYPE_JSON) {
-            // overwrite the doctrine json type since it uses the assoc
-            // parameter. This is a problem for empty objects since we cant
-            // distinguish between an empty array or object
+            // overwrite the doctrine json type since it uses the assoc parameter. This is a problem for empty objects
+            // since we cant distinguish between an empty array or object
             if ($value === null) {
                 return null;
             } elseif ($value === '') {
@@ -113,12 +122,12 @@ abstract class TableAbstract implements TableInterface
             }
 
             return json_decode($value);
-        } else {
-            return $this->connection->convertToPHPValue(
-                $value,
-                TypeMapper::getDoctrineTypeByType($type)
-            );
         }
+
+        return $this->connection->convertToPHPValue(
+            $value,
+            TypeMapper::getDoctrineTypeByType($type)
+        );
     }
 
     /**
