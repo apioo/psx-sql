@@ -26,6 +26,7 @@ use PSX\Sql\Builder;
 use PSX\Sql\Exception\BuilderException;
 use PSX\Sql\Field;
 use PSX\Sql\Provider\Map;
+use PSX\Sql\Test\DatabaseTestCaseTrait;
 
 /**
  * BuilderTest
@@ -36,6 +37,8 @@ use PSX\Sql\Provider\Map;
  */
 class BuilderTest extends TestCase
 {
+    use DatabaseTestCaseTrait;
+
     public function testBuild()
     {
         $news = [[
@@ -109,7 +112,7 @@ class BuilderTest extends TestCase
 }
 JSON;
 
-        $builder = new Builder();
+        $builder = new Builder($this->connection);
         $result  = json_encode($builder->build($definition), JSON_PRETTY_PRINT);
 
         $this->assertJsonStringEqualsJsonString($expect, $result, $result);
@@ -129,7 +132,7 @@ JSON;
             ]),
         ];
 
-        $builder = new Builder();
+        $builder = new Builder($this->connection);
         $builder->build($definition);
     }
 
@@ -139,7 +142,7 @@ JSON;
             'foo' => 'bar',
         ];
 
-        $builder = new Builder();
+        $builder = new Builder($this->connection);
         $result  = $builder->build($definition);
 
         $this->assertEquals(Record::fromArray($definition), $result);
@@ -176,7 +179,7 @@ JSON;
 }
 JSON;
 
-        $builder = new Builder();
+        $builder = new Builder($this->connection);
         $result  = json_encode($builder->build($definition), JSON_PRETTY_PRINT);
 
         $this->assertJsonStringEqualsJsonString($expect, $result, $result);
