@@ -56,13 +56,12 @@ $row->setTitle('foo');
 $table->create($row);
 
 // updates a row
-$row = new \PSX\Sql\Tests\Generator\SqlTableTestRow();
+$row = $table->findOneById(1);
 $row->setTitle('bar');
-$table->update($row, ['id' => 1]);
+$table->update($row);
 
 // deletes a row
-$row = new \PSX\Sql\Tests\Generator\SqlTableTestRow();
-$row->setId(1);
+$row = $table->findOneById(1);
 $table->delete($row);
 
 ```
@@ -78,37 +77,35 @@ namespace PSX\Sql\Tests\Generator;
 
 class SqlTableTestTable extends \PSX\Sql\TableAbstract
 {
+    public const NAME = 'psx_sql_table_test';
     public const COLUMN_ID = 'id';
     public const COLUMN_TITLE = 'title';
     public const COLUMN_DATE = 'date';
-    public function getName()
+    public function getName() : string
     {
-        return 'psx_sql_table_test';
+        return self::NAME;
     }
-    public function getColumns()
+    public function getColumns() : array
     {
         return array(self::COLUMN_ID => 0x30200000, self::COLUMN_TITLE => 0xa00020, self::COLUMN_DATE => 0x800000);
     }
     /**
      * @return \PSX\Sql\Tests\Generator\SqlTableTestRow[]
      */
-    public function findAll(?int $startIndex = null, ?int $count = null, ?string $sortBy = null, ?int $sortOrder = null)
+    public function findAll(?int $startIndex = null, ?int $count = null, ?string $sortBy = null, ?int $sortOrder = null) : iterable
     {
         return $this->getAll($startIndex, $count, $sortBy, $sortOrder, null, null);
     }
     /**
      * @return \PSX\Sql\Tests\Generator\SqlTableTestRow[]
      */
-    public function findById(int $value, ?int $startIndex = null, ?int $count = null, ?string $sortBy = null, ?int $sortOrder = null)
+    public function findById(int $value, ?int $startIndex = null, ?int $count = null, ?string $sortBy = null, ?int $sortOrder = null) : iterable
     {
         $condition = new \PSX\Sql\Condition();
         $condition->equals('id', $value);
         return $this->getBy($condition, null, $startIndex, $count, $sortBy, $sortOrder);
     }
-    /**
-     * @return \PSX\Sql\Tests\Generator\SqlTableTestRow
-     */
-    public function findOneById(int $value)
+    public function findOneById(int $value) : ?\PSX\Sql\Tests\Generator\SqlTableTestRow
     {
         $condition = new \PSX\Sql\Condition();
         $condition->equals('id', $value);
@@ -117,16 +114,13 @@ class SqlTableTestTable extends \PSX\Sql\TableAbstract
     /**
      * @return \PSX\Sql\Tests\Generator\SqlTableTestRow[]
      */
-    public function findByTitle(string $value, ?int $startIndex = null, ?int $count = null, ?string $sortBy = null, ?int $sortOrder = null)
+    public function findByTitle(string $value, ?int $startIndex = null, ?int $count = null, ?string $sortBy = null, ?int $sortOrder = null) : iterable
     {
         $condition = new \PSX\Sql\Condition();
         $condition->like('title', $value);
         return $this->getBy($condition, null, $startIndex, $count, $sortBy, $sortOrder);
     }
-    /**
-     * @return \PSX\Sql\Tests\Generator\SqlTableTestRow
-     */
-    public function findOneByTitle(string $value)
+    public function findOneByTitle(string $value) : ?\PSX\Sql\Tests\Generator\SqlTableTestRow
     {
         $condition = new \PSX\Sql\Condition();
         $condition->like('title', $value);
@@ -135,16 +129,13 @@ class SqlTableTestTable extends \PSX\Sql\TableAbstract
     /**
      * @return \PSX\Sql\Tests\Generator\SqlTableTestRow[]
      */
-    public function findByDate(\DateTime $value, ?int $startIndex = null, ?int $count = null, ?string $sortBy = null, ?int $sortOrder = null)
+    public function findByDate(\DateTime $value, ?int $startIndex = null, ?int $count = null, ?string $sortBy = null, ?int $sortOrder = null) : iterable
     {
         $condition = new \PSX\Sql\Condition();
         $condition->equals('date', $value);
         return $this->getBy($condition, null, $startIndex, $count, $sortBy, $sortOrder);
     }
-    /**
-     * @return \PSX\Sql\Tests\Generator\SqlTableTestRow
-     */
-    public function findOneByDate(\DateTime $value)
+    public function findOneByDate(\DateTime $value) : ?\PSX\Sql\Tests\Generator\SqlTableTestRow
     {
         $condition = new \PSX\Sql\Condition();
         $condition->equals('date', $value);
