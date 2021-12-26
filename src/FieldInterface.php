@@ -30,7 +30,7 @@ namespace PSX\Sql;
 interface FieldInterface
 {
     /**
-     * Returns the value
+     * A field transform a value from a database result into a specific value
      */
-    public function getResult(array|\ArrayObject|null $context = null): mixed;
+    public function getResult(array|\ArrayAccess|null $context = null): mixed;
 }
