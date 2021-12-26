@@ -35,10 +35,8 @@ use PSX\Sql\Test\DatabaseTestCaseTrait;
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    https://phpsx.org
  */
-class BuilderTest extends TestCase
+class BuilderTest extends TableTestCase
 {
-    use DatabaseTestCaseTrait;
-
     public function testBuild()
     {
         $news = [[

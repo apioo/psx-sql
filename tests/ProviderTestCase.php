@@ -54,7 +54,7 @@ abstract class ProviderTestCase extends TestCase
 
     public function testBuild()
     {
-        $builder = new Builder();
+        $builder = new Builder($this->connection);
         $result  = json_encode($builder->build($this->getDefinition()), JSON_PRETTY_PRINT);
 
         $expect = <<<JSON

@@ -32,7 +32,7 @@ use PSX\Sql\Provider\Map;
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    https://phpsx.org
  */
-class FieldTest extends TestCase
+class FieldTest extends TableTestCase
 {
     public function testFields()
     {
@@ -58,7 +58,7 @@ class FieldTest extends TestCase
             ]),
         ];
 
-        $builder = new Builder();
+        $builder = new Builder($this->connection);
         $result  = json_encode($builder->build($definition), JSON_PRETTY_PRINT);
 
         $expect = <<<JSON
