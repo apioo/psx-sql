@@ -36,7 +36,7 @@ use PSX\Sql\TableQueryInterface;
  */
 trait TableQueryTestTrait
 {
-    public function testGetAll()
+    public function testFindAll()
     {
         $table = $this->getTable();
 
@@ -44,7 +44,7 @@ trait TableQueryTestTrait
             $this->markTestSkipped('Table not a query interface');
         }
 
-        $result = $table->getAll();
+        $result = $table->findAll();
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(4, count($result));
@@ -79,7 +79,7 @@ trait TableQueryTestTrait
         $this->assertEquals($expect, $result);
     }
 
-    public function testGetAllStartIndex()
+    public function testFindAllStartIndex()
     {
         $table = $this->getTable();
 
@@ -87,7 +87,7 @@ trait TableQueryTestTrait
             $this->markTestSkipped('Table not a query interface');
         }
 
-        $result = $table->getAll(3);
+        $result = $table->findAll(startIndex: 3);
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(1, count($result));
@@ -104,7 +104,7 @@ trait TableQueryTestTrait
         $this->assertEquals($expect, $result);
     }
 
-    public function testGetAllCount()
+    public function testFindAllCount()
     {
         $table = $this->getTable();
 
@@ -112,7 +112,7 @@ trait TableQueryTestTrait
             $this->markTestSkipped('Table not a query interface');
         }
 
-        $result = $table->getAll(0, 2);
+        $result = $table->findAll(startIndex: 0, count: 2);
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(2, count($result));
@@ -135,7 +135,7 @@ trait TableQueryTestTrait
         $this->assertEquals($expect, $result);
     }
 
-    public function testGetAllStartIndexAndCountDefault()
+    public function testFindAllStartIndexAndCountDefault()
     {
         $table = $this->getTable();
 
@@ -143,7 +143,7 @@ trait TableQueryTestTrait
             $this->markTestSkipped('Table not a query interface');
         }
 
-        $result = $table->getAll(2, 2);
+        $result = $table->findAll(startIndex: 2, count: 2);
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(2, count($result));
@@ -166,7 +166,7 @@ trait TableQueryTestTrait
         $this->assertEquals($expect, $result);
     }
 
-    public function testGetAllStartIndexAndCountDesc()
+    public function testFindAllStartIndexAndCountDesc()
     {
         $table = $this->getTable();
 
@@ -174,7 +174,7 @@ trait TableQueryTestTrait
             $this->markTestSkipped('Table not a query interface');
         }
 
-        $result = $table->getAll(2, 2, 'id', Sql::SORT_DESC);
+        $result = $table->findAll(startIndex: 2, count: 2, sortBy: 'id', sortOrder: Sql::SORT_DESC);
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(2, count($result));
@@ -197,7 +197,7 @@ trait TableQueryTestTrait
         $this->assertEquals($expect, $result);
     }
 
-    public function testGetAllStartIndexAndCountAsc()
+    public function testFindAllStartIndexAndCountAsc()
     {
         $table = $this->getTable();
 
@@ -205,7 +205,7 @@ trait TableQueryTestTrait
             $this->markTestSkipped('Table not a query interface');
         }
 
-        $result = $table->getAll(2, 2, 'id', Sql::SORT_ASC);
+        $result = $table->findAll(startIndex: 2, count: 2, sortBy: 'id', sortOrder: Sql::SORT_ASC);
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(2, count($result));
@@ -228,7 +228,7 @@ trait TableQueryTestTrait
         $this->assertEquals($expect, $result);
     }
 
-    public function testGetAllSortDesc()
+    public function testFindAllSortDesc()
     {
         $table = $this->getTable();
 
@@ -236,7 +236,7 @@ trait TableQueryTestTrait
             $this->markTestSkipped('Table not a query interface');
         }
 
-        $result = $table->getAll(0, 2, 'id', Sql::SORT_DESC);
+        $result = $table->findAll(startIndex: 0, count: 2, sortBy: 'id', sortOrder: Sql::SORT_DESC);
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(2, count($result));
@@ -268,7 +268,7 @@ trait TableQueryTestTrait
         $this->assertEquals(3, $result[1]->id);
     }
 
-    public function testGetAllSortAsc()
+    public function testFindAllSortAsc()
     {
         $table = $this->getTable();
 
@@ -276,7 +276,7 @@ trait TableQueryTestTrait
             $this->markTestSkipped('Table not a query interface');
         }
 
-        $result = $table->getAll(0, 2, 'id', Sql::SORT_ASC);
+        $result = $table->findAll(startIndex: 0, count: 2, sortBy: 'id', sortOrder: Sql::SORT_ASC);
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(2, count($result));
@@ -299,7 +299,7 @@ trait TableQueryTestTrait
         $this->assertEquals($expect, $result);
     }
 
-    public function testGetAllCondition()
+    public function testFindAllCondition()
     {
         $table = $this->getTable();
 
@@ -308,7 +308,7 @@ trait TableQueryTestTrait
         }
 
         $con    = new Condition(array('userId', '=', 1));
-        $result = $table->getAll(0, 16, 'id', Sql::SORT_DESC, $con);
+        $result = $table->findAll(condition: $con, startIndex: 0, count: 16, sortBy: 'id', sortOrder: Sql::SORT_DESC);
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(2, count($result));
@@ -331,7 +331,7 @@ trait TableQueryTestTrait
         $this->assertEquals($expect, $result);
     }
 
-    public function testGetAllConditionAndConjunction()
+    public function testFindAllConditionAndConjunction()
     {
         $table = $this->getTable();
 
@@ -342,7 +342,7 @@ trait TableQueryTestTrait
         $con = new Condition();
         $con->add('userId', '=', 1, 'AND');
         $con->add('userId', '=', 3);
-        $result = $table->getAll(0, 16, 'id', Sql::SORT_DESC, $con);
+        $result = $table->findAll(condition: $con, startIndex: 0, count: 16, sortBy: 'id', sortOrder: Sql::SORT_DESC);
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(0, count($result));
@@ -351,7 +351,7 @@ trait TableQueryTestTrait
         $con = new Condition();
         $con->add('userId', '=', 1, 'AND');
         $con->add('title', '=', 'foo');
-        $result = $table->getAll(0, 16, 'id', Sql::SORT_DESC, $con);
+        $result = $table->findAll(condition: $con, startIndex: 0, count: 16, sortBy: 'id', sortOrder: Sql::SORT_DESC);
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(1, count($result));
@@ -368,7 +368,7 @@ trait TableQueryTestTrait
         $this->assertEquals($expect, $result);
     }
 
-    public function testGetAllConditionOrConjunction()
+    public function testFindAllConditionOrConjunction()
     {
         $table = $this->getTable();
 
@@ -379,7 +379,7 @@ trait TableQueryTestTrait
         $con = new Condition();
         $con->add('userId', '=', 1, 'OR');
         $con->add('userId', '=', 3);
-        $result = $table->getAll(0, 16, 'id', Sql::SORT_DESC, $con);
+        $result = $table->findAll(condition: $con, startIndex: 0, count: 16, sortBy: 'id', sortOrder: Sql::SORT_DESC);
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(3, count($result));
@@ -408,7 +408,7 @@ trait TableQueryTestTrait
         $this->assertEquals($expect, $result);
     }
 
-    public function testGetAllFieldWhitelist()
+    public function testFindAllFieldWhitelist()
     {
         $table = $this->getTable();
 
@@ -416,7 +416,7 @@ trait TableQueryTestTrait
             $this->markTestSkipped('Table not a query interface');
         }
 
-        $result = $table->getAll(0, 2, 'id', Sql::SORT_DESC, null, Fields::whitelist(['id', 'title']));
+        $result = $table->findAll(startIndex: 0, count: 2, sortBy: 'id', sortOrder: Sql::SORT_DESC, fields: Fields::whitelist(['id', 'title']));
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(2, count($result));
@@ -435,7 +435,7 @@ trait TableQueryTestTrait
         $this->assertEquals($expect, $result);
     }
 
-    public function testGetAllFieldBlacklist()
+    public function testFindAllFieldBlacklist()
     {
         $table = $this->getTable();
 
@@ -443,7 +443,7 @@ trait TableQueryTestTrait
             $this->markTestSkipped('Table not a query interface');
         }
 
-        $result = $table->getAll(0, 2, 'id', Sql::SORT_DESC, null, Fields::blacklist(['id', 'title']));
+        $result = $table->findAll(startIndex: 0, count: 2, sortBy: 'id', sortOrder: Sql::SORT_DESC, fields: Fields::blacklist(['id', 'title']));
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(2, count($result));
@@ -462,7 +462,7 @@ trait TableQueryTestTrait
         $this->assertEquals($expect, $result);
     }
 
-    public function testGetBy()
+    public function testFindBy()
     {
         $table = $this->getTable();
 
@@ -470,7 +470,7 @@ trait TableQueryTestTrait
             $this->markTestSkipped('Table not a query interface');
         }
 
-        $result = $table->getBy(new Condition(['userId', '=', 1]));
+        $result = $table->findBy(condition: new Condition(['userId', '=', 1]));
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(2, count($result));
@@ -493,7 +493,7 @@ trait TableQueryTestTrait
         $this->assertEquals($expect, $result);
     }
 
-    public function testGetByFieldWhitelist()
+    public function testFindByFieldWhitelist()
     {
         $table = $this->getTable();
 
@@ -501,7 +501,7 @@ trait TableQueryTestTrait
             $this->markTestSkipped('Table not a query interface');
         }
 
-        $result = $table->getBy(new Condition(['userId', '=', 1]), Fields::whitelist(['id', 'title']));
+        $result = $table->findBy(condition: new Condition(['userId', '=', 1]), fields: Fields::whitelist(['id', 'title']));
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(2, count($result));
@@ -520,7 +520,7 @@ trait TableQueryTestTrait
         $this->assertEquals($expect, $result);
     }
 
-    public function testGetByStartIndexCountOrder()
+    public function testFindByStartIndexCountOrder()
     {
         $table = $this->getTable();
 
@@ -528,7 +528,7 @@ trait TableQueryTestTrait
             $this->markTestSkipped('Table not a query interface');
         }
 
-        $result = $table->getBy(new Condition(['userId', '=', 1]), null, 0, 1, 'id', Sql::SORT_ASC);
+        $result = $table->findBy(condition: new Condition(['userId', '=', 1]), startIndex: 0, count: 1, sortBy: 'id', sortOrder: Sql::SORT_ASC);
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(1, count($result));
@@ -545,7 +545,7 @@ trait TableQueryTestTrait
         $this->assertEquals($expect, $result);
     }
 
-    public function testGetOneBy()
+    public function testFindOneBy()
     {
         $table = $this->getTable();
 
@@ -553,7 +553,7 @@ trait TableQueryTestTrait
             $this->markTestSkipped('Table not a query interface');
         }
 
-        $row = $table->getOneBy(new Condition(['id', '=', 1]));
+        $row = $table->findOneBy(condition: new Condition(['id', '=', 1]));
 
         $expect = array(
             new Record(array(
@@ -567,7 +567,7 @@ trait TableQueryTestTrait
         $this->assertEquals($expect, array($row));
     }
 
-    public function testGetOneByFieldWhitelist()
+    public function testFindOneByFieldWhitelist()
     {
         $table = $this->getTable();
 
@@ -575,7 +575,7 @@ trait TableQueryTestTrait
             $this->markTestSkipped('Table not a query interface');
         }
 
-        $row = $table->getOneBy(new Condition(['id', '=', 1]), Fields::whitelist(['id', 'title']));
+        $row = $table->findOneBy(condition: new Condition(['id', '=', 1]), fields: Fields::whitelist(['id', 'title']));
 
         $expect = array(
             new Record(array(
@@ -587,7 +587,7 @@ trait TableQueryTestTrait
         $this->assertEquals($expect, array($row));
     }
 
-    public function testGet()
+    public function testFind()
     {
         $table = $this->getTable();
 
@@ -595,7 +595,7 @@ trait TableQueryTestTrait
             $this->markTestSkipped('Table not a query interface');
         }
 
-        $row = $table->get(1);
+        $row = $table->find(1);
 
         $expect = array(
             new Record(array(
@@ -609,7 +609,7 @@ trait TableQueryTestTrait
         $this->assertEquals($expect, array($row));
     }
 
-    public function testGetFieldWhitelist()
+    public function testGetColumnNames()
     {
         $table = $this->getTable();
 
@@ -617,29 +617,9 @@ trait TableQueryTestTrait
             $this->markTestSkipped('Table not a query interface');
         }
 
-        $row = $table->get(1, Fields::whitelist(['id', 'title']));
+        $columnNames = $table->getColumnNames();
 
-        $expect = array(
-            new Record(array(
-                'id' => 1,
-                'title' => 'foo',
-            )),
-        );
-
-        $this->assertEquals($expect, array($row));
-    }
-
-    public function testGetSupportedFields()
-    {
-        $table = $this->getTable();
-
-        if (!$table instanceof TableQueryInterface) {
-            $this->markTestSkipped('Table not a query interface');
-        }
-
-        $fields = $table->getSupportedFields();
-
-        $this->assertEquals(array('id', 'userId', 'title', 'date'), $fields);
+        $this->assertEquals(array('id', 'userId', 'title', 'date'), $columnNames);
     }
 
     public function testGetCount()
@@ -653,18 +633,5 @@ trait TableQueryTestTrait
         $this->assertEquals(4, $table->getCount());
         $this->assertEquals(2, $table->getCount(new Condition(array('userId', '=', 1))));
         $this->assertEquals(1, $table->getCount(new Condition(array('userId', '=', 3))));
-    }
-
-    public function testNewRecord()
-    {
-        $table = $this->getTable();
-
-        if (!$table instanceof TableQueryInterface) {
-            $this->markTestSkipped('Table not a query interface');
-        }
-
-        $obj = $table->newRecord();
-
-        $this->assertInstanceOf(RecordInterface::class, $obj);
     }
 }

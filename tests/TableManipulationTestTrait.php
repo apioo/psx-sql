@@ -21,6 +21,7 @@
 namespace PSX\Sql\Tests;
 
 use DateTime;
+use PSX\Record\Record;
 use PSX\Record\RecordInterface;
 use PSX\Sql\Condition;
 use PSX\Sql\Exception\NoFieldsAvailableException;
@@ -46,17 +47,18 @@ trait TableManipulationTestTrait
             $this->markTestSkipped('Table not a manipulation interface');
         }
 
-        $record = $table->newRecord();
-        $record->id = 5;
-        $record->userId = 2;
-        $record->title = 'foobar';
-        $record->date = new DateTime();
+        $record = new Record([
+            'id' => 5,
+            'userId' => 2,
+            'title' => 'foobar',
+            'date' => new DateTime(),
+        ]);
 
         $table->create($record);
 
         $this->assertEquals(5, $table->getLastInsertId());
 
-        $row = $table->getOneBy(new Condition(['id', '=', 5]));
+        $row = $table->find(5);
 
         $this->assertInstanceOf(RecordInterface::class, $row);
         $this->assertEquals(5, $row->id);
@@ -86,14 +88,14 @@ trait TableManipulationTestTrait
             $this->markTestSkipped('Table not a manipulation interface');
         }
 
-        $row = $table->getOneBy(new Condition(['id', '=', 1]));
+        $row = $table->find(1);
         $row->userId = 2;
         $row->title = 'foobar';
         $row->date = new DateTime();
 
         $table->update($row);
 
-        $row = $table->getOneBy(new Condition(['id', '=', 1]));
+        $row = $table->find(1);
 
         $this->assertEquals(2, $row->userId);
         $this->assertEquals('foobar', $row->title);
@@ -121,11 +123,11 @@ trait TableManipulationTestTrait
             $this->markTestSkipped('Table not a manipulation interface');
         }
 
-        $row = $table->getOneBy(new Condition(['id', '=', 1]));
+        $row = $table->find(1);
 
         $table->delete($row);
 
-        $row = $table->getOneBy(new Condition(['id', '=', 1]));
+        $row = $table->find(1);
 
         $this->assertEmpty($row);
     }

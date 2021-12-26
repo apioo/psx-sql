@@ -22,6 +22,7 @@ namespace PSX\Sql\Tests;
 
 use Doctrine\DBAL\Connection;
 use PHPUnit\Framework\TestCase;
+use PSX\Sql\Exception\InvalidTableException;
 use PSX\Sql\Table\Reader;
 use PSX\Sql\TableInterface;
 use PSX\Sql\TableManager;
@@ -49,7 +50,7 @@ class TableManagerTest extends TableTestCase
 
     public function testGetTableInvalidTable()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidTableException::class);
 
         $manager = new TableManager(getConnection());
         $manager->getTable('PSX\Sql\FooTable');

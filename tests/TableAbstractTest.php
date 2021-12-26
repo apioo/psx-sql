@@ -104,7 +104,7 @@ class TableAbstractTest extends TableTestCase
 
     public function testGetPrimaryKey()
     {
-        $this->assertEquals('id', $this->getTable()->getPrimaryKey());
+        $this->assertEquals('id', $this->getTable()->getPrimaryKeys()[0]);
     }
 
     public function testHasColumn()

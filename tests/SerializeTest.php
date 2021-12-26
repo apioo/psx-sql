@@ -35,9 +35,8 @@ class SerializeTest extends TableTestCase
     {
         $tableManager = new TableManager(getConnection());
 
-        /** @var \PSX\Sql\Tests\TestTableCommand $table */
         $table = $tableManager->getTable('PSX\Sql\Tests\TestTableCommand');
-        $row   = $table->get(1);
+        $row   = $table->find(1);
 
         $this->assertIsString($row->col_bigint);
         $this->assertEquals('68719476735', $row->col_bigint);
