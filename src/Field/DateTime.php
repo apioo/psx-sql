@@ -29,17 +29,17 @@ namespace PSX\Sql\Field;
  */
 class DateTime extends TransformFieldAbstract
 {
-    protected function transform($value)
+    protected function transform(mixed $value): ?string
     {
-        if (!$value instanceof \DateTime) {
+        if (!$value instanceof \DateTimeInterface) {
             $data = (string) $value;
             if (empty($data) || $data === '0000-00-00 00:00:00') {
                 return null;
             } else {
-                $value = new \DateTime($data);
+                $value = new \DateTimeImmutable($data);
             }
         }
 
-        return $value->getOffset() == 0 ? $value->format('Y-m-d\TH:i:s') . 'Z' : $value->format(\DateTime::RFC3339);
+        return $value->getOffset() == 0 ? $value->format('Y-m-d\TH:i:s') . 'Z' : $value->format(\DateTimeInterface::RFC3339);
     }
 }

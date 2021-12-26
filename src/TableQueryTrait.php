@@ -20,10 +20,9 @@
 
 namespace PSX\Sql;
 
-use BadMethodCallException;
 use Doctrine\DBAL\Query\QueryBuilder;
-use InvalidArgumentException;
 use PSX\Record\Record;
+use PSX\Record\RecordInterface;
 
 /**
  * TableQueryTrait
@@ -34,21 +33,12 @@ use PSX\Record\Record;
  */
 trait TableQueryTrait
 {
-    /**
-     * @param integer $startIndex
-     * @param integer $count
-     * @param string $sortBy
-     * @param integer $sortOrder
-     * @param Condition|null $condition
-     * @param Fields|null $fields
-     * @return \PSX\Record\Record[]
-     */
-    public function getAll($startIndex = null, $count = null, $sortBy = null, $sortOrder = null, Condition $condition = null, Fields $fields = null)
+    public function getAll(?int $startIndex = null, ?int $count = null, ?string $sortBy = null, ?int $sortOrder = null, ?Condition $condition = null, ?Fields $fields = null): iterable
     {
-        $startIndex = $startIndex !== null ? (int) $startIndex : 0;
-        $count      = !empty($count)       ? (int) $count      : $this->limit();
-        $sortBy     = $sortBy     !== null ? $sortBy           : $this->sortKey();
-        $sortOrder  = $sortOrder  !== null ? (int) $sortOrder  : $this->sortOrder();
+        $startIndex = $startIndex !== null ? $startIndex : 0;
+        $count = !empty($count) ? $count : $this->limit();
+        $sortBy = $sortBy !== null ? $sortBy : $this->sortKey();
+        $sortOrder = $sortOrder !== null ? $sortOrder : $this->sortOrder();
 
         if ($fields !== null) {
             $fieldsWhitelist = $fields->getWhitelist();
@@ -83,38 +73,22 @@ trait TableQueryTrait
         return $this->project($sql, $parameters);
     }
 
-    /**
-     * @param Condition $condition
-     * @param Fields|null $fields
-     * @param integer $startIndex
-     * @param integer $count
-     * @param string $sortBy
-     * @param integer $sortOrder
-     * @return \PSX\Record\Record[]
-     */
-    public function getBy(Condition $condition, Fields $fields = null, $startIndex = null, $count = null, $sortBy = null, $sortOrder = null)
+    public function getBy(Condition $condition, ?Fields $fields = null, ?int $startIndex = null, ?int $count = null, ?string $sortBy = null, ?int $sortOrder = null): iterable
     {
         return $this->getAll($startIndex, $count, $sortBy, $sortOrder, $condition, $fields);
     }
 
-    /**
-     * @param Condition $condition
-     * @param Fields|null $fields
-     * @return \PSX\Record\Record
-     */
-    public function getOneBy(Condition $condition, Fields $fields = null)
+    public function getOneBy(Condition $condition, ?Fields $fields = null): ?RecordInterface
     {
         $result = $this->getAll(0, 1, null, null, $condition, $fields);
+        foreach ($result as $row) {
+            return $row;
+        }
 
-        return current($result);
+        return null;
     }
 
-    /**
-     * @param integer $id
-     * @param Fields|null $fields
-     * @return \PSX\Record\Record
-     */
-    public function get($id, Fields $fields = null)
+    public function get(string|int $id, ?Fields $fields = null): ?RecordInterface
     {
         $condition = new Condition(array($this->getPrimaryKey(), '=', $id));
 
@@ -122,105 +96,37 @@ trait TableQueryTrait
     }
 
     /**
-     * @param Condition|null $condition
-     * @return integer
+     * @throws \Doctrine\DBAL\Exception
      */
-    public function getCount(Condition $condition = null)
+    public function getCount(?Condition $condition = null): int
     {
         [$sql, $parameters] = $this->getQueryCount(
             $this->getName(),
             $condition
         );
 
-        return (int) $this->connection->fetchColumn($sql, $parameters);
+        return (int) $this->connection->fetchOne($sql, $parameters);
     }
 
-    /**
-     * @return array
-     */
-    public function getSupportedFields()
+    public function getSupportedFields(): array
     {
         return array_keys($this->getColumns());
     }
 
-    /**
-     * @return \PSX\Record\Record
-     * @deprecated
-     */
-    public function getRecord()
+    public function newRecord(): RecordInterface
     {
         $supported = $this->getSupportedFields();
         $fields    = array_combine($supported, array_fill(0, count($supported), null));
 
-        return new Record('record', $fields);
-    }
-
-    /**
-     * Magic method to make conditional selection
-     *
-     * @param string $method
-     * @param string $arguments
-     * @return mixed
-     */
-    public function __call($method, $arguments)
-    {
-        if (substr($method, 0, 8) == 'getOneBy') {
-            $column = lcfirst(substr($method, 8));
-            $value  = isset($arguments[0]) ? $arguments[0] : null;
-            $fields = isset($arguments[1]) ? $arguments[1] : null;
-
-            if (!empty($value)) {
-                $condition = new Condition(array($column, '=', $value));
-            } else {
-                throw new InvalidArgumentException('Value required');
-            }
-
-            if ($fields !== null && !$fields instanceof Fields) {
-                throw new InvalidArgumentException('Invalid fields provided must be an instance of Fields');
-            }
-
-            return $this->getOneBy($condition, $fields);
-        } elseif (substr($method, 0, 5) == 'getBy') {
-            $column = lcfirst(substr($method, 5));
-            $value  = isset($arguments[0]) ? $arguments[0] : null;
-            $fields = isset($arguments[1]) ? $arguments[1] : null;
-
-            if (!empty($value)) {
-                $condition = new Condition(array($column, '=', $value));
-            } else {
-                throw new InvalidArgumentException('Value required');
-            }
-
-            if ($fields !== null && !$fields instanceof Fields) {
-                throw new InvalidArgumentException('Invalid fields provided must be an instance of Fields');
-            }
-
-            $startIndex = isset($arguments[2]) ? $arguments[2] : null;
-            $count      = isset($arguments[3]) ? $arguments[3] : null;
-            $sortBy     = isset($arguments[4]) ? $arguments[4] : null;
-            $sortOrder  = isset($arguments[5]) ? $arguments[5] : null;
-
-            return $this->getBy($condition, $fields, $startIndex, $count, $sortBy, $sortOrder);
-        } else {
-            throw new BadMethodCallException('Undefined method ' . $method);
-        }
+        return new Record($fields);
     }
 
     /**
      * Returns an array which contains as first value a SQL query and as second
      * an array of parameters. Uses by default the dbal query builder to create
      * the SQL query. The query is used for the default query methods
-     *
-     * @param string $table
-     * @param array $fields
-     * @param integer $startIndex
-     * @param integer $count
-     * @param string $sortBy
-     * @param string $sortOrder
-     * @param \PSX\Sql\Condition|null $condition
-     * @return array
      */
-    protected function getQuery($table, array $fields, $startIndex, $count, $sortBy, $sortOrder, Condition $condition = null)
+    protected function getQuery(string $table, array $fields, int $startIndex, int $count, string $sortBy, int $sortOrder, ?Condition $condition = null): array
     {
         $builder = $this->newQueryBuilder($table)
             ->select($fields)
@@ -235,12 +141,10 @@ trait TableQueryTrait
      * Returns an array which contains as first value a SQL query and as second
      * an array of parameters. Uses by default the dbal query builder to create
      * the SQL query. The query is used for the count method
-     * 
-     * @param string $table
-     * @param \PSX\Sql\Condition|null $condition
-     * @return array
+     *
+     * @throws \Doctrine\DBAL\Exception
      */
-    protected function getQueryCount($table, Condition $condition = null)
+    protected function getQueryCount(string $table, ?Condition $condition = null): array
     {
         $builder = $this->newQueryBuilder($table)
             ->select($this->connection->getDatabasePlatform()->getCountExpression($this->getPrimaryKey()));
@@ -248,15 +152,18 @@ trait TableQueryTrait
         return $this->convertBuilder($builder, $condition);
     }
 
-    protected function project($sql, array $params = array(), array $columns = null)
+    /**
+     * @throws \Doctrine\DBAL\Exception
+     * @throws \Doctrine\DBAL\Driver\Exception
+     */
+    protected function project(string $sql, array $params = array(), array $columns = null): array
     {
         $result  = array();
         $columns = $columns === null ? $this->getColumns() : $columns;
         $stmt    = $this->connection->executeQuery($sql, $params ?: array());
-        $name    = $this->getDisplayName();
         $class   = $this->getRecordClass();
 
-        while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+        while ($row = $stmt->fetchAssociative()) {
             foreach ($row as $key => $value) {
                 if (isset($columns[$key])) {
                     $value = $this->unserializeType($value, $columns[$key]);
@@ -265,34 +172,30 @@ trait TableQueryTrait
                 $row[$key] = $value;
             }
 
-            $result[] = new $class($name, $row);
+            $result[] = new $class($row);
         }
 
-        $stmt->closeCursor();
+        $stmt->free();
 
         return $result;
     }
 
-    protected function limit()
+    protected function limit(): int
     {
         return 16;
     }
 
-    protected function sortKey()
+    protected function sortKey(): ?string
     {
         return $this->getPrimaryKey();
     }
 
-    protected function sortOrder()
+    protected function sortOrder(): int
     {
         return Sql::SORT_DESC;
     }
 
-    /**
-     * @param string $table
-     * @return \Doctrine\DBAL\Query\QueryBuilder
-     */
-    protected function newQueryBuilder($table)
+    protected function newQueryBuilder(string $table): QueryBuilder
     {
         return $this->connection->createQueryBuilder()
             ->from($table, null);
@@ -300,8 +203,6 @@ trait TableQueryTrait
 
     /**
      * Returns the default record class
-     *
-     * @return string
      */
     protected function getRecordClass(): string
     {
@@ -309,11 +210,9 @@ trait TableQueryTrait
     }
 
     /**
-     * @param \Doctrine\DBAL\Query\QueryBuilder $builder
-     * @param \PSX\Sql\Condition|null $condition
-     * @return array
+     * @throws \Doctrine\DBAL\Exception
      */
-    private function convertBuilder(QueryBuilder $builder, Condition $condition = null)
+    private function convertBuilder(QueryBuilder $builder, ?Condition $condition = null): array
     {
         if ($condition !== null && $condition->hasCondition()) {
             $builder->where($condition->getExpression($this->connection->getDatabasePlatform()));

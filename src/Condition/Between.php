@@ -31,23 +31,23 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
  */
 class Between extends ExpressionAbstract
 {
-    protected $left;
-    protected $right;
+    private mixed $left;
+    private mixed $right;
 
-    public function __construct($column, $left, $right, $conjunction = 'AND')
+    public function __construct(string $column, mixed $left, mixed $right, $conjunction = 'AND')
     {
         parent::__construct($column, $conjunction);
 
-        $this->left  = $left;
+        $this->left = $left;
         $this->right = $right;
     }
 
-    public function getExpression(AbstractPlatform $platform)
+    public function getExpression(AbstractPlatform $platform): string
     {
         return $platform->getBetweenExpression($this->column, '?', '?');
     }
 
-    public function getValues()
+    public function getValues(): array
     {
         return [$this->left, $this->right];
     }

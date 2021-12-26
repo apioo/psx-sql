@@ -31,9 +31,6 @@ interface FieldInterface
 {
     /**
      * Returns the value
-     *
-     * @param array|\ArrayObject $context
-     * @return mixed
      */
-    public function getResult($context = null);
+    public function getResult(array|\ArrayObject|null $context = null): mixed;
 }

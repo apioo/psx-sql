@@ -33,10 +33,10 @@ use PSX\Sql\Provider\ProviderCollectionInterface;
  */
 class Collection extends DBALAbstract implements ProviderCollectionInterface
 {
-    protected $key;
-    protected $filter;
+    private string|\Closure|null $key;
+    private ?\Closure $filter;
 
-    public function __construct(Connection $connection, $sql, array $parameters, $definition, $key = null, \Closure $filter = null)
+    public function __construct(Connection $connection, string $sql, array $parameters, mixed $definition, string|\Closure|null $key = null, ?\Closure $filter = null)
     {
         parent::__construct($connection, $sql, $parameters, $definition);
 
@@ -44,17 +44,17 @@ class Collection extends DBALAbstract implements ProviderCollectionInterface
         $this->filter = $filter;
     }
 
-    public function getKey()
+    public function getKey(): string|\Closure|null
     {
         return $this->key;
     }
 
-    public function getFilter()
+    public function getFilter(): ?\Closure
     {
         return $this->filter;
     }
 
-    public function getResult($context = null)
+    public function getResult(array|\ArrayAccess|null $context = null): array
     {
         $parameters = ParameterResolver::resolve($this->parameters, $context);
         $types      = self::getTypes($parameters);

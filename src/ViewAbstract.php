@@ -20,6 +20,8 @@
 
 namespace PSX\Sql;
 
+use Doctrine\DBAL\Connection;
+
 /**
  * ViewAbstract
  *
@@ -27,28 +29,15 @@ namespace PSX\Sql;
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    http://phpsx.org
  */
-abstract class ViewAbstract
+abstract class ViewAbstract implements ViewInterface
 {
     use ViewTrait;
 
-    /**
-     * @var \Doctrine\DBAL\Connection
-     */
-    protected $connection;
+    protected Connection $connection;
 
-    /**
-     * @var \PSX\Sql\TableManagerInterface
-     */
-    private $tableManager;
+    private TableManagerInterface $tableManager;
+    private Builder $builder;
 
-    /**
-     * @var \PSX\Sql\Builder
-     */
-    private $builder;
-
-    /**
-     * @param \PSX\Sql\TableManager $tableManager
-     */
     public function __construct(TableManager $tableManager)
     {
         $this->connection   = $tableManager->getConnection();

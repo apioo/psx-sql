@@ -33,9 +33,6 @@ interface GeneratorInterface
 {
     /**
      * Generates a different representation of the table
-     * 
-     * @param \Doctrine\DBAL\Schema\Table $table
-     * @return string
      */
-    public function generate(Table $table);
+    public function generate(Table $table): string;
 }

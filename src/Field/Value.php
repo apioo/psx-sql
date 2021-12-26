@@ -31,14 +31,14 @@ use PSX\Sql\FieldInterface;
  */
 class Value implements FieldInterface
 {
-    protected $value;
+    protected mixed $value;
 
-    public function __construct($value)
+    public function __construct(mixed $value)
     {
         $this->value = $value;
     }
 
-    public function getResult($context = null)
+    public function getResult(array|\ArrayObject $context = null): mixed
     {
         return $this->value;
     }

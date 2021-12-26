@@ -28,6 +28,7 @@ use PhpParser\BuilderFactory;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\PrettyPrinter;
 use PhpParser\Node;
+use PhpParser\Builder;
 use PSX\DateTime\Date;
 use PSX\DateTime\DateTime;
 use PSX\DateTime\Time;
@@ -44,30 +45,11 @@ use PSX\Sql\TypeMapper;
  */
 class Generator
 {
-    /**
-     * @var Connection
-     */
-    private $connection;
-
-    /**
-     * @var string|null
-     */
-    private $namespace;
-
-    /**
-     * @var string|null
-     */
-    private $prefix;
-
-    /**
-     * @var BuilderFactory
-     */
-    private $factory;
-
-    /**
-     * @var PrettyPrinter\Standard
-     */
-    private $printer;
+    private Connection $connection;
+    private ?string $namespace;
+    private ?string $prefix;
+    private BuilderFactory $factory;
+    private PrettyPrinter\Standard $printer;
 
     public function __construct(Connection $connection, ?string $namespace = null, ?string $prefix = null)
     {
@@ -102,7 +84,7 @@ class Generator
         }
     }
 
-    private function generateModel(string $className, Table $table)
+    private function generateModel(string $className, Table $table): Builder\Class_
     {
         $class = $this->factory->class($className);
         $class->extend('\\' . Record::class);
@@ -118,7 +100,11 @@ class Generator
             // setter
             $param = $this->factory->param($name);
             if (!empty($type)) {
-                $param->setType(new Node\NullableType($type));
+                if ($type !== 'mixed') {
+                    $param->setType(new Node\NullableType($type));
+                } else {
+                    $param->setType($type);
+                }
             }
 
             $setter = $this->factory->method('set' . ucfirst($name));
@@ -134,9 +120,13 @@ class Generator
             // getter
             $getter = $this->factory->method('get' . ucfirst($name));
             if (!empty($type)) {
-                $getter->setReturnType(new Node\NullableType($type));
+                if ($type !== 'mixed') {
+                    $getter->setReturnType(new Node\NullableType($type));
+                } else {
+                    $getter->setReturnType($type);
+                }
             } else {
-                $setter->setReturnType('void');
+                $getter->setReturnType('void');
             }
             $getter->makePublic();
             $getter->addStmt(new Node\Stmt\Return_(
@@ -151,7 +141,7 @@ class Generator
         return $class;
     }
 
-    private function generateRepository(string $className, string $rowClass, Table $table)
+    private function generateRepository(string $className, string $rowClass, Table $table): Builder\Class_
     {
         if ($this->namespace !== null) {
             $rowClass = '\\' . $this->namespace . '\\' . $rowClass;
@@ -190,6 +180,7 @@ class Generator
 
         $findAll = $this->factory->method('findAll');
         $findAll->makePublic();
+        $findAll->setReturnType('iterable');
         $findAll->setDocComment($this->buildComment(['return' => $rowClass . '[]']));
         $findAll->addParam(new Node\Param(new Node\Expr\Variable('startIndex'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('int'))));
         $findAll->addParam(new Node\Param(new Node\Expr\Variable('count'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('int'))));
@@ -199,7 +190,7 @@ class Generator
         $class->addStmt($findAll);
     }
 
-    private function buildFindBy(\PhpParser\Builder\Class_ $class, Column $column, string $rowClass)
+    private function buildFindBy(Builder\Class_ $class, Column $column, string $rowClass)
     {
         $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('getBy'), [
             new Node\Arg(new Node\Expr\Variable('condition')),
@@ -214,6 +205,7 @@ class Generator
 
         $findBy = $this->factory->method('findBy' . ucfirst($this->normalizeName($column->getName())));
         $findBy->makePublic();
+        $findBy->setReturnType('iterable');
         $findBy->setDocComment($this->buildComment(['return' => $rowClass . '[]']));
         $findBy->addParam(new Node\Param(new Node\Expr\Variable('value'), null, $type !== null ? new Node\Identifier($type) : null));
         $findBy->addParam(new Node\Param(new Node\Expr\Variable('startIndex'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('int'))));
@@ -229,7 +221,7 @@ class Generator
         $class->addStmt($findBy);
     }
 
-    private function buildFindOneBy(\PhpParser\Builder\Class_ $class, Column $column, string $rowClass)
+    private function buildFindOneBy(Builder\Class_ $class, Column $column, string $rowClass)
     {
         $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('getOneBy'), [
             new Node\Arg(new Node\Expr\Variable('condition')),
@@ -240,7 +232,7 @@ class Generator
 
         $findOneBy = $this->factory->method('findOneBy' . ucfirst($this->normalizeName($column->getName())));
         $findOneBy->makePublic();
-        $findOneBy->setDocComment($this->buildComment(['return' => $rowClass]));
+        $findOneBy->setReturnType(new Node\NullableType($rowClass));
         $findOneBy->addParam(new Node\Param(new Node\Expr\Variable('value'), null, $type !== null ? new Node\Identifier($type) : null));
         $findOneBy->addStmt(new Node\Stmt\Expression(new Node\Expr\Assign(new Node\Expr\Variable('condition'), new Node\Expr\New_(new Node\Name('\\' . Condition::class)))));
         $findOneBy->addStmt(new Node\Stmt\Expression(new Node\Expr\MethodCall(new Node\Expr\Variable('condition'), new Node\Identifier($this->getOperatorForColumn($column)), [
@@ -251,8 +243,11 @@ class Generator
         $class->addStmt($findOneBy);
     }
 
-    private function buildConstants(\PhpParser\Builder\Class_ $class, Table $table)
+    private function buildConstants(Builder\Class_ $class, Table $table)
     {
+        $constName = 'NAME';
+        $class->addStmt(new Node\Stmt\ClassConst([new Node\Const_($constName, new Node\Scalar\String_($table->getName()))], Class_::MODIFIER_PUBLIC));
+
         $columns = $table->getColumns();
         foreach ($columns as $column) {
             $constName = 'COLUMN_' . strtoupper($column->getName());
@@ -264,7 +259,8 @@ class Generator
     {
         $getName = $this->factory->method('getName');
         $getName->makePublic();
-        $getName->addStmt(new Node\Stmt\Return_(new Node\Scalar\String_($table->getName())));
+        $getName->setReturnType('string');
+        $getName->addStmt(new Node\Stmt\Return_(new Node\Expr\ClassConstFetch(new Node\Name('self'), 'NAME')));
         $class->addStmt($getName);
     }
 
@@ -285,6 +281,7 @@ class Generator
 
         $getColumns = $this->factory->method('getColumns');
         $getColumns->makePublic();
+        $getColumns->setReturnType('array');
         $getColumns->addStmt(new Node\Stmt\Return_(new Node\Expr\Array_($items)));
         $class->addStmt($getColumns);
     }
@@ -344,13 +341,13 @@ class Generator
         $type = $column->getType();
 
         if ($type instanceof Types\ArrayType) {
-            return null;
+            return 'mixed';
         } elseif ($type instanceof Types\BigIntType) {
             return 'int';
         } elseif ($type instanceof Types\BinaryType) {
-            return null;
+            return 'mixed';
         } elseif ($type instanceof Types\BlobType) {
-            return null;
+            return 'mixed';
         } elseif ($type instanceof Types\BooleanType) {
             return 'bool';
         } elseif ($type instanceof Types\DateType) {
@@ -368,9 +365,9 @@ class Generator
         } elseif ($type instanceof Types\IntegerType) {
             return 'int';
         } elseif ($type instanceof Types\JsonType) {
-            return null;
+            return 'mixed';
         } elseif ($type instanceof Types\ObjectType) {
-            return null;
+            return 'mixed';
         } elseif ($type instanceof Types\SimpleArrayType) {
             return 'string';
         } elseif ($type instanceof Types\SmallIntType) {

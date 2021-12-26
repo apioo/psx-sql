@@ -32,7 +32,7 @@ use PSX\Sql\Provider\ProviderValueInterface;
  */
 class Value extends PDOAbstract implements ProviderValueInterface
 {
-    public function getResult($context = null)
+    public function getResult(array|\ArrayAccess|null $context = null): array
     {
         return $this->getStatement($context)->fetch(PDO::FETCH_ASSOC);
     }

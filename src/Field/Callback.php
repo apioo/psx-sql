@@ -32,16 +32,16 @@ use PSX\Sql\FieldInterface;
  */
 class Callback implements FieldInterface
 {
-    protected $field;
-    protected $callback;
+    private string $field;
+    private Closure $callback;
 
-    public function __construct($field, Closure $callback)
+    public function __construct(string $field, Closure $callback)
     {
         $this->field    = $field;
         $this->callback = $callback;
     }
 
-    public function getResult($context = null)
+    public function getResult(array|\ArrayObject $context = null): mixed
     {
         return call_user_func($this->callback, isset($context[$this->field]) ? $context[$this->field] : null, $context);
     }

@@ -31,21 +31,21 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
  */
 class Regexp extends ExpressionAbstract
 {
-    protected $regexp;
+    private string $regexp;
 
-    public function __construct($column, $regexp, $conjunction = 'AND')
+    public function __construct(string $column, string $regexp, $conjunction = 'AND')
     {
         parent::__construct($column, $conjunction);
 
         $this->regexp = $regexp;
     }
-    
-    public function getExpression(AbstractPlatform $platform)
+
+    public function getExpression(AbstractPlatform $platform): string
     {
         return $this->column . ' ' . $platform->getRegexpExpression() . ' ?';
     }
 
-    public function getValues()
+    public function getValues(): array
     {
         return [$this->regexp];
     }

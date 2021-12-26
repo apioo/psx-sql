@@ -22,6 +22,7 @@ namespace PSX\Sql\Tests;
 
 use PSX\Sql\Reference;
 use PSX\Sql\TableInterface;
+use PSX\Sql\Tests\Generator\TableCommandTestTable;
 use PSX\Sql\ViewAbstract;
 
 /**
@@ -51,7 +52,7 @@ class TestView extends ViewAbstract
                 'id' => $this->fieldReplace('urn:profile:{userId}'),
                 'date' => $this->fieldDateTime('date'),
             ],
-            'note' => $this->doEntity([$this->getTable(TestTableCommand::class), 'getOneById'], [new Reference('id')], [
+            'note' => $this->doEntity([$this->getTable(TableCommandTestTable::class), 'findOneById'], [new Reference('id')], [
                 'comments' => true,
                 'title' => 'col_text',
             ]),
@@ -80,7 +81,7 @@ class TestView extends ViewAbstract
                 'id' => $this->fieldReplace('urn:profile:{userId}'),
                 'date' => $this->fieldDateTime('date'),
             ],
-            'note' => $this->doEntity([$this->getTable(TestTableCommand::class), 'getOneById'], [new Reference('id')], [
+            'note' => $this->doEntity([$this->getTable(TableCommandTestTable::class), 'findOneById'], [new Reference('id')], [
                 'comments' => true,
                 'title' => 'col_text',
             ])
@@ -109,7 +110,7 @@ class TestView extends ViewAbstract
                 'id' => $this->fieldReplace('urn:profile:{userId}'),
                 'date' => $this->fieldDateTime('date'),
             ],
-            'note' => $this->doEntity([$this->getTable(TestTableCommand::class), 'getOneById'], [new Reference('id')], [
+            'note' => $this->doEntity([$this->getTable(TableCommandTestTable::class), 'findOneById'], [new Reference('id')], [
                 'comments' => true,
                 'title' => 'col_text',
             ])

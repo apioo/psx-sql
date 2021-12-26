@@ -43,10 +43,7 @@ class ViewAbstractTest extends TableTestCase
         $this->manager = new TableManager($this->connection);
     }
 
-    /**
-     * @return TestView
-     */
-    protected function getTable()
+    protected function getTable(): TestView
     {
         return $this->manager->getTable(TestView::class);
     }

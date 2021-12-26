@@ -20,9 +20,13 @@
 
 namespace PSX\Sql;
 
+use ArrayObject;
 use InvalidArgumentException;
+use JsonSerializable;
 use PSX\Record\RecordInterface;
-use RuntimeException;
+use PSX\Sql\Exception\NoFieldsAvailableException;
+use PSX\Sql\Exception\NoPrimaryKeyAvailableException;
+use stdClass;
 
 /**
  * TableManipulationTrait
@@ -33,92 +37,85 @@ use RuntimeException;
  */
 trait TableManipulationTrait
 {
-    protected $lastInsertId;
+    protected ?int $lastInsertId = null;
 
     /**
-     * @param array|\stdClass|\PSX\Record\RecordInterface $record
-     * @return integer
+     * @throws NoFieldsAvailableException
+     * @throws \Doctrine\DBAL\Exception
      */
-    public function create($record)
+    public function create(RecordInterface|stdClass|ArrayObject|array $record): int
     {
-        $fields = $this->serializeFields($this->getArray($record));
+        $fields = $this->getFields($record);
+        $result = $this->connection->insert($this->getName(), $fields);
 
-        if (!empty($fields)) {
-            $result = $this->connection->insert($this->getName(), $fields);
+        $this->lastInsertId = $this->connection->lastInsertId();
 
-            // set last insert id
-            $this->lastInsertId = $this->connection->lastInsertId();
-
-            return $result;
-        } else {
-            throw new RuntimeException('No valid field set');
-        }
+        return $result;
     }
 
     /**
-     * @param array|\stdClass|\PSX\Record\RecordInterface $record
-     * @return integer
+     * @throws NoPrimaryKeyAvailableException
+     * @throws NoFieldsAvailableException
+     * @throws \Doctrine\DBAL\Exception
      */
-    public function update($record)
+    public function update(RecordInterface|stdClass|ArrayObject|array $record): int
     {
-        $fields = $this->serializeFields($this->getArray($record));
+        $fields = $this->getFields($record);
+        $criteria = $this->getCriteria($fields);
 
-        if (!empty($fields)) {
-            $pk = $this->getPrimaryKey();
-
-            if ($pk !== null && isset($fields[$pk])) {
-                $condition = [$pk => $fields[$pk]];
-            } else {
-                throw new RuntimeException('No primary key set');
-            }
-
-            return $this->connection->update($this->getName(), $fields, $condition);
-        } else {
-            throw new RuntimeException('No valid field set');
-        }
+        return $this->connection->update($this->getName(), $fields, $criteria);
     }
 
     /**
-     * @param array|\stdClass|\PSX\Record\RecordInterface $record
-     * @return integer
+     * @throws NoPrimaryKeyAvailableException
+     * @throws NoFieldsAvailableException
+     * @throws \Doctrine\DBAL\Exception
      */
-    public function delete($record)
+    public function delete(RecordInterface|stdClass|ArrayObject|array $record): int
     {
-        $fields = $this->serializeFields($this->getArray($record));
+        $fields = $this->getFields($record);
+        $criteria = $this->getCriteria($fields);
 
-        if (!empty($fields)) {
-            $pk = $this->getPrimaryKey();
-
-            if ($pk !== null && isset($fields[$pk])) {
-                $condition = [$pk => $fields[$pk]];
-            } else {
-                throw new RuntimeException('No primary key set');
-            }
-
-            return $this->connection->delete($this->getName(), $condition);
-        } else {
-            throw new RuntimeException('No valid field set');
-        }
+        return $this->connection->delete($this->getName(), $criteria);
     }
 
-    /**
-     * @return integer
-     */
-    public function getLastInsertId()
+    public function getLastInsertId(): ?int
     {
         return $this->lastInsertId;
     }
 
     /**
-     * Returns an array which can be used by the dbal insert, update and delete
-     * methods
-     *
-     * @param array $row
-     * @return array
+     * @throws NoPrimaryKeyAvailableException
      */
-    protected function serializeFields(array $row)
+    private function getCriteria(array $fields): array
     {
-        $data    = array();
+        $pk = $this->getPrimaryKey();
+        if ($pk !== null && isset($fields[$pk])) {
+            return [$pk => $fields[$pk]];
+        } else {
+            throw new NoPrimaryKeyAvailableException('No primary key set');
+        }
+    }
+
+    /**
+     * @throws NoFieldsAvailableException
+     */
+    private function getFields(RecordInterface|stdClass|ArrayObject|array $record): array
+    {
+        $fields = $this->serializeFields($this->getArray($record));
+        if (empty($fields)) {
+            throw new NoFieldsAvailableException('No valid field set');
+        }
+
+        return $fields;
+    }
+
+    /**
+     * Returns an array which can be used by the dbal insert, update and delete methods
+     */
+    protected function serializeFields(array $row): array
+    {
+        $data    = [];
         $columns = $this->getColumns();
 
         $builder = $this->newQueryBuilder($this->getName());
@@ -142,7 +139,7 @@ trait TableManipulationTrait
         return $data;
     }
 
-    protected function getArray($record)
+    protected function getArray(RecordInterface|stdClass|ArrayObject|array $record): array
     {
         if ($record instanceof RecordInterface) {
             return $record->getProperties();
@@ -150,12 +147,10 @@ trait TableManipulationTrait
             return (array) $record;
         } elseif ($record instanceof \ArrayObject) {
             return $record->getArrayCopy();
-        } elseif ($record instanceof \JsonSerializable) {
-            return $record->jsonSerialize();
         } elseif (is_array($record)) {
             return $record;
         } else {
-            throw new InvalidArgumentException('Record must bei either an PSX\Record\RecordInterface, stdClass or array');
+            throw new InvalidArgumentException('Record must bei either an ' . RecordInterface::class . ', stdClass or array');
         }
     }
 }

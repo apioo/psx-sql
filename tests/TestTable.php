@@ -32,12 +32,12 @@ use PSX\Sql\TableInterface;
  */
 class TestTable extends TableAbstract
 {
-    public function getName()
+    public function getName(): string
     {
         return 'psx_handler_comment';
     }
 
-    public function getColumns()
+    public function getColumns(): array
     {
         return array(
             'id'     => TableInterface::TYPE_INT | 10 | TableInterface::PRIMARY_KEY | TableInterface::AUTO_INCREMENT,

@@ -32,12 +32,12 @@ use PSX\Sql\Provider\PDO\PDOAbstract;
  */
 abstract class DBALAbstract
 {
-    protected $connection;
-    protected $sql;
-    protected $parameters;
-    protected $definition;
+    protected Connection $connection;
+    protected string $sql;
+    protected array $parameters;
+    protected mixed $definition;
 
-    public function __construct(Connection $connection, $sql, array $parameters, $definition)
+    public function __construct(Connection $connection, string $sql, array $parameters, mixed $definition)
     {
         $this->connection = $connection;
         $this->sql        = $sql;
@@ -45,19 +45,15 @@ abstract class DBALAbstract
         $this->definition = $definition;
     }
 
-    public function getDefinition()
+    public function getDefinition(): mixed
     {
         return $this->definition;
     }
 
     /**
      * Returns an array of PDO type corresponding to the parameter array
-     *
-     * @internal
-     * @param array $parameters
-     * @return array
      */
-    public static function getTypes(array $parameters)
+    public static function getTypes(array $parameters): array
     {
         $types = [];
         foreach ($parameters as $parameter) {

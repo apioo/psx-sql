@@ -31,12 +31,12 @@ use PSX\Sql\TableAbstract;
  */
 class TestTableCommand extends TableAbstract
 {
-    public function getName()
+    public function getName(): string
     {
         return 'psx_table_command_test';
     }
 
-    public function getColumns()
+    public function getColumns(): array
     {
         return array(
             'id' => self::TYPE_INT | self::AUTO_INCREMENT | self::PRIMARY_KEY,

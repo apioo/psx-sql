@@ -29,21 +29,21 @@ namespace PSX\Sql\Condition;
  */
 abstract class ExpressionAbstract implements ExpressionInterface
 {
-    protected $column;
-    protected $conjunction;
+    protected string $column;
+    protected string $conjunction;
 
-    public function __construct($column, $conjunction = 'AND')
+    public function __construct(string $column, string $conjunction = 'AND')
     {
         $this->column      = $column;
         $this->conjunction = $conjunction;
     }
 
-    public function getColumn()
+    public function getColumn(): string
     {
         return $this->column;
     }
 
-    public function getConjunction()
+    public function getConjunction(): string
     {
         return $this->conjunction;
     }

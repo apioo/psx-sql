@@ -18,33 +18,16 @@
  * limitations under the License.
  */
 
-namespace PSX\Sql\Table;
+namespace PSX\Sql\Exception;
 
 /**
- * Definition
+ * NoFieldsAvailableException
  *
  * @author  Christoph Kappestein <christoph.kappestein@gmail.com>
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    http://phpsx.org
  */
-class Definition
+class NoFieldsAvailableException extends \Exception
 {
-    protected $name;
-    protected $columns;
 
-    public function __construct($name, array $columns)
-    {
-        $this->name    = $name;
-        $this->columns = $columns;
-    }
-
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    public function getColumns()
-    {
-        return $this->columns;
-    }
 }

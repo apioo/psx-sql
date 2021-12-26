@@ -31,10 +31,10 @@ use PSX\Sql\Provider\ProviderCollectionInterface;
  */
 class Collection extends CallbackAbstract implements ProviderCollectionInterface
 {
-    protected $key;
-    protected $filter;
+    private string|\Closure|null $key;
+    private ?\Closure $filter;
 
-    public function __construct($callback, array $parameters, $definition, $key = null, \Closure $filter = null)
+    public function __construct($callback, array $parameters, $definition, string|\Closure|null $key = null, ?\Closure $filter = null)
     {
         parent::__construct($callback, $parameters, $definition);
 
@@ -42,12 +42,12 @@ class Collection extends CallbackAbstract implements ProviderCollectionInterface
         $this->filter = $filter;
     }
 
-    public function getKey()
+    public function getKey(): string|\Closure|null
     {
         return $this->key;
     }
 
-    public function getFilter()
+    public function getFilter(): ?\Closure
     {
         return $this->filter;
     }

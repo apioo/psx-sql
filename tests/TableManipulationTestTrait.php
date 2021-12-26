@@ -21,6 +21,10 @@
 namespace PSX\Sql\Tests;
 
 use DateTime;
+use PSX\Record\RecordInterface;
+use PSX\Sql\Condition;
+use PSX\Sql\Exception\NoFieldsAvailableException;
+use PSX\Sql\Exception\NoPrimaryKeyAvailableException;
 use PSX\Sql\Table;
 use PSX\Sql\TableInterface;
 use PSX\Sql\TableManipulationInterface;
@@ -42,7 +46,7 @@ trait TableManipulationTestTrait
             $this->markTestSkipped('Table not a manipulation interface');
         }
 
-        $record = $table->getRecord();
+        $record = $table->newRecord();
         $record->id = 5;
         $record->userId = 2;
         $record->title = 'foobar';
@@ -52,18 +56,18 @@ trait TableManipulationTestTrait
 
         $this->assertEquals(5, $table->getLastInsertId());
 
-        $row = $table->getOneById(5);
+        $row = $table->getOneBy(new Condition(['id', '=', 5]));
 
-        $this->assertInstanceOf('PSX\Record\RecordInterface', $row);
+        $this->assertInstanceOf(RecordInterface::class, $row);
         $this->assertEquals(5, $row->id);
         $this->assertEquals(2, $row->userId);
         $this->assertEquals('foobar', $row->title);
-        $this->assertInstanceOf('DateTime', $row->date);
+        $this->assertInstanceOf(DateTime::class, $row->date);
     }
 
     public function testCreateEmpty()
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(NoFieldsAvailableException::class);
 
         $table = $this->getTable();
 
@@ -82,14 +86,14 @@ trait TableManipulationTestTrait
             $this->markTestSkipped('Table not a manipulation interface');
         }
 
-        $row = $table->getOneById(1);
+        $row = $table->getOneBy(new Condition(['id', '=', 1]));
         $row->userId = 2;
         $row->title = 'foobar';
         $row->date = new DateTime();
 
         $table->update($row);
 
-        $row = $table->getOneById(1);
+        $row = $table->getOneBy(new Condition(['id', '=', 1]));
 
         $this->assertEquals(2, $row->userId);
         $this->assertEquals('foobar', $row->title);
@@ -98,7 +102,7 @@ trait TableManipulationTestTrait
 
     public function testUpdateEmpty()
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(NoFieldsAvailableException::class);
 
         $table = $this->getTable();
 
@@ -117,18 +121,18 @@ trait TableManipulationTestTrait
             $this->markTestSkipped('Table not a manipulation interface');
         }
 
-        $row = $table->getOneById(1);
+        $row = $table->getOneBy(new Condition(['id', '=', 1]));
 
         $table->delete($row);
 
-        $row = $table->getOneById(1);
+        $row = $table->getOneBy(new Condition(['id', '=', 1]));
 
         $this->assertEmpty($row);
     }
 
     public function testDeleteEmpty()
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(NoFieldsAvailableException::class);
 
         $table = $this->getTable();
 
@@ -141,7 +145,7 @@ trait TableManipulationTestTrait
 
     public function testUpdateNoPrimaryKey()
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(NoPrimaryKeyAvailableException::class);
 
         $table = new Table($this->manager, 'psx_handler_comment', array('foo' => TableInterface::TYPE_VARCHAR));
         $table->update(array('foo' => 'bar'));
@@ -149,33 +153,9 @@ trait TableManipulationTestTrait
 
     public function testDeleteNoPrimaryKey()
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(NoPrimaryKeyAvailableException::class);
 
         $table = new Table($this->manager, 'psx_handler_comment', array('foo' => TableInterface::TYPE_VARCHAR));
         $table->delete(array('foo' => 'bar'));
-    }
-
-    public function testCreateInvalidData()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-
-        $table = new Table($this->manager, 'psx_handler_comment', array('foo' => TableInterface::TYPE_VARCHAR));
-        $table->create('foo');
-    }
-
-    public function testUpdateInvalidData()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-
-        $table = new Table($this->manager, 'psx_handler_comment', array('foo' => TableInterface::TYPE_VARCHAR));
-        $table->update('foo');
-    }
-
-    public function testDeleteInvalidData()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-
-        $table = new Table($this->manager, 'psx_handler_comment', array('foo' => TableInterface::TYPE_VARCHAR));
-        $table->delete('foo');
     }
 }

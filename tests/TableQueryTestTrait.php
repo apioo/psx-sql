@@ -21,6 +21,7 @@
 namespace PSX\Sql\Tests;
 
 use PSX\Record\Record;
+use PSX\Record\RecordInterface;
 use PSX\Sql\Condition;
 use PSX\Sql\Fields;
 use PSX\Sql\Sql;
@@ -49,25 +50,25 @@ trait TableQueryTestTrait
         $this->assertEquals(4, count($result));
 
         $expect = array(
-            new Record('comment', array(
+            new Record(array(
                 'id' => 4,
                 'userId' => 3,
                 'title' => 'blub',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
             )),
-            new Record('comment', array(
+            new Record(array(
                 'id' => 3,
                 'userId' => 2,
                 'title' => 'test',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
             )),
-            new Record('comment', array(
+            new Record(array(
                 'id' => 2,
                 'userId' => 1,
                 'title' => 'bar',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
             )),
-            new Record('comment', array(
+            new Record(array(
                 'id' => 1,
                 'userId' => 1,
                 'title' => 'foo',
@@ -92,7 +93,7 @@ trait TableQueryTestTrait
         $this->assertEquals(1, count($result));
 
         $expect = array(
-            new Record('comment', array(
+            new Record(array(
                 'id' => 1,
                 'userId' => 1,
                 'title' => 'foo',
@@ -117,13 +118,13 @@ trait TableQueryTestTrait
         $this->assertEquals(2, count($result));
 
         $expect = array(
-            new Record('comment', array(
+            new Record(array(
                 'id' => 4,
                 'userId' => 3,
                 'title' => 'blub',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
             )),
-            new Record('comment', array(
+            new Record(array(
                 'id' => 3,
                 'userId' => 2,
                 'title' => 'test',
@@ -148,13 +149,13 @@ trait TableQueryTestTrait
         $this->assertEquals(2, count($result));
 
         $expect = array(
-            new Record('comment', array(
+            new Record(array(
                 'id' => 2,
                 'userId' => 1,
                 'title' => 'bar',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
             )),
-            new Record('comment', array(
+            new Record(array(
                 'id' => 1,
                 'userId' => 1,
                 'title' => 'foo',
@@ -179,13 +180,13 @@ trait TableQueryTestTrait
         $this->assertEquals(2, count($result));
 
         $expect = array(
-            new Record('comment', array(
+            new Record(array(
                 'id' => 2,
                 'userId' => 1,
                 'title' => 'bar',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
             )),
-            new Record('comment', array(
+            new Record(array(
                 'id' => 1,
                 'userId' => 1,
                 'title' => 'foo',
@@ -210,13 +211,13 @@ trait TableQueryTestTrait
         $this->assertEquals(2, count($result));
 
         $expect = array(
-            new Record('comment', array(
+            new Record(array(
                 'id' => 3,
                 'userId' => 2,
                 'title' => 'test',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
             )),
-            new Record('comment', array(
+            new Record(array(
                 'id' => 4,
                 'userId' => 3,
                 'title' => 'blub',
@@ -241,13 +242,13 @@ trait TableQueryTestTrait
         $this->assertEquals(2, count($result));
 
         $expect = array(
-            new Record('comment', array(
+            new Record(array(
                 'id' => 4,
                 'userId' => 3,
                 'title' => 'blub',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
             )),
-            new Record('comment', array(
+            new Record(array(
                 'id' => 3,
                 'userId' => 2,
                 'title' => 'test',
@@ -281,13 +282,13 @@ trait TableQueryTestTrait
         $this->assertEquals(2, count($result));
 
         $expect = array(
-            new Record('comment', array(
+            new Record(array(
                 'id' => 1,
                 'userId' => 1,
                 'title' => 'foo',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
             )),
-            new Record('comment', array(
+            new Record(array(
                 'id' => 2,
                 'userId' => 1,
                 'title' => 'bar',
@@ -313,13 +314,13 @@ trait TableQueryTestTrait
         $this->assertEquals(2, count($result));
 
         $expect = array(
-            new Record('comment', array(
+            new Record(array(
                 'id' => 2,
                 'userId' => 1,
                 'title' => 'bar',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
             )),
-            new Record('comment', array(
+            new Record(array(
                 'id' => 1,
                 'userId' => 1,
                 'title' => 'foo',
@@ -356,7 +357,7 @@ trait TableQueryTestTrait
         $this->assertEquals(1, count($result));
 
         $expect = array(
-            new Record('comment', array(
+            new Record(array(
                 'id' => 1,
                 'userId' => 1,
                 'title' => 'foo',
@@ -384,19 +385,19 @@ trait TableQueryTestTrait
         $this->assertEquals(3, count($result));
 
         $expect = array(
-            new Record('comment', array(
+            new Record(array(
                 'id' => 4,
                 'userId' => 3,
                 'title' => 'blub',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
             )),
-            new Record('comment', array(
+            new Record(array(
                 'id' => 2,
                 'userId' => 1,
                 'title' => 'bar',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
             )),
-            new Record('comment', array(
+            new Record(array(
                 'id' => 1,
                 'userId' => 1,
                 'title' => 'foo',
@@ -421,11 +422,11 @@ trait TableQueryTestTrait
         $this->assertEquals(2, count($result));
 
         $expect = array(
-            new Record('comment', array(
+            new Record(array(
                 'id' => 4,
                 'title' => 'blub',
             )),
-            new Record('comment', array(
+            new Record(array(
                 'id' => 3,
                 'title' => 'test',
             )),
@@ -448,11 +449,11 @@ trait TableQueryTestTrait
         $this->assertEquals(2, count($result));
 
         $expect = array(
-            new Record('comment', array(
+            new Record(array(
                 'userId' => 3,
                 'date' => new \DateTime('2013-04-29 16:56:32'),
             )),
-            new Record('comment', array(
+            new Record(array(
                 'userId' => 2,
                 'date' => new \DateTime('2013-04-29 16:56:32'),
             )),
@@ -469,19 +470,19 @@ trait TableQueryTestTrait
             $this->markTestSkipped('Table not a query interface');
         }
 
-        $result = $table->getByUserId(1);
+        $result = $table->getBy(new Condition(['userId', '=', 1]));
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(2, count($result));
 
         $expect = array(
-            new Record('comment', array(
+            new Record(array(
                 'id' => 2,
                 'userId' => 1,
                 'title' => 'bar',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
             )),
-            new Record('comment', array(
+            new Record(array(
                 'id' => 1,
                 'userId' => 1,
                 'title' => 'foo',
@@ -500,17 +501,17 @@ trait TableQueryTestTrait
             $this->markTestSkipped('Table not a query interface');
         }
 
-        $result = $table->getByUserId(1, Fields::whitelist(['id', 'title']));
+        $result = $table->getBy(new Condition(['userId', '=', 1]), Fields::whitelist(['id', 'title']));
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(2, count($result));
 
         $expect = array(
-            new Record('comment', array(
+            new Record(array(
                 'id' => 2,
                 'title' => 'bar',
             )),
-            new Record('comment', array(
+            new Record(array(
                 'id' => 1,
                 'title' => 'foo',
             )),
@@ -527,13 +528,13 @@ trait TableQueryTestTrait
             $this->markTestSkipped('Table not a query interface');
         }
 
-        $result = $table->getByUserId(1, null, 0, 1, 'id', Sql::SORT_ASC);
+        $result = $table->getBy(new Condition(['userId', '=', 1]), null, 0, 1, 'id', Sql::SORT_ASC);
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(1, count($result));
 
         $expect = array(
-            new Record('comment', array(
+            new Record(array(
                 'id' => 1,
                 'userId' => 1,
                 'title' => 'foo',
@@ -552,10 +553,10 @@ trait TableQueryTestTrait
             $this->markTestSkipped('Table not a query interface');
         }
 
-        $row = $table->getOneById(1);
+        $row = $table->getOneBy(new Condition(['id', '=', 1]));
 
         $expect = array(
-            new Record('comment', array(
+            new Record(array(
                 'id' => 1,
                 'userId' => 1,
                 'title' => 'foo',
@@ -574,10 +575,10 @@ trait TableQueryTestTrait
             $this->markTestSkipped('Table not a query interface');
         }
 
-        $row = $table->getOneById(1, Fields::whitelist(['id', 'title']));
+        $row = $table->getOneBy(new Condition(['id', '=', 1]), Fields::whitelist(['id', 'title']));
 
         $expect = array(
-            new Record('comment', array(
+            new Record(array(
                 'id' => 1,
                 'title' => 'foo',
             )),
@@ -597,7 +598,7 @@ trait TableQueryTestTrait
         $row = $table->get(1);
 
         $expect = array(
-            new Record('comment', array(
+            new Record(array(
                 'id' => 1,
                 'userId' => 1,
                 'title' => 'foo',
@@ -619,7 +620,7 @@ trait TableQueryTestTrait
         $row = $table->get(1, Fields::whitelist(['id', 'title']));
 
         $expect = array(
-            new Record('comment', array(
+            new Record(array(
                 'id' => 1,
                 'title' => 'foo',
             )),
@@ -654,7 +655,7 @@ trait TableQueryTestTrait
         $this->assertEquals(1, $table->getCount(new Condition(array('userId', '=', 3))));
     }
 
-    public function testGetRecord()
+    public function testNewRecord()
     {
         $table = $this->getTable();
 
@@ -662,30 +663,8 @@ trait TableQueryTestTrait
             $this->markTestSkipped('Table not a query interface');
         }
 
-        $obj = $table->getRecord();
+        $obj = $table->newRecord();
 
-        $this->assertInstanceOf('PSX\Record\RecordInterface', $obj);
-        $this->assertEquals('record', $obj->getDisplayName());
-    }
-
-    public function testGetOneByXXXMethodNoValue()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-
-        $this->getTable()->getOneById();
-    }
-
-    public function testGetByXXXMethodNoValue()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-
-        $this->getTable()->getById();
-    }
-
-    public function testInvalidMethodCall()
-    {
-        $this->expectException(\BadMethodCallException::class);
-
-        $this->getTable()->foobar();
+        $this->assertInstanceOf(RecordInterface::class, $obj);
     }
 }

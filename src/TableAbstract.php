@@ -20,6 +20,8 @@
 
 namespace PSX\Sql;
 
+use Doctrine\DBAL\Connection;
+
 /**
  * TableAbstract
  *
@@ -33,24 +35,11 @@ abstract class TableAbstract implements TableInterface
     use TableManipulationTrait;
     use ViewTrait;
 
-    /**
-     * @var \Doctrine\DBAL\Connection
-     */
-    protected $connection;
+    protected Connection $connection;
 
-    /**
-     * @var \PSX\Sql\TableManagerInterface
-     */
-    private $tableManager;
+    private TableManagerInterface $tableManager;
+    private Builder $builder;
 
-    /**
-     * @var \PSX\Sql\Builder
-     */
-    private $builder;
-
-    /**
-     * @param \PSX\Sql\TableManager $tableManager
-     */
     public function __construct(TableManager $tableManager)
     {
         $this->connection   = $tableManager->getConnection();
@@ -58,7 +47,7 @@ abstract class TableAbstract implements TableInterface
         $this->builder      = new Builder($this->connection);
     }
 
-    public function getDisplayName()
+    public function getDisplayName(): string
     {
         $name = $this->getName();
         $pos  = strrpos($name, '_');
@@ -66,38 +55,34 @@ abstract class TableAbstract implements TableInterface
         return $pos !== false ? substr($name, $pos + 1) : $name;
     }
 
-    public function getPrimaryKey()
+    public function getPrimaryKey(): ?string
     {
         return $this->getFirstColumnWithAttr(self::PRIMARY_KEY);
     }
 
-    public function hasColumn($column)
+    public function hasColumn(string $column): bool
     {
         $columns = $this->getColumns();
 
         return isset($columns[$column]);
     }
 
-    public function beginTransaction()
+    public function beginTransaction(): void
     {
         $this->connection->beginTransaction();
     }
 
-    public function commit()
+    public function commit(): void
     {
         $this->connection->commit();
     }
 
-    public function rollBack()
+    public function rollBack(): void
     {
         $this->connection->rollBack();
     }
 
-    /**
-     * @param integer $searchAttr
-     * @return string|null
-     */
-    protected function getFirstColumnWithAttr($searchAttr)
+    protected function getFirstColumnWithAttr(int $searchAttr): ?string
     {
         $columns = $this->getColumns();
 
@@ -112,12 +97,8 @@ abstract class TableAbstract implements TableInterface
 
     /**
      * Returns a php type based on the serialized string representation
-     * 
-     * @param string $value
-     * @param integer $type
-     * @return mixed
      */
-    protected function unserializeType($value, $type)
+    protected function unserializeType(mixed $value, int $type): mixed
     {
         if ($type === self::TYPE_JSON) {
             // overwrite the doctrine json type since it uses the assoc
@@ -142,68 +123,12 @@ abstract class TableAbstract implements TableInterface
 
     /**
      * Returns a string representation which can be stored in the database
-     * 
-     * @param mixed $value
-     * @param integer $type
-     * @return string
      */
-    protected function serializeType($value, $type)
+    protected function serializeType(mixed $value, int $type): string
     {
         return $this->connection->convertToDatabaseValue(
             $value,
             TypeMapper::getDoctrineTypeByType($type)
         );
-    }
-
-    /**
-     * @param $value
-     * @return Field\DateTime
-     * @deprecated
-     */
-    protected function dateTime($value)
-    {
-        return $this->fieldDateTime($value);
-    }
-
-    /**
-     * @param $key
-     * @param \Closure $callback
-     * @return Field\Callback
-     * @deprecated 
-     */
-    protected function callback($key, \Closure $callback)
-    {
-        return $this->fieldCallback($key, $callback);
-    }
-
-    /**
-     * @param $value
-     * @return Field\Replace
-     * @deprecated 
-     */
-    protected function replace($value)
-    {
-        return $this->fieldReplace($value);
-    }
-
-    /**
-     * @param $key
-     * @param $type
-     * @return Field\Type
-     * @deprecated 
-     */
-    protected function type($key, $type)
-    {
-        return $this->fieldType($key, $type);
-    }
-
-    /**
-     * @param $value
-     * @return Field\Value
-     * @deprecated 
-     */
-    protected function value($value)
-    {
-        return $this->fieldValue($value);
     }
 }

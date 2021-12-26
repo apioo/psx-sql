@@ -29,7 +29,7 @@ namespace PSX\Sql\Field;
  */
 class Integer extends TransformFieldAbstract
 {
-    protected function transform($value)
+    protected function transform(mixed $value): ?int
     {
         if ($value === null) {
             return null;

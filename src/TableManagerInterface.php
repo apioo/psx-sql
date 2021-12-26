@@ -32,10 +32,9 @@ interface TableManagerInterface
     /**
      * Returns a table
      *
-     * @param string $tableName
-     * @template T
+     * @template T of ViewInterface
      * @psalm-param class-string<T> $tableName
-     * @return TableInterface
+     * @return T
      */
-    public function getTable(string $tableName);
+    public function getTable(string $tableName): ViewInterface;
 }

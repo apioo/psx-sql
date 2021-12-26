@@ -29,14 +29,14 @@ namespace PSX\Sql;
  */
 class Reference
 {
-    protected $value;
+    private mixed $value;
 
-    public function __construct($value)
+    public function __construct(mixed $value)
     {
         $this->value = $value;
     }
 
-    public function getValue()
+    public function getValue(): mixed
     {
         return $this->value;
     }

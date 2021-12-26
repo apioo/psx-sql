@@ -33,23 +33,16 @@ interface ExpressionInterface
 {
     /**
      * Returns the name of the column
-     *
-     * @return string
      */
-    public function getColumn();
+    public function getColumn(): string;
 
     /**
-     * Returns the SQL as string containing prepared statment placeholder
-     *
-     * @param \Doctrine\DBAL\Platforms\AbstractPlatform $platform
-     * @return string
+     * Returns the SQL as string containing prepared statement placeholder
      */
-    public function getExpression(AbstractPlatform $platform);
+    public function getExpression(AbstractPlatform $platform): string;
 
     /**
      * Returns the parameters as array
-     *
-     * @return array
      */
-    public function getValues();
+    public function getValues(): array;
 }

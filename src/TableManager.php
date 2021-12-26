@@ -22,7 +22,6 @@ namespace PSX\Sql;
 
 use Doctrine\DBAL\Connection;
 use InvalidArgumentException;
-use PSX\Sql\Table\ReaderInterface;
 
 /**
  * TableManager
@@ -33,66 +32,34 @@ use PSX\Sql\Table\ReaderInterface;
  */
 class TableManager implements TableManagerInterface
 {
-    /**
-     * @var \Doctrine\DBAL\Connection
-     */
-    private $connection;
+    private Connection $connection;
 
     /**
-     * @var \PSX\Sql\Table\ReaderInterface
+     * @var ViewInterface[]
      */
-    private $reader;
+    private array $container;
 
-    /**
-     * @var TableInterface[]
-     */
-    private $container;
-
-    /**
-     * @param \Doctrine\DBAL\Connection $connection
-     * @param \PSX\Sql\Table\ReaderInterface $reader
-     */
-    public function __construct(Connection $connection, ReaderInterface $reader = null)
+    public function __construct(Connection $connection)
     {
         $this->connection = $connection;
-        $this->reader     = $reader;
     }
 
-    /**
-     * @return \Doctrine\DBAL\Connection
-     */
     public function getConnection(): Connection
     {
         return $this->connection;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getTable(string $tableName)
+    public function getTable(string $tableName): ViewInterface
     {
         if (isset($this->container[$tableName])) {
             return $this->container[$tableName];
         }
 
-        if ($this->reader === null) {
-            // we assume that $tableName is a class name of a TableInterface implementation
-            if (!class_exists($tableName)) {
-                throw new InvalidArgumentException('Provided table class does not exist');
-            }
-
-            $table = new $tableName($this);
-
-            $this->container[$tableName] = $table;
-        } else {
-            $definition = $this->reader->getTableDefinition($tableName);
-
-            $this->container[$tableName] = new Table($this,
-                $definition->getName(),
-                $definition->getColumns()
-            );
+        // we assume that $tableName is a class name of a TableInterface implementation
+        if (!class_exists($tableName)) {
+            throw new InvalidArgumentException('Provided table class does not exist');
         }
 
-        return $this->container[$tableName];
+        return $this->container[$tableName] = new $tableName($this);
     }
 }

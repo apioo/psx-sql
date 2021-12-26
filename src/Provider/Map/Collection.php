@@ -31,10 +31,10 @@ use PSX\Sql\Provider\ProviderCollectionInterface;
  */
 class Collection extends MapAbstract implements ProviderCollectionInterface
 {
-    protected $key;
-    protected $filter;
+    protected string|\Closure|null $key;
+    protected ?\Closure $filter;
 
-    public function __construct(array $result, $definition, $key = null, \Closure $filter = null)
+    public function __construct(array $result, mixed $definition, string|\Closure|null $key = null, ?\Closure $filter = null)
     {
         parent::__construct($result, $definition);
 
@@ -42,12 +42,12 @@ class Collection extends MapAbstract implements ProviderCollectionInterface
         $this->filter = $filter;
     }
 
-    public function getKey()
+    public function getKey(): string|\Closure|null
     {
         return $this->key;
     }
 
-    public function getFilter()
+    public function getFilter(): ?\Closure
     {
         return $this->filter;
     }

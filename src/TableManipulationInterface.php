@@ -20,6 +20,10 @@
 
 namespace PSX\Sql;
 
+use ArrayObject;
+use PSX\Record\RecordInterface;
+use stdClass;
+
 /**
  * TableManipulationInterface
  *
@@ -31,25 +35,16 @@ interface TableManipulationInterface
 {
     /**
      * Create the record
-     *
-     * @param \PSX\Record\RecordInterface|array $record
-     * @return void
      */
-    public function create($record);
+    public function create(RecordInterface|stdClass|ArrayObject|array $record): int;
 
     /**
      * Update the record
-     *
-     * @param \PSX\Record\RecordInterface|array $record
-     * @return void
      */
-    public function update($record);
+    public function update(RecordInterface|stdClass|ArrayObject|array $record): int;
 
     /**
      * Delete the record
-     *
-     * @param \PSX\Record\RecordInterface|array $record
-     * @return void
      */
-    public function delete($record);
+    public function delete(RecordInterface|stdClass|ArrayObject|array $record): int;
 }

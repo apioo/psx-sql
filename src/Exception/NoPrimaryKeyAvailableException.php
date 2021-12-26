@@ -18,24 +18,16 @@
  * limitations under the License.
  */
 
-namespace PSX\Sql\Table;
+namespace PSX\Sql\Exception;
 
 /**
- * The meta information how an table is structured can be read from different
- * sources. I.e. an doctrine entity, calling sql describe etc. An reader is a
- * class wich extracts such informations
+ * NoPrimaryKeyAvailableException
  *
  * @author  Christoph Kappestein <christoph.kappestein@gmail.com>
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    http://phpsx.org
  */
-interface ReaderInterface
+class NoPrimaryKeyAvailableException extends \Exception
 {
-    /**
-     * Returns the table definition
-     *
-     * @param string $value
-     * @return \PSX\Sql\Table\Definition
-     */
-    public function getTableDefinition($value);
+
 }

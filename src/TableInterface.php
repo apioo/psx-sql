@@ -27,7 +27,7 @@ namespace PSX\Sql;
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    http://phpsx.org
  */
-interface TableInterface extends TableQueryInterface, TableManipulationInterface
+interface TableInterface extends TableQueryInterface, TableManipulationInterface, ViewInterface
 {
     const PRIMARY_KEY     = 0x10000000;
     const AUTO_INCREMENT  = 0x20000000;
@@ -66,10 +66,8 @@ interface TableInterface extends TableQueryInterface, TableManipulationInterface
 
     /**
      * Returns the name of the table
-     *
-     * @return string
      */
-    public function getName();
+    public function getName(): string;
 
     /**
      * Returns the columns of the table where the key is the name of the column
@@ -100,44 +98,37 @@ interface TableInterface extends TableQueryInterface, TableManipulationInterface
      *
      * @return array<string, int>
      */
-    public function getColumns();
+    public function getColumns(): array;
 
     /**
      * Returns a pretty representation of the table name. If the table is
      * seperated with underscores the last part could be the display name i.e.
      * "foo_bar" should return "bar"
-     *
-     * @return string
      */
-    public function getDisplayName();
+    public function getDisplayName(): string;
 
     /**
      * Returns the name of the primary key column
-     *
-     * @return string|null
      */
-    public function getPrimaryKey();
+    public function getPrimaryKey(): ?string;
 
     /**
      * Returns whether the table has the $column
-     *
-     * @param string $column
-     * @return boolean
      */
-    public function hasColumn($column);
+    public function hasColumn(string $column): bool;
 
     /**
      * Start a transaction
      */
-    public function beginTransaction();
+    public function beginTransaction(): void;
 
     /**
      * Commit a transaction
      */
-    public function commit();
+    public function commit(): void;
 
     /**
      * Rollback a transaction
      */
-    public function rollBack();
+    public function rollBack(): void;
 }

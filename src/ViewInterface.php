@@ -18,49 +18,17 @@
  * limitations under the License.
  */
 
-namespace PSX\Sql\Table\Reader;
-
-use Psr\Cache\CacheItemPoolInterface;
-use PSX\Sql\Table\ReaderInterface;
+namespace PSX\Sql;
 
 /**
- * CachedReader
+ * A view is a class which contains methods to obtain data from a database. It is like a table but it does not work on
+ * a specific table i.e. you could create a view for every GET API endpoint which returns specific results. You are free
+ * to add the methods you like i.e. getEntity or getCollection.
  *
  * @author  Christoph Kappestein <christoph.kappestein@gmail.com>
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    http://phpsx.org
  */
-class CachedReader implements ReaderInterface
+interface ViewInterface
 {
-    protected $reader;
-    protected $cache;
-    protected $expire;
-
-    public function __construct(ReaderInterface $reader, CacheItemPoolInterface $cache, $expire = null)
-    {
-        $this->reader = $reader;
-        $this->cache  = $cache;
-        $this->expire = $expire;
-    }
-
-    public function getTableDefinition($value)
-    {
-        $item = $this->cache->getItem('table-' . $value);
-
-        if ($item->isHit()) {
-            return $item->get();
-        } else {
-            $result = $this->reader->getTableDefinition($value);
-
-            $item->set($result);
-
-            if ($this->expire !== null) {
-                $item->expiresAfter($this->expire);
-            }
-
-            $this->cache->save($item);
-
-            return $result;
-        }
-    }
 }

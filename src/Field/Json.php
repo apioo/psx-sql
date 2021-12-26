@@ -29,7 +29,7 @@ namespace PSX\Sql\Field;
  */
 class Json extends TransformFieldAbstract
 {
-    protected function transform($value)
+    protected function transform(mixed $value): mixed
     {
         if ($value === null) {
             return null;

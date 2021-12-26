@@ -18,32 +18,16 @@
  * limitations under the License.
  */
 
-namespace PSX\Sql\Tests\Table\Reader;
-
-use PSX\Sql\Table\Reader\Schema;
-use PSX\Sql\TableInterface;
-use PSX\Sql\Tests\TableTestCase;
+namespace PSX\Sql\Exception;
 
 /**
- * SchemaTest
+ * BuilderException
  *
  * @author  Christoph Kappestein <christoph.kappestein@gmail.com>
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    http://phpsx.org
  */
-class SchemaTest extends TableTestCase
+class BuilderException extends \Exception
 {
-    public function testGetTableDefinition()
-    {
-        $reader = new Schema(getConnection());
-        $table  = $reader->getTableDefinition('psx_sql_table_test');
 
-        $this->assertEquals('psx_sql_table_test', $table->getName());
-
-        $columns = $table->getColumns();
-
-        $this->assertEquals(TableInterface::TYPE_INT | TableInterface::PRIMARY_KEY | TableInterface::AUTO_INCREMENT, $columns['id']);
-        $this->assertEquals(TableInterface::TYPE_VARCHAR | 32, $columns['title']);
-        $this->assertEquals(TableInterface::TYPE_DATETIME, $columns['date']);
-    }
 }

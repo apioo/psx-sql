@@ -20,6 +20,7 @@
 
 namespace PSX\Sql\Provider\Callback;
 
+use phpDocumentor\Reflection\Types\Callable_;
 use PSX\Sql\Provider\ParameterResolver;
 
 /**
@@ -31,23 +32,23 @@ use PSX\Sql\Provider\ParameterResolver;
  */
 abstract class CallbackAbstract
 {
-    protected $callback;
-    protected $parameters;
-    protected $definition;
+    protected \Closure $callback;
+    protected array $parameters;
+    protected mixed $definition;
 
-    public function __construct($callback, array $parameters, $definition)
+    public function __construct(callable $callback, array $parameters, mixed $definition)
     {
-        $this->callback   = $callback;
+        $this->callback   = \Closure::fromCallable($callback);
         $this->parameters = $parameters;
         $this->definition = $definition;
     }
 
-    public function getResult($context = null)
+    public function getResult(array|\ArrayAccess|null $context = null): mixed
     {
         return call_user_func_array($this->callback, ParameterResolver::resolve($this->parameters, $context));
     }
 
-    public function getDefinition()
+    public function getDefinition(): mixed
     {
         return $this->definition;
     }

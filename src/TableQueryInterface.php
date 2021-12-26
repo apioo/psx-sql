@@ -20,6 +20,8 @@
 
 namespace PSX\Sql;
 
+use PSX\Record\RecordInterface;
+
 /**
  * TableQueryInterface
  *
@@ -31,52 +33,31 @@ interface TableQueryInterface
 {
     /**
      * Returns an array of records matching the conditions
-     *
-     * @param integer $startIndex
-     * @param integer $count
-     * @param string $sortBy
-     * @param integer $sortOrder
-     * @param \PSX\Sql\Condition $condition
-     * @return array
      */
-    public function getAll($startIndex = null, $count = null, $sortBy = null, $sortOrder = null, Condition $condition = null, Fields $fields = null);
+    public function getAll(?int $startIndex = null, ?int $count = null, ?string $sortBy = null, ?int $sortOrder = null, ?Condition $condition = null, ?Fields $fields = null): iterable;
 
     /**
      * Returns an array of records matching the condition
-     *
-     * @param \PSX\Sql\Condition $condition
-     * @return array
      */
-    public function getBy(Condition $condition, Fields $fields = null);
+    public function getBy(Condition $condition, ?Fields $fields = null, ?int $startIndex = null, ?int $count = null, ?string $sortBy = null, ?int $sortOrder = null): iterable;
 
     /**
      * Returns an record by the condition
-     *
-     * @param \PSX\Sql\Condition $condition
-     * @return \PSX\Record\RecordInterface
      */
-    public function getOneBy(Condition $condition, Fields $fields = null);
+    public function getOneBy(Condition $condition, ?Fields $fields = null): ?RecordInterface;
 
     /**
      * Returns an record by the primary key
-     *
-     * @param string $id
-     * @return \PSX\Record\RecordInterface
      */
-    public function get($id, Fields $fields = null);
+    public function get(string|int $id, ?Fields $fields = null): ?RecordInterface;
 
     /**
      * Returns all available fields of this handler
-     *
-     * @return array
      */
-    public function getSupportedFields();
+    public function getSupportedFields(): array;
 
     /**
      * Returns the number of rows matching the given condition in the resultset
-     *
-     * @param \PSX\Sql\Condition $condition
-     * @return integer
      */
-    public function getCount(Condition $condition = null);
+    public function getCount(?Condition $condition = null): int;
 }

@@ -36,11 +36,8 @@ class Logger implements SQLLogger
     const MAX_STRING_LENGTH = 32;
     const BINARY_DATA_VALUE = '(binary value)';
 
-    protected $logger;
+    private LoggerInterface $logger;
 
-    /**
-     * @param \Psr\Log\LoggerInterface $logger
-     */
     public function __construct(LoggerInterface $logger)
     {
         $this->logger = $logger;

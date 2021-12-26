@@ -29,16 +29,16 @@ namespace PSX\Sql\Field;
  */
 class Csv extends TransformFieldAbstract
 {
-    protected $delimiter;
+    private string $delimiter;
 
-    public function __construct($field, $delimiter = ',')
+    public function __construct(string $field, string $delimiter = ',')
     {
         parent::__construct($field);
 
         $this->delimiter = $delimiter;
     }
 
-    protected function transform($value)
+    protected function transform(mixed $value): array
     {
         if (empty($value)) {
             return [];

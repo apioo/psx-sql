@@ -32,25 +32,18 @@ use PSX\Sql\TypeMapper;
  */
 class Type extends TransformFieldAbstract
 {
-    /**
-     * @var \Doctrine\DBAL\Connection
-     */
-    protected $connection;
+    private Connection $connection;
+    private int $type;
 
-    /**
-     * @var integer
-     */
-    protected $type;
-
-    public function __construct($field, Connection $connection, $type)
+    public function __construct(string $field, Connection $connection, int $type)
     {
         parent::__construct($field);
 
         $this->connection = $connection;
-        $this->type       = $type;
+        $this->type = $type;
     }
 
-    protected function transform($value)
+    protected function transform(mixed $value): mixed
     {
         $type = (($this->type >> 20) & 0xFF) << 20;
         $type = TypeMapper::getDoctrineTypeByType($type);

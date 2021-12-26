@@ -21,6 +21,7 @@
 namespace PSX\Sql\Provider\PDO;
 
 use PDO;
+use PDOStatement;
 use PSX\Sql\Provider\ParameterResolver;
 
 /**
@@ -32,26 +33,27 @@ use PSX\Sql\Provider\ParameterResolver;
  */
 abstract class PDOAbstract
 {
-    protected $pdo;
-    protected $sql;
-    protected $parameters;
-    protected $definition;
-    protected $statement;
+    protected PDO $pdo;
+    protected string $sql;
+    protected array $parameters;
+    protected mixed $definition;
+    protected ?PDOStatement $statement;
 
-    public function __construct(PDO $pdo, $sql, array $parameters, $definition)
+    public function __construct(PDO $pdo, string $sql, array $parameters, mixed $definition)
     {
-        $this->pdo        = $pdo;
-        $this->sql        = $sql;
+        $this->pdo = $pdo;
+        $this->sql = $sql;
         $this->parameters = $parameters;
         $this->definition = $definition;
+        $this->statement = null;
     }
 
-    public function getDefinition()
+    public function getDefinition(): mixed
     {
         return $this->definition;
     }
 
-    protected function getStatement($context = null)
+    protected function getStatement($context = null): PDOStatement
     {
         if ($this->statement === null) {
             $this->statement = $this->pdo->prepare($this->sql);
@@ -70,12 +72,10 @@ abstract class PDOAbstract
 
     /**
      * Returns the fitting PDO type for the parameter
-     * 
+     *
      * @internal
-     * @param mixed $parameter
-     * @return int
      */
-    public static function getType($parameter)
+    public static function getType(mixed $parameter): int
     {
         if (is_bool($parameter)) {
             return \PDO::PARAM_BOOL;

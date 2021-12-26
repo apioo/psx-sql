@@ -29,31 +29,31 @@ namespace PSX\Sql;
  */
 class Fields
 {
-    protected $whitelist;
-    protected $blacklist;
+    private ?array $whitelist;
+    private ?array $blacklist;
 
-    private function __construct(array $whitelist = null, array $blacklist = null)
+    private function __construct(?array $whitelist = null, ?array $blacklist = null)
     {
         $this->whitelist = $whitelist;
         $this->blacklist = $blacklist;
     }
 
-    public function getWhitelist()
+    public function getWhitelist(): ?array
     {
         return $this->whitelist;
     }
 
-    public function getBlacklist()
+    public function getBlacklist(): ?array
     {
         return $this->blacklist;
     }
 
-    public static function whitelist(array $fields)
+    public static function whitelist(array $fields): self
     {
         return new self($fields);
     }
 
-    public static function blacklist(array $fields)
+    public static function blacklist(array $fields): self
     {
         return new self(null, $fields);
     }

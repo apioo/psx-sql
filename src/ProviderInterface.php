@@ -31,16 +31,11 @@ interface ProviderInterface
 {
     /**
      * Returns the actual result. Is either an array or ArrayAccess object
-     *
-     * @param array|\ArrayAccess $context
-     * @return array
      */
-    public function getResult($context = null);
+    public function getResult(array|\ArrayAccess|null $context = null): mixed;
 
     /**
      * Returns the definition of the result
-     *
-     * @return array
      */
-    public function getDefinition();
+    public function getDefinition(): mixed;
 }

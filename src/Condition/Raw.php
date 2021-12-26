@@ -36,18 +36,18 @@ class Raw extends ExpressionAbstract
 
     public function __construct($expression, array $values = array(), $conjunction = 'AND')
     {
-        parent::__construct(null, $conjunction);
+        parent::__construct('', $conjunction);
 
         $this->expression = $expression;
         $this->values     = $values;
     }
 
-    public function getExpression(AbstractPlatform $platform)
+    public function getExpression(AbstractPlatform $platform): string
     {
         return $this->expression;
     }
 
-    public function getValues()
+    public function getValues(): array
     {
         return $this->values;
     }

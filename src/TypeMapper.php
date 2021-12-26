@@ -53,10 +53,6 @@ class TypeMapper
         TableInterface::TYPE_GUID     => Types::GUID,
     ];
 
-    /**
-     * @param string $name
-     * @return int
-     */
     public static function getTypeByDoctrineType(string $name): int
     {
         $type = array_search($name, self::MAPPING);
@@ -67,10 +63,6 @@ class TypeMapper
         }
     }
 
-    /**
-     * @param int $type
-     * @return string
-     */
     public static function getDoctrineTypeByType(int $type): string
     {
         if (isset(self::MAPPING[$type & 0xFF00000])) {

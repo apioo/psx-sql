@@ -29,7 +29,7 @@ namespace PSX\Sql\Field;
  */
 class Number extends TransformFieldAbstract
 {
-    protected function transform($value)
+    protected function transform($value): ?float
     {
         if ($value === null) {
             return null;

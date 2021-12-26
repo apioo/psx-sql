@@ -31,23 +31,23 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
  */
 class In extends ExpressionAbstract
 {
-    protected $values;
+    private array $values;
 
-    public function __construct($column, array $values, $conjunction = 'AND')
+    public function __construct(string $column, array $values, string $conjunction = 'AND')
     {
         parent::__construct($column, $conjunction);
 
         $this->values = $values;
     }
 
-    public function getExpression(AbstractPlatform $platform)
+    public function getExpression(AbstractPlatform $platform): string
     {
         $values = implode(',', array_fill(0, count($this->values), '?'));
 
         return $this->column . ' IN (' . $values . ')';
     }
 
-    public function getValues()
+    public function getValues(): array
     {
         return $this->values;
     }

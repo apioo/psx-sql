@@ -32,7 +32,7 @@ use PSX\Sql\Provider\ProviderValueInterface;
  */
 class Value extends DBALAbstract implements ProviderValueInterface
 {
-    public function getResult($context = null)
+    public function getResult(array|\ArrayAccess|null $context = null): array
     {
         return (array) $this->connection->fetchAssoc(
             $this->sql,

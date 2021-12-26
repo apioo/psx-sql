@@ -23,6 +23,7 @@ namespace PSX\Sql\Tests;
 use PHPUnit\Framework\TestCase;
 use PSX\Record\Record;
 use PSX\Sql\Builder;
+use PSX\Sql\Exception\BuilderException;
 use PSX\Sql\Field;
 use PSX\Sql\Provider\Map;
 
@@ -116,7 +117,7 @@ JSON;
 
     public function testBuildUnknownFieldInContext()
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(BuilderException::class);
 
         $data = [
             'foo' => 'bar',

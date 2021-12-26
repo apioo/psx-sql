@@ -47,17 +47,6 @@ class TableManagerTest extends TableTestCase
         $this->assertEquals(['id', 'userId', 'title', 'date'], array_keys($table->getColumns()));
     }
 
-    public function testGetTableWithReader()
-    {
-        $manager = new TableManager(getConnection(), new Reader\Schema(getConnection()));
-
-        $table = $manager->getTable('psx_handler_comment');
-
-        $this->assertInstanceOf(TableInterface::class, $table);
-        $this->assertEquals('psx_handler_comment', $table->getName());
-        $this->assertEquals(['id', 'userId', 'title', 'date'], array_keys($table->getColumns()));
-    }
-
     public function testGetTableInvalidTable()
     {
         $this->expectException(\InvalidArgumentException::class);

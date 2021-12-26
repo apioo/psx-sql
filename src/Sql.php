@@ -29,6 +29,6 @@ namespace PSX\Sql;
  */
 class Sql
 {
-    const SORT_ASC  = 0x0;
-    const SORT_DESC = 0x1;
+    public const SORT_ASC  = 0x0;
+    public const SORT_DESC = 0x1;
 }

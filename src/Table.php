@@ -29,10 +29,10 @@ namespace PSX\Sql;
  */
 class Table extends TableAbstract
 {
-    protected $name;
-    protected $columns = array();
+    private string $name;
+    private array $columns;
 
-    public function __construct(TableManager $tableManager, $name, array $columns)
+    public function __construct(TableManager $tableManager, string $name, array $columns)
     {
         parent::__construct($tableManager);
 
@@ -40,12 +40,12 @@ class Table extends TableAbstract
         $this->columns = $columns;
     }
 
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
-    public function getColumns()
+    public function getColumns(): array
     {
         return $this->columns;
     }

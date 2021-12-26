@@ -31,14 +31,14 @@ use PSX\Sql\FieldInterface;
  */
 abstract class TransformFieldAbstract implements FieldInterface
 {
-    protected $field;
+    protected string $field;
 
-    public function __construct($field)
+    public function __construct(string $field)
     {
         $this->field = $field;
     }
 
-    public function getResult($context = null)
+    public function getResult(array|\ArrayObject $context = null): mixed
     {
         if (isset($context[$this->field])) {
             return $this->transform($context[$this->field]);
@@ -47,5 +47,5 @@ abstract class TransformFieldAbstract implements FieldInterface
         }
     }
 
-    abstract protected function transform($value);
+    abstract protected function transform(mixed $value): mixed;
 }

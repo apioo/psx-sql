@@ -31,13 +31,13 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
  */
 class NotNil extends ExpressionAbstract
 {
-    public function getExpression(AbstractPlatform $platform)
+    public function getExpression(AbstractPlatform $platform): string
     {
         return $platform->getIsNotNullExpression($this->column);
     }
 
-    public function getValues()
+    public function getValues(): array
     {
-        return array();
+        return [];
     }
 }

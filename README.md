@@ -33,13 +33,13 @@ $table = $tableManager->getTable(\PSX\Sql\Tests\Generator\SqlTableTestTable::cla
 $table->findAll();
 
 // returns 12 entries starting at index 0
-$table->findAll(0, 12);
+$table->findAll(startIndex: 0, count: 12);
 
 // orders the entries after the column "id" descending
-$table->findAll(0, 12, 'id', Sql::SORT_DESC);
+$table->findAll(startIndex: 0, count: 12, sortBy: 'id', sortOrder: Sql::SORT_DESC);
 
 // adds a condition to select only the rows where the title contains "foo"
-$table->findByTitle('%foo%', 0, 12, 'id', Sql::SORT_DESC);
+$table->findByTitle(value: '%foo%', startIndex: 0, count: 12, sortBy: 'id', sortOrder: Sql::SORT_DESC);
 
 // returns a complete row by the primary key
 $table->findOneById(1);
@@ -57,9 +57,8 @@ $table->create($row);
 
 // updates a row
 $row = new \PSX\Sql\Tests\Generator\SqlTableTestRow();
-$row->setId(1);
 $row->setTitle('bar');
-$table->update($row);
+$table->update($row, ['id' => 1]);
 
 // deletes a row
 $row = new \PSX\Sql\Tests\Generator\SqlTableTestRow();
@@ -213,7 +212,7 @@ class AcmeView extends ViewAbstract
 {
     /**
      * Example howto build a nested result based on different tables. It 
-     * contains also some field tranformations
+     * contains also some field transformations
      */
     public function getNestedResult()
     {

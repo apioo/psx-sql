@@ -32,7 +32,7 @@ use PSX\Sql\Provider\ProviderColumnInterface;
  */
 class Column extends PDOAbstract implements ProviderColumnInterface
 {
-    public function getResult($context = null)
+    public function getResult(array|\ArrayAccess|null $context = null): array
     {
         return $this->getStatement($context)->fetchAll(PDO::FETCH_ASSOC);
     }

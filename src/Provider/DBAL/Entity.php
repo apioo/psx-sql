@@ -32,7 +32,7 @@ use PSX\Sql\Provider\ProviderEntityInterface;
  */
 class Entity extends DBALAbstract implements ProviderEntityInterface
 {
-    public function getResult($context = null)
+    public function getResult(array|\ArrayAccess|null $context = null): array
     {
         $parameters = ParameterResolver::resolve($this->parameters, $context);
         $types      = self::getTypes($parameters);

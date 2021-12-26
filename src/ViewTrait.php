@@ -20,6 +20,11 @@
 
 namespace PSX\Sql;
 
+use PSX\Sql\Provider\ProviderCollectionInterface;
+use PSX\Sql\Provider\ProviderColumnInterface;
+use PSX\Sql\Provider\ProviderEntityInterface;
+use PSX\Sql\Provider\ProviderValueInterface;
+
 /**
  * ViewTrait
  *
@@ -30,158 +35,98 @@ namespace PSX\Sql;
 trait ViewTrait
 {
     /**
-     * @param string $tableName
-     * @return \PSX\Sql\TableInterface
+     * @template T of ViewInterface
+     * @psalm-param class-string<T> $tableName
+     * @return T
      */
-    protected function getTable($tableName)
+    protected function getTable(string $tableName): ViewInterface
     {
         return $this->tableManager->getTable($tableName);
     }
 
-    /**
-     * @param array $definition
-     * @return mixed
-     */
-    protected function build($definition)
+    protected function build(mixed $definition): mixed
     {
         return $this->builder->build($definition);
     }
 
     /**
-     * @param mixed $source
-     * @param array $arguments
-     * @param array $definition
-     * @param string|null $key
-     * @param \Closure|null $filter
-     * @return \PSX\Sql\Provider\ProviderCollectionInterface
+     * @throws Exception\BuilderException
      */
-    protected function doCollection($source, array $arguments, array $definition, $key = null, \Closure $filter = null)
+    protected function doCollection(callable|string|array $source, array $arguments, array $definition, string|\Closure|null $key = null, ?\Closure $filter = null): ProviderCollectionInterface
     {
         return $this->builder->doCollection($source, $arguments, $definition, $key, $filter);
     }
 
     /**
-     * @param mixed $source
-     * @param array $arguments
-     * @param array $definition
-     * @return \PSX\Sql\Provider\ProviderEntityInterface
+     * @throws Exception\BuilderException
      */
-    protected function doEntity($source, array $arguments, array $definition)
+    protected function doEntity(callable|string|array $source, array $arguments, array $definition): ProviderEntityInterface
     {
         return $this->builder->doEntity($source, $arguments, $definition);
     }
 
     /**
-     * @param mixed $source
-     * @param array $arguments
-     * @param mixed $definition
-     * @return \PSX\Sql\Provider\ProviderColumnInterface
+     * @throws Exception\BuilderException
      */
-    protected function doColumn($source, array $arguments, $definition)
+    protected function doColumn(mixed $source, array $arguments, mixed $definition): ProviderColumnInterface
     {
         return $this->builder->doColumn($source, $arguments, $definition);
     }
 
     /**
-     * @param mixed $source
-     * @param array $arguments
-     * @param mixed $definition
-     * @return \PSX\Sql\Provider\ProviderValueInterface
+     * @throws Exception\BuilderException
      */
-    protected function doValue($source, array $arguments, $definition)
+    protected function doValue(mixed $source, array $arguments, mixed $definition): ProviderValueInterface
     {
         return $this->builder->doValue($source, $arguments, $definition);
     }
 
-    /**
-     * @param string $value
-     * @return \PSX\Sql\Field\Boolean
-     */
-    protected function fieldBoolean($value)
+    protected function fieldBoolean(string $value): Field\Boolean
     {
         return $this->builder->fieldBoolean($value);
     }
 
-    /**
-     * @param string $key
-     * @param \Closure $callback
-     * @return \PSX\Sql\Field\Callback
-     */
-    protected function fieldCallback($key, \Closure $callback)
+    protected function fieldCallback(string $key, \Closure $callback): Field\Callback
     {
         return $this->builder->fieldCallback($key, $callback);
     }
 
-    /**
-     * @param string $key
-     * @param string $delimiter
-     * @return \PSX\Sql\Field\Csv
-     */
-    protected function fieldCsv($key, $delimiter = ',')
+    protected function fieldCsv(string $key, string $delimiter = ','): Field\Csv
     {
         return $this->builder->fieldCsv($key, $delimiter);
     }
 
-    /**
-     * @param string $value
-     * @return \PSX\Sql\Field\DateTime
-     */
-    protected function fieldDateTime($value)
+    protected function fieldDateTime(string $value): Field\DateTime
     {
         return $this->builder->fieldDateTime($value);
     }
 
-    /**
-     * @param string $value
-     * @return \PSX\Sql\Field\Integer
-     */
-    protected function fieldInteger($value)
+    protected function fieldInteger(string $value): Field\Integer
     {
         return $this->builder->fieldInteger($value);
     }
 
-    /**
-     * @param string $value
-     * @return \PSX\Sql\Field\Json
-     */
-    protected function fieldJson($value)
+    protected function fieldJson(string $value): Field\Json
     {
         return $this->builder->fieldJson($value);
     }
 
-    /**
-     * @param string $value
-     * @return \PSX\Sql\Field\Number
-     */
-    protected function fieldNumber($value)
+    protected function fieldNumber(string $value): Field\Number
     {
         return $this->builder->fieldNumber($value);
     }
 
-    /**
-     * @param string $value
-     * @return \PSX\Sql\Field\Replace
-     */
-    protected function fieldReplace($value)
+    protected function fieldReplace(string $value): Field\Replace
     {
         return $this->builder->fieldReplace($value);
     }
 
-    /**
-     * @param string $value
-     * @param integer $type
-     * @return \PSX\Sql\Field\Type
-     */
-    protected function fieldType($value, $type)
+    protected function fieldType(string $value, int $type): Field\Type
     {
         return $this->builder->fieldType($value, $type);
     }
 
-    /**
-     * @param string $value
-     * @return \PSX\Sql\Field\Value
-     */
-    protected function fieldValue($value)
+    protected function fieldValue(mixed $value): Field\Value
     {
         return $this->builder->fieldValue($value);
     }

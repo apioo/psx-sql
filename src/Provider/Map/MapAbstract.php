@@ -29,21 +29,21 @@ namespace PSX\Sql\Provider\Map;
  */
 abstract class MapAbstract
 {
-    protected $result;
-    protected $definition;
+    protected array $result;
+    protected mixed $definition;
 
-    public function __construct($result, $definition)
+    public function __construct(array $result, mixed $definition)
     {
         $this->result     = $result;
         $this->definition = $definition;
     }
 
-    public function getResult($context = null)
+    public function getResult(array|\ArrayAccess|null $context = null): array
     {
         return $this->result;
     }
 
-    public function getDefinition()
+    public function getDefinition(): mixed
     {
         return $this->definition;
     }

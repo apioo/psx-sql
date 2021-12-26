@@ -29,7 +29,7 @@ namespace PSX\Sql\Field;
  */
 class Boolean extends TransformFieldAbstract
 {
-    protected function transform($value)
+    protected function transform(mixed $value): ?bool
     {
         if ($value === null) {
             return null;
