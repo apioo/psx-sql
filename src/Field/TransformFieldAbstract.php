@@ -38,7 +38,7 @@ abstract class TransformFieldAbstract implements FieldInterface
         $this->field = $field;
     }
 
-    public function getResult(array|\ArrayObject $context = null): mixed
+    public function getResult(array|\ArrayAccess|null $context = null): mixed
     {
         if (isset($context[$this->field])) {
             return $this->transform($context[$this->field]);

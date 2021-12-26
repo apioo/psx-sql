@@ -29,7 +29,7 @@ namespace PSX\Sql\Field;
  */
 class Replace extends Value
 {
-    public function getResult(array|\ArrayObject $context = null): mixed
+    public function getResult(array|\ArrayAccess|null $context = null): mixed
     {
         $value = $this->value;
 

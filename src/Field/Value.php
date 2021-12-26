@@ -38,7 +38,7 @@ class Value implements FieldInterface
         $this->value = $value;
     }
 
-    public function getResult(array|\ArrayObject $context = null): mixed
+    public function getResult(array|\ArrayAccess|null $context = null): mixed
     {
         return $this->value;
     }
