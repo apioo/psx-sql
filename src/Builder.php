@@ -27,8 +27,6 @@ use PSX\Sql\Provider\ProviderCollectionInterface;
 use PSX\Sql\Provider\ProviderColumnInterface;
 use PSX\Sql\Provider\ProviderEntityInterface;
 use PSX\Sql\Provider\ProviderValueInterface;
-use RuntimeException;
-use InvalidArgumentException;
 
 /**
  * The build method resolves the definition through calling every provider and 
@@ -40,9 +38,9 @@ use InvalidArgumentException;
  */
 class Builder
 {
-    private ?Connection $connection;
+    private Connection $connection;
 
-    public function __construct(?Connection $connection = null)
+    public function __construct(Connection $connection)
     {
         $this->connection = $connection;
     }
@@ -59,12 +57,12 @@ class Builder
         } elseif ($definition instanceof FieldInterface) {
             return $definition->getResult($context);
         } elseif (is_array($definition)) {
-            $result = [];
+            $result = new Record();
             foreach ($definition as $key => $value) {
-                $result[$key] = $this->build($value, $context);
+                $result->setProperty($key, $this->build($value, $context));
             }
 
-            return new Record($result);
+            return $result;
         } elseif (is_string($definition)) {
             if ($context !== null) {
                 if (is_array($context)) {
@@ -90,67 +88,47 @@ class Builder
         }
     }
 
-    /**
-     * @throws BuilderException
-     */
     public function doCollection(callable|string|array $source, array $arguments, array $definition, string|\Closure|null $key = null, ?\Closure $filter = null): ProviderCollectionInterface
     {
         if (is_callable($source)) {
             return new Provider\Callback\Collection($source, $arguments, $definition, $key, $filter);
         } elseif (is_string($source)) {
             return new Provider\DBAL\Collection($this->connection, $source, $arguments, $definition, $key, $filter);
-        } elseif (is_array($source)) {
-            return new Provider\Map\Collection($source, $definition, $key, $filter);
         } else {
-            throw new BuilderException('Source must be either a callable, string or array');
+            return new Provider\Map\Collection($source, $definition, $key, $filter);
         }
     }
 
-    /**
-     * @throws BuilderException
-     */
     public function doEntity(callable|string|array $source, array $arguments, array $definition): ProviderEntityInterface
     {
         if (is_callable($source)) {
             return new Provider\Callback\Entity($source, $arguments, $definition);
         } elseif (is_string($source)) {
             return new Provider\DBAL\Entity($this->connection, $source, $arguments, $definition);
-        } elseif (is_array($source)) {
-            return new Provider\Map\Entity($source, $definition);
         } else {
-            throw new BuilderException('Source must be either a callable, string or array');
+            return new Provider\Map\Entity($source, $definition);
         }
     }
 
-    /**
-     * @throws BuilderException
-     */
     public function doColumn(callable|string|array $source, array $arguments, $definition): ProviderColumnInterface
     {
         if (is_callable($source)) {
             return new Provider\Callback\Column($source, $arguments, $definition);
         } elseif (is_string($source)) {
             return new Provider\DBAL\Column($this->connection, $source, $arguments, $definition);
-        } elseif (is_array($source)) {
-            return new Provider\Map\Column($source, $definition);
         } else {
-            throw new BuilderException('Source must be either a callable, string or array');
+            return new Provider\Map\Column($source, $definition);
         }
     }
 
-    /**
-     * @throws BuilderException
-     */
     public function doValue(callable|string|array $source, array $arguments, $definition): ProviderValueInterface
     {
         if (is_callable($source)) {
             return new Provider\Callback\Value($source, $arguments, $definition);
         } elseif (is_string($source)) {
             return new Provider\DBAL\Value($this->connection, $source, $arguments, $definition);
-        } elseif (is_array($source)) {
-            return new Provider\Map\Value($source, $definition);
         } else {
-            throw new BuilderException('Source must be either a callable, string or array');
+            return new Provider\Map\Value($source, $definition);
         }
     }
 
@@ -230,7 +208,7 @@ class Builder
                 foreach ($data as $row) {
                     $result[$row[$key]] = $this->build($definition, $row);
                 }
-            } elseif (is_callable($key)) {
+            } else {
                 foreach ($data as $row) {
                     $return = call_user_func_array($key, [$row]);
                     $result[$return] = $this->build($definition, $row);
