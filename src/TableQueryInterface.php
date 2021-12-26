@@ -20,41 +20,44 @@
 
 namespace PSX\Sql;
 
-use PSX\Record\RecordInterface;
-
 /**
  * TableQueryInterface
  *
  * @author  Christoph Kappestein <christoph.kappestein@gmail.com>
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    https://phpsx.org
+ *
+ * @template T
  */
 interface TableQueryInterface
 {
     /**
-     * Returns an array of records matching the conditions
+     * @return iterable<T>
      */
-    public function getAll(?int $startIndex = null, ?int $count = null, ?string $sortBy = null, ?int $sortOrder = null, ?Condition $condition = null, ?Fields $fields = null): iterable;
+    public function findAll(?Condition $condition = null, ?int $startIndex = null, ?int $count = null, ?string $sortBy = null, ?int $sortOrder = null, ?Fields $fields = null) : iterable;
 
     /**
-     * Returns an array of records matching the condition
+     * @return iterable<T>
      */
-    public function getBy(Condition $condition, ?Fields $fields = null, ?int $startIndex = null, ?int $count = null, ?string $sortBy = null, ?int $sortOrder = null): iterable;
+    public function findBy(Condition $condition, ?int $startIndex = null, ?int $count = null, ?string $sortBy = null, ?int $sortOrder = null, ?Fields $fields = null) : iterable;
 
     /**
-     * Returns an record by the condition
+     * @return T|null
      */
-    public function getOneBy(Condition $condition, ?Fields $fields = null): ?RecordInterface;
+    public function findOneBy(Condition $condition, ?Fields $fields = null): mixed;
 
     /**
-     * Returns an record by the primary key
+     * Finds a database record by its primary key, normally this is simply the id column but the method supports also
+     * combined primary keys then you can pass multiple values
+     *
+     * @return T|null
      */
-    public function get(string|int $id, ?Fields $fields = null): ?RecordInterface;
+    public function find(...$identifiers): mixed;
 
     /**
-     * Returns all available fields of this handler
+     * Returns all available column names of this table
      */
-    public function getSupportedFields(): array;
+    public function getColumnNames(): array;
 
     /**
      * Returns the number of rows matching the given condition in the resultset

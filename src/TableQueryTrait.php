@@ -23,6 +23,7 @@ namespace PSX\Sql;
 use Doctrine\DBAL\Query\QueryBuilder;
 use PSX\Record\Record;
 use PSX\Record\RecordInterface;
+use PSX\Sql\Exception\NoPrimaryKeyAvailableException;
 
 /**
  * TableQueryTrait
@@ -30,10 +31,15 @@ use PSX\Record\RecordInterface;
  * @author  Christoph Kappestein <christoph.kappestein@gmail.com>
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    https://phpsx.org
+ *
+ * @template T
  */
 trait TableQueryTrait
 {
-    public function getAll(?int $startIndex = null, ?int $count = null, ?string $sortBy = null, ?int $sortOrder = null, ?Condition $condition = null, ?Fields $fields = null): iterable
+    /**
+     * @return iterable<T>
+     */
+    public function findAll(?Condition $condition = null, ?int $startIndex = null, ?int $count = null, ?string $sortBy = null, ?int $sortOrder = null, ?Fields $fields = null): iterable
     {
         $startIndex = $startIndex !== null ? $startIndex : 0;
         $count = !empty($count) ? $count : $this->limit();
@@ -57,7 +63,7 @@ trait TableQueryTrait
         }
 
         if (!in_array($sortBy, $columns)) {
-            $sortBy = $this->getPrimaryKey();
+            $sortBy = $this->getPrimaryKeys()[0] ?? null;
         }
 
         [$sql, $parameters] = $this->getQuery(
@@ -73,14 +79,20 @@ trait TableQueryTrait
         return $this->project($sql, $parameters);
     }
 
-    public function getBy(Condition $condition, ?Fields $fields = null, ?int $startIndex = null, ?int $count = null, ?string $sortBy = null, ?int $sortOrder = null): iterable
+    /**
+     * @return iterable<T>
+     */
+    public function findBy(?Condition $condition, ?int $startIndex = null, ?int $count = null, ?string $sortBy = null, ?int $sortOrder = null, ?Fields $fields = null): iterable
     {
-        return $this->getAll($startIndex, $count, $sortBy, $sortOrder, $condition, $fields);
+        return $this->findAll($condition, $startIndex, $count, $sortBy, $sortOrder, $fields);
     }
 
-    public function getOneBy(Condition $condition, ?Fields $fields = null): ?RecordInterface
+    /**
+     * @return T|null
+     */
+    public function findOneBy(Condition $condition, ?Fields $fields = null): mixed
     {
-        $result = $this->getAll(0, 1, null, null, $condition, $fields);
+        $result = $this->findAll($condition, 0, 1, null, null, $fields);
         foreach ($result as $row) {
             return $row;
         }
@@ -88,11 +100,26 @@ trait TableQueryTrait
         return null;
     }
 
-    public function get(string|int $id, ?Fields $fields = null): ?RecordInterface
+    /**
+     * @return T|null
+     * @throws NoPrimaryKeyAvailableException
+     */
+    public function find(...$identifiers): mixed
     {
-        $condition = new Condition(array($this->getPrimaryKey(), '=', $id));
+        $condition = new Condition();
+        foreach ($this->getPrimaryKeys() as $index => $primaryKey) {
+            if (!isset($identifiers[$index])) {
+                throw new NoPrimaryKeyAvailableException('Needed primary key ' . $primaryKey . ' not provided');
+            }
 
-        return $this->getOneBy($condition, $fields);
+            $condition->equals($primaryKey, $identifiers[$index]);
+        }
+
+        if (!$condition->hasCondition()) {
+            throw new NoPrimaryKeyAvailableException('No primary keys available on table');
+        }
+
+        return $this->findOneBy($condition);
     }
 
     /**
@@ -108,46 +135,41 @@ trait TableQueryTrait
         return (int) $this->connection->fetchOne($sql, $parameters);
     }
 
-    public function getSupportedFields(): array
+    public function getColumnNames(): array
     {
         return array_keys($this->getColumns());
     }
 
-    public function newRecord(): RecordInterface
-    {
-        $supported = $this->getSupportedFields();
-        $fields    = array_combine($supported, array_fill(0, count($supported), null));
-
-        return new Record($fields);
-    }
-
     /**
-     * Returns an array which contains as first value a SQL query and as second
-     * an array of parameters. Uses by default the dbal query builder to create
-     * the SQL query. The query is used for the default query methods
+     * Returns an array which contains as first value a SQL query and as second an array of parameters. Uses by default
+     * the dbal query builder to create the SQL query. The query is used for the default query methods
+     *
+     * @throws \Doctrine\DBAL\Exception
      */
-    protected function getQuery(string $table, array $fields, int $startIndex, int $count, string $sortBy, int $sortOrder, ?Condition $condition = null): array
+    protected function getQuery(string $table, array $fields, int $startIndex, int $count, ?string $sortBy, int $sortOrder, ?Condition $condition = null): array
     {
         $builder = $this->newQueryBuilder($table)
             ->select($fields)
-            ->orderBy($sortBy, $sortOrder == Sql::SORT_ASC ? 'ASC' : 'DESC')
             ->setFirstResult($startIndex)
             ->setMaxResults($count);
+
+        if ($sortBy !== null) {
+            $builder->orderBy($sortBy, $sortOrder == Sql::SORT_ASC ? 'ASC' : 'DESC');
+        }
 
         return $this->convertBuilder($builder, $condition);
     }
 
     /**
-     * Returns an array which contains as first value a SQL query and as second
-     * an array of parameters. Uses by default the dbal query builder to create
-     * the SQL query. The query is used for the count method
+     * Returns an array which contains as first value a SQL query and as second an array of parameters. Uses by default
+     * the dbal query builder to create the SQL query. The query is used for the count method
      *
      * @throws \Doctrine\DBAL\Exception
      */
     protected function getQueryCount(string $table, ?Condition $condition = null): array
     {
         $builder = $this->newQueryBuilder($table)
-            ->select($this->connection->getDatabasePlatform()->getCountExpression($this->getPrimaryKey()));
+            ->select($this->connection->getDatabasePlatform()->getCountExpression('*'));
 
         return $this->convertBuilder($builder, $condition);
     }
@@ -187,7 +209,7 @@ trait TableQueryTrait
 
     protected function sortKey(): ?string
     {
-        return $this->getPrimaryKey();
+        return $this->getPrimaryKeys()[0] ?? null;
     }
 
     protected function sortOrder(): int
