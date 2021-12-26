@@ -36,10 +36,10 @@ class ParameterResolver
      * Resolves parameters agains a context
      *
      * @param array $parameters
-     * @param array $context
+     * @param array|\ArrayAccess|null $context
      * @return array
      */
-    public static function resolve(array $parameters, $context = null)
+    public static function resolve(array $parameters, array|\ArrayAccess|null $context = null)
     {
         $params = [];
         foreach ($parameters as $key => $value) {

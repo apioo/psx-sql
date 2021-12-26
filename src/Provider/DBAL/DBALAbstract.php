@@ -57,8 +57,21 @@ abstract class DBALAbstract
     {
         $types = [];
         foreach ($parameters as $parameter) {
-            $types[] = PDOAbstract::getType($parameter);
+            $types[] = self::getType($parameter);
         }
         return $types;
+    }
+
+    private static function getType(mixed $parameter): int
+    {
+        if (is_bool($parameter)) {
+            return \PDO::PARAM_BOOL;
+        } elseif ($parameter === null) {
+            return \PDO::PARAM_NULL;
+        } elseif (is_int($parameter)) {
+            return \PDO::PARAM_INT;
+        } else {
+            return \PDO::PARAM_STR;
+        }
     }
 }
