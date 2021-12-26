@@ -20,6 +20,8 @@
 
 namespace PSX\Sql;
 
+use PSX\Sql\Exception\InvalidTableException;
+
 /**
  * TableManagerInterface
  *
@@ -30,11 +32,12 @@ namespace PSX\Sql;
 interface TableManagerInterface
 {
     /**
-     * Returns a table
+     * Returns a table or view instance
      *
      * @template T of ViewInterface
-     * @psalm-param class-string<T> $tableName
+     * @psalm-param class-string<T> $tableClass
      * @return T
+     * @throws InvalidTableException
      */
-    public function getTable(string $tableName): ViewInterface;
+    public function getTable(string $tableClass): ViewInterface;
 }

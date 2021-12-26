@@ -21,7 +21,7 @@
 namespace PSX\Sql;
 
 use Doctrine\DBAL\Connection;
-use InvalidArgumentException;
+use PSX\Sql\Exception\InvalidTableException;
 
 /**
  * TableManager
@@ -33,10 +33,6 @@ use InvalidArgumentException;
 class TableManager implements TableManagerInterface
 {
     private Connection $connection;
-
-    /**
-     * @var ViewInterface[]
-     */
     private array $container;
 
     public function __construct(Connection $connection)
@@ -49,17 +45,16 @@ class TableManager implements TableManagerInterface
         return $this->connection;
     }
 
-    public function getTable(string $tableName): ViewInterface
+    public function getTable(string $tableClass): ViewInterface
     {
-        if (isset($this->container[$tableName])) {
-            return $this->container[$tableName];
+        if (isset($this->container[$tableClass])) {
+            return $this->container[$tableClass];
         }
 
-        // we assume that $tableName is a class name of a TableInterface implementation
-        if (!class_exists($tableName)) {
-            throw new InvalidArgumentException('Provided table class does not exist');
+        if (!class_exists($tableClass)) {
+            throw new InvalidTableException('Provided table ' . $tableClass . ' does not exist');
         }
 
-        return $this->container[$tableName] = new $tableName($this);
+        return $this->container[$tableClass] = new $tableClass($this);
     }
 }
