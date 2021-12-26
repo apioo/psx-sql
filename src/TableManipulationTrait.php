@@ -34,6 +34,8 @@ use stdClass;
  * @author  Christoph Kappestein <christoph.kappestein@gmail.com>
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    https://phpsx.org
+ *
+ * @template T
  */
 trait TableManipulationTrait
 {
@@ -48,7 +50,7 @@ trait TableManipulationTrait
         $fields = $this->getFields($record);
         $result = $this->connection->insert($this->getName(), $fields);
 
-        $this->lastInsertId = $this->connection->lastInsertId();
+        $this->lastInsertId = (int) $this->connection->lastInsertId();
 
         return $result;
     }
@@ -89,12 +91,21 @@ trait TableManipulationTrait
      */
     private function getCriteria(array $fields): array
     {
-        $pk = $this->getPrimaryKey();
-        if ($pk !== null && isset($fields[$pk])) {
-            return [$pk => $fields[$pk]];
-        } else {
-            throw new NoPrimaryKeyAvailableException('No primary key set');
+        $primaryKeys = $this->getPrimaryKeys();
+        $criteria = [];
+        foreach ($primaryKeys as $primaryKey) {
+            if (!isset($fields[$primaryKey])) {
+                throw new NoPrimaryKeyAvailableException('Primary key field not set on record');
+            }
+
+            $criteria[$primaryKey] = $fields[$primaryKey];
         }
+
+        if (empty($criteria)) {
+            throw new NoPrimaryKeyAvailableException('No primary key available on table');
+        }
+
+        return $criteria;
     }
 
     /**
@@ -147,10 +158,8 @@ trait TableManipulationTrait
             return (array) $record;
         } elseif ($record instanceof \ArrayObject) {
             return $record->getArrayCopy();
-        } elseif (is_array($record)) {
-            return $record;
         } else {
-            throw new InvalidArgumentException('Record must bei either an ' . RecordInterface::class . ', stdClass or array');
+            return $record;
         }
     }
 }
