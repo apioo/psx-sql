@@ -26,43 +26,47 @@ namespace PSX\Sql;
  * @author  Christoph Kappestein <christoph.kappestein@gmail.com>
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    https://phpsx.org
+ *
+ * @template T
+ * @extends TableQueryInterface<T>
+ * @extends TableManipulationInterface<T>
  */
 interface TableInterface extends TableQueryInterface, TableManipulationInterface, ViewInterface
 {
-    const PRIMARY_KEY     = 0x10000000;
-    const AUTO_INCREMENT  = 0x20000000;
-    const IS_NULL         = 0x40000000;
-    const UNSIGNED        = 0x80000000;
+    public const PRIMARY_KEY     = 0x10000000;
+    public const AUTO_INCREMENT  = 0x20000000;
+    public const IS_NULL         = 0x40000000;
+    public const UNSIGNED        = 0x80000000;
 
     // integer
-    const TYPE_SMALLINT   = 0x100000;
-    const TYPE_INT        = 0x200000;
-    const TYPE_BIGINT     = 0x300000;
-    const TYPE_BOOLEAN    = 0x400000;
+    public const TYPE_SMALLINT   = 0x100000;
+    public const TYPE_INT        = 0x200000;
+    public const TYPE_BIGINT     = 0x300000;
+    public const TYPE_BOOLEAN    = 0x400000;
 
     // float
-    const TYPE_DECIMAL    = 0x500000;
-    const TYPE_FLOAT      = 0x600000;
+    public const TYPE_DECIMAL    = 0x500000;
+    public const TYPE_FLOAT      = 0x600000;
 
     // date
-    const TYPE_DATE       = 0x700000;
-    const TYPE_DATETIME   = 0x800000;
-    const TYPE_TIME       = 0x900000;
-    const TYPE_INTERVAL   = 0x4000000;
+    public const TYPE_DATE       = 0x700000;
+    public const TYPE_DATETIME   = 0x800000;
+    public const TYPE_TIME       = 0x900000;
+    public const TYPE_INTERVAL   = 0x4000000;
 
     // string
-    const TYPE_VARCHAR    = 0xA00000;
-    const TYPE_TEXT       = 0xB00000;
+    public const TYPE_VARCHAR    = 0xA00000;
+    public const TYPE_TEXT       = 0xB00000;
 
     // binary
-    const TYPE_BINARY     = 0x2000000;
-    const TYPE_BLOB       = 0xC00000;
+    public const TYPE_BINARY     = 0x2000000;
+    public const TYPE_BLOB       = 0xC00000;
 
     // formats
-    const TYPE_ARRAY      = 0xD00000;
-    const TYPE_OBJECT     = 0xE00000;
-    const TYPE_JSON       = 0xF00000;
-    const TYPE_GUID       = 0x1000000;
+    public const TYPE_ARRAY      = 0xD00000;
+    public const TYPE_OBJECT     = 0xE00000;
+    public const TYPE_JSON       = 0xF00000;
+    public const TYPE_GUID       = 0x1000000;
 
     /**
      * Returns the name of the table
@@ -108,9 +112,9 @@ interface TableInterface extends TableQueryInterface, TableManipulationInterface
     public function getDisplayName(): string;
 
     /**
-     * Returns the name of the primary key column
+     * Returns the name of the primary key columns
      */
-    public function getPrimaryKey(): ?string;
+    public function getPrimaryKeys(): array;
 
     /**
      * Returns whether the table has the $column
