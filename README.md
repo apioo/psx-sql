@@ -38,14 +38,11 @@ $table->findAll(startIndex: 0, count: 12);
 // orders the entries after the column "id" descending
 $table->findAll(startIndex: 0, count: 12, sortBy: 'id', sortOrder: Sql::SORT_DESC);
 
-// adds a condition to select only the rows where the title contains "foo"
-$table->findByTitle(value: '%foo%', startIndex: 0, count: 12, sortBy: 'id', sortOrder: Sql::SORT_DESC);
-
-// returns a complete row by the primary key
-$table->findOneById(1);
-
-// returns a all rows which match the specified title
+// returns all rows which match the specified title
 $table->findByTitle('foo%');
+
+// returns a row by the primary key
+$table->find(1);
 
 // returns the count of entries in the table. It is also possible to provide a condition
 $table->getCount();
@@ -56,12 +53,12 @@ $row->setTitle('foo');
 $table->create($row);
 
 // updates a row
-$row = $table->findOneById(1);
+$row = $table->find(1);
 $row->setTitle('bar');
 $table->update($row);
 
 // deletes a row
-$row = $table->findOneById(1);
+$row = $table->find(1);
 $table->delete($row);
 
 ```
@@ -75,6 +72,9 @@ The following is an example of a generated table class.
 
 namespace PSX\Sql\Tests\Generator;
 
+/**
+ * @extends \PSX\Sql\TableAbstract<\PSX\Sql\Tests\Generator\SqlTableTestRow>
+ */
 class SqlTableTestTable extends \PSX\Sql\TableAbstract
 {
     public const NAME = 'psx_sql_table_test';
@@ -92,24 +92,17 @@ class SqlTableTestTable extends \PSX\Sql\TableAbstract
     /**
      * @return \PSX\Sql\Tests\Generator\SqlTableTestRow[]
      */
-    public function findAll(?int $startIndex = null, ?int $count = null, ?string $sortBy = null, ?int $sortOrder = null) : iterable
-    {
-        return $this->getAll($startIndex, $count, $sortBy, $sortOrder, null, null);
-    }
-    /**
-     * @return \PSX\Sql\Tests\Generator\SqlTableTestRow[]
-     */
     public function findById(int $value, ?int $startIndex = null, ?int $count = null, ?string $sortBy = null, ?int $sortOrder = null) : iterable
     {
         $condition = new \PSX\Sql\Condition();
         $condition->equals('id', $value);
-        return $this->getBy($condition, null, $startIndex, $count, $sortBy, $sortOrder);
+        return $this->findBy($condition, null, $startIndex, $count, $sortBy, $sortOrder);
     }
     public function findOneById(int $value) : ?\PSX\Sql\Tests\Generator\SqlTableTestRow
     {
         $condition = new \PSX\Sql\Condition();
         $condition->equals('id', $value);
-        return $this->getOneBy($condition, null);
+        return $this->findOneBy($condition, null);
     }
     /**
      * @return \PSX\Sql\Tests\Generator\SqlTableTestRow[]
@@ -118,13 +111,13 @@ class SqlTableTestTable extends \PSX\Sql\TableAbstract
     {
         $condition = new \PSX\Sql\Condition();
         $condition->like('title', $value);
-        return $this->getBy($condition, null, $startIndex, $count, $sortBy, $sortOrder);
+        return $this->findBy($condition, null, $startIndex, $count, $sortBy, $sortOrder);
     }
     public function findOneByTitle(string $value) : ?\PSX\Sql\Tests\Generator\SqlTableTestRow
     {
         $condition = new \PSX\Sql\Condition();
         $condition->like('title', $value);
-        return $this->getOneBy($condition, null);
+        return $this->findOneBy($condition, null);
     }
     /**
      * @return \PSX\Sql\Tests\Generator\SqlTableTestRow[]
@@ -133,13 +126,13 @@ class SqlTableTestTable extends \PSX\Sql\TableAbstract
     {
         $condition = new \PSX\Sql\Condition();
         $condition->equals('date', $value);
-        return $this->getBy($condition, null, $startIndex, $count, $sortBy, $sortOrder);
+        return $this->findBy($condition, null, $startIndex, $count, $sortBy, $sortOrder);
     }
     public function findOneByDate(\DateTime $value) : ?\PSX\Sql\Tests\Generator\SqlTableTestRow
     {
         $condition = new \PSX\Sql\Condition();
         $condition->equals('date', $value);
-        return $this->getOneBy($condition, null);
+        return $this->findOneBy($condition, null);
     }
     protected function getRecordClass() : string
     {
