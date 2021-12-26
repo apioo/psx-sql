@@ -18,22 +18,15 @@
  * limitations under the License.
  */
 
-namespace PSX\Sql\Provider\PDO;
-
-use PDO;
-use PSX\Sql\Provider\ProviderValueInterface;
+namespace PSX\Sql\Exception;
 
 /**
- * Value
+ * InvalidTableException
  *
  * @author  Christoph Kappestein <christoph.kappestein@gmail.com>
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    https://phpsx.org
  */
-class Value extends PDOAbstract implements ProviderValueInterface
+class InvalidTableException extends \Exception
 {
-    public function getResult(array|\ArrayAccess|null $context = null): array
-    {
-        return $this->getStatement($context)->fetch(PDO::FETCH_ASSOC);
-    }
 }
