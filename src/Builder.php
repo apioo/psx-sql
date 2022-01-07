@@ -172,6 +172,9 @@ class Builder
         return new Field\Replace($value);
     }
 
+    /**
+     * @deprecated
+     */
     public function fieldType(string $value, int $type): Field\Type
     {
         return new Field\Type($value, $this->connection, $type);
