@@ -24,7 +24,6 @@ use Doctrine\DBAL\Connection;
 use PSX\Sql\Builder;
 use PSX\Sql\Exception\BuilderException;
 use PSX\Sql\Reference;
-use PSX\Sql\ViewTrait;
 
 /**
  * JsonDefinition
@@ -35,14 +34,10 @@ use PSX\Sql\ViewTrait;
  */
 class JsonProvider
 {
-    use ViewTrait;
-
-    private Connection $connection;
     private Builder $builder;
 
     public function __construct(Connection $connection)
     {
-        $this->connection = $connection;
         $this->builder = new Builder($connection);
     }
 
@@ -69,39 +64,39 @@ class JsonProvider
             $params = $this->parseParams($payload->{'$params'} ?? null, $context);
             $definition = $this->parseDefinitions($payload->{'$definition'} ?? null, $context);
 
-            return $this->doCollection($payload->{'$collection'}, $params, $definition);
+            return $this->builder->doCollection($payload->{'$collection'}, $params, $definition);
         } elseif (isset($payload->{'$entity'}) && is_string($payload->{'$entity'})) {
             $params = $this->parseParams($payload->{'$params'} ?? null, $context);
             $definition = $this->parseDefinitions($payload->{'$definition'} ?? null, $context);
 
-            return $this->doEntity($payload->{'$entity'}, $params, $definition);
+            return $this->builder->doEntity($payload->{'$entity'}, $params, $definition);
         } elseif (isset($payload->{'$column'}) && is_string($payload->{'$column'})) {
             $params = $this->parseParams($payload->{'$params'} ?? null, $context);
             $definition = $this->parseDefinitions($payload->{'$definition'} ?? null, $context);
 
-            return $this->doColumn($payload->{'$column'}, $params, $definition);
+            return $this->builder->doColumn($payload->{'$column'}, $params, $definition);
         } elseif (isset($payload->{'$value'}) && is_string($payload->{'$value'})) {
             $params = $this->parseParams($payload->{'$params'} ?? null, $context);
             $definition = $this->parseDefinitions($payload->{'$definition'} ?? null, $context);
 
-            return $this->doValue($payload->{'$value'}, $params, $definition);
+            return $this->builder->doValue($payload->{'$value'}, $params, $definition);
         } elseif (isset($payload->{'$field'}) && is_string($payload->{'$field'})) {
             $key = $payload->{'$key'} ?? '';
             switch ($payload->{'$field'}) {
                 case 'boolean':
-                    return $this->fieldBoolean($key);
+                    return $this->builder->fieldBoolean($key);
                 case 'csv':
-                    return $this->fieldCsv($key);
+                    return $this->builder->fieldCsv($key);
                 case 'integer':
-                    return $this->fieldInteger($key);
+                    return $this->builder->fieldInteger($key);
                 case 'json':
-                    return $this->fieldJson($key);
+                    return $this->builder->fieldJson($key);
                 case 'number':
-                    return $this->fieldNumber($key);
+                    return $this->builder->fieldNumber($key);
                 case 'replace':
-                    return $this->fieldReplace($key);
+                    return $this->builder->fieldReplace($key);
                 case 'value':
-                    return $this->fieldValue($key);
+                    return $this->builder->fieldValue($key);
                 default:
                     throw new BuilderException('Provided a not valid $field value');
             }
@@ -145,12 +140,10 @@ class JsonProvider
                 } else {
                     throw new BuilderException('When using an object at a $params value it must contain a $ref key');
                 }
-            } elseif (is_scalar($value)) {
-                if (isset($context[$value])) {
-                    $result[$key] = $context[$value];
-                } else {
-                    $result[$key] = $value;
-                }
+            } elseif (is_string($value) && isset($context[$value])) {
+                $result[$key] = $context[$value];
+            } else {
+                $result[$key] = $value;
             }
         }
 
