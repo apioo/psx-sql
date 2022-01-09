@@ -71,6 +71,11 @@ class Generator
 
             $tableName = $table->getName();
             if ($this->prefix !== null) {
+                if (!str_starts_with($tableName, $this->prefix)) {
+                    // if the table does not start with the prefix ignore
+                    continue;
+                }
+
                 $tableName = substr($tableName, strlen($this->prefix));
             }
 
