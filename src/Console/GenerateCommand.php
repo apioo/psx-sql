@@ -58,7 +58,7 @@ class GenerateCommand extends Command
             ->setName('sql:generate')
             ->setDescription('Generates all models and repositories based on the available database schema')
             ->addArgument('target', InputArgument::OPTIONAL, 'The output directory otherwise we use the CWD')
-            ->addOption('namespace', 'n', InputOption::VALUE_REQUIRED, 'Optional the namespace which should be used')
+            ->addOption('namespace', 's', InputOption::VALUE_REQUIRED, 'Optional the namespace which should be used')
             ->addOption('prefix', 'p', InputOption::VALUE_REQUIRED, 'Optional removes the provided prefix from the table name');
     }
 
