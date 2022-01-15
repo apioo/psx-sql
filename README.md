@@ -72,9 +72,6 @@ The following is an example of a generated table class.
 
 namespace PSX\Sql\Tests\Generator;
 
-/**
- * @extends \PSX\Sql\TableAbstract<\PSX\Sql\Tests\Generator\SqlTableTestRow>
- */
 class SqlTableTestTable extends \PSX\Sql\TableAbstract
 {
     public const NAME = 'psx_sql_table_test';
@@ -87,56 +84,121 @@ class SqlTableTestTable extends \PSX\Sql\TableAbstract
     }
     public function getColumns() : array
     {
-        return array(self::COLUMN_ID => 0x30200000, self::COLUMN_TITLE => 0xa00020, self::COLUMN_DATE => 0x800000);
+        return array(self::COLUMN_ID => 0x3020000a, self::COLUMN_TITLE => 0xa00020, self::COLUMN_DATE => 0x800000);
     }
     /**
      * @return \PSX\Sql\Tests\Generator\SqlTableTestRow[]
+     * @throws \PSX\Sql\Exception\QueryException
+     */
+    public function findAll(?\PSX\Sql\Condition $condition = null, ?int $startIndex = null, ?int $count = null, ?string $sortBy = null, ?int $sortOrder = null, ?\PSX\Sql\Fields $fields = null) : iterable
+    {
+        return $this->doFindAll($condition, $startIndex, $count, $sortBy, $sortOrder, $fields);
+    }
+    /**
+     * @return \PSX\Sql\Tests\Generator\SqlTableTestRow[]
+     * @throws \PSX\Sql\Exception\QueryException
+     */
+    public function findBy(\PSX\Sql\Condition $condition, ?int $startIndex = null, ?int $count = null, ?string $sortBy = null, ?int $sortOrder = null, ?\PSX\Sql\Fields $fields = null) : iterable
+    {
+        return $this->doFindBy($condition, $startIndex, $count, $sortBy, $sortOrder, $fields);
+    }
+    /**
+     * @throws \PSX\Sql\Exception\QueryException
+     */
+    public function findOneBy(\PSX\Sql\Condition $condition, ?\PSX\Sql\Fields $fields = null) : ?\PSX\Sql\Tests\Generator\SqlTableTestRow
+    {
+        return $this->doFindOneBy($condition, $fields);
+    }
+    /**
+     * @throws \PSX\Sql\Exception\QueryException
+     */
+    public function find(int $id) : ?\PSX\Sql\Tests\Generator\SqlTableTestRow
+    {
+        $condition = new \PSX\Sql\Condition();
+        $condition->equals('id', $id);
+        return $this->doFindOneBy($condition);
+    }
+    /**
+     * @return \PSX\Sql\Tests\Generator\SqlTableTestRow[]
+     * @throws \PSX\Sql\Exception\QueryException
      */
     public function findById(int $value, ?int $startIndex = null, ?int $count = null, ?string $sortBy = null, ?int $sortOrder = null) : iterable
     {
         $condition = new \PSX\Sql\Condition();
         $condition->equals('id', $value);
-        return $this->findBy($condition, null, $startIndex, $count, $sortBy, $sortOrder);
+        return $this->doFindBy($condition, $startIndex, $count, $sortBy, $sortOrder);
     }
+    /**
+     * @throws \PSX\Sql\Exception\QueryException
+     */
     public function findOneById(int $value) : ?\PSX\Sql\Tests\Generator\SqlTableTestRow
     {
         $condition = new \PSX\Sql\Condition();
         $condition->equals('id', $value);
-        return $this->findOneBy($condition, null);
+        return $this->doFindOneBy($condition);
     }
     /**
      * @return \PSX\Sql\Tests\Generator\SqlTableTestRow[]
+     * @throws \PSX\Sql\Exception\QueryException
      */
     public function findByTitle(string $value, ?int $startIndex = null, ?int $count = null, ?string $sortBy = null, ?int $sortOrder = null) : iterable
     {
         $condition = new \PSX\Sql\Condition();
         $condition->like('title', $value);
-        return $this->findBy($condition, null, $startIndex, $count, $sortBy, $sortOrder);
+        return $this->doFindBy($condition, $startIndex, $count, $sortBy, $sortOrder);
     }
+    /**
+     * @throws \PSX\Sql\Exception\QueryException
+     */
     public function findOneByTitle(string $value) : ?\PSX\Sql\Tests\Generator\SqlTableTestRow
     {
         $condition = new \PSX\Sql\Condition();
         $condition->like('title', $value);
-        return $this->findOneBy($condition, null);
+        return $this->doFindOneBy($condition);
     }
     /**
      * @return \PSX\Sql\Tests\Generator\SqlTableTestRow[]
+     * @throws \PSX\Sql\Exception\QueryException
      */
     public function findByDate(\DateTime $value, ?int $startIndex = null, ?int $count = null, ?string $sortBy = null, ?int $sortOrder = null) : iterable
     {
         $condition = new \PSX\Sql\Condition();
         $condition->equals('date', $value);
-        return $this->findBy($condition, null, $startIndex, $count, $sortBy, $sortOrder);
+        return $this->doFindBy($condition, $startIndex, $count, $sortBy, $sortOrder);
     }
+    /**
+     * @throws \PSX\Sql\Exception\QueryException
+     */
     public function findOneByDate(\DateTime $value) : ?\PSX\Sql\Tests\Generator\SqlTableTestRow
     {
         $condition = new \PSX\Sql\Condition();
         $condition->equals('date', $value);
-        return $this->findOneBy($condition, null);
+        return $this->doFindOneBy($condition);
     }
-    protected function getRecordClass() : string
+    /**
+     * @throws \PSX\Sql\Exception\ManipulationException
+     */
+    public function create(\PSX\Sql\Tests\Generator\SqlTableTestRow $record) : int
     {
-        return '\\PSX\\Sql\\Tests\\Generator\\SqlTableTestRow';
+        return $this->doCreate($record);
+    }
+    /**
+     * @throws \PSX\Sql\Exception\ManipulationException
+     */
+    public function update(\PSX\Sql\Tests\Generator\SqlTableTestRow $record) : int
+    {
+        return $this->doUpdate($record);
+    }
+    /**
+     * @throws \PSX\Sql\Exception\ManipulationException
+     */
+    public function delete(\PSX\Sql\Tests\Generator\SqlTableTestRow $record) : int
+    {
+        return $this->doDelete($record);
+    }
+    protected function newRecord(array $row) : \PSX\Sql\Tests\Generator\SqlTableTestRow
+    {
+        return new \PSX\Sql\Tests\Generator\SqlTableTestRow($row);
     }
 }
 ```
