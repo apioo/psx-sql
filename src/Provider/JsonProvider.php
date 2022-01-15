@@ -86,15 +86,19 @@ class JsonProvider
                 case 'boolean':
                     return $this->builder->fieldBoolean($key);
                 case 'csv':
-                    return $this->builder->fieldCsv($key);
+                    $delimiter = $payload->{'$delimiter'} ?? ',';
+                    return $this->builder->fieldCsv($key, $delimiter);
                 case 'integer':
                     return $this->builder->fieldInteger($key);
                 case 'json':
                     return $this->builder->fieldJson($key);
                 case 'number':
                     return $this->builder->fieldNumber($key);
-                case 'replace':
-                    return $this->builder->fieldReplace($key);
+                case 'format':
+                    if (!isset($payload->{'$format'})) {
+                        throw new BuilderException('Provided format field has no $format value');
+                    }
+                    return $this->builder->fieldFormat($key, $payload->{'$format'});
                 case 'value':
                     return $this->builder->fieldValue($key);
                 default:

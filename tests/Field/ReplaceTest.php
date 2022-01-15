@@ -21,7 +21,7 @@
 namespace PSX\Sql\Tests\Field;
 
 use PHPUnit\Framework\TestCase;
-use PSX\Sql\Field\Replace;
+use PSX\Sql\Field\Format;
 
 /**
  * ReplaceTest
@@ -34,11 +34,11 @@ class ReplaceTest extends TestCase
 {
     public function testTransform()
     {
-        $field = new Replace('http://google.com?q={foo}');
+        $field = new Format('foo', 'http://google.com?q=%s');
 
         $this->assertEquals('http://google.com?q=bar', $field->getResult(['foo' => 'bar']));
 
-        $field = new Replace('http://google.com');
+        $field = new Format('foo', 'http://google.com');
 
         $this->assertEquals('http://google.com', $field->getResult(['foo' => 'bar']));
     }

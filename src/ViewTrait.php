@@ -105,9 +105,9 @@ trait ViewTrait
         return $this->builder->fieldNumber($value);
     }
 
-    protected function fieldReplace(string $value): Field\Replace
+    protected function fieldFormat(string $value, string $format): Field\Format
     {
-        return $this->builder->fieldReplace($value);
+        return $this->builder->fieldFormat($value, $format);
     }
 
     protected function fieldValue(mixed $value): Field\Value

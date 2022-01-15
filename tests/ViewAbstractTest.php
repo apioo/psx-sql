@@ -21,6 +21,7 @@
 namespace PSX\Sql\Tests;
 
 use PSX\Sql\TableManager;
+use PSX\Sql\TableManagerInterface;
 
 /**
  * ViewAbstractTest
@@ -31,10 +32,7 @@ use PSX\Sql\TableManager;
  */
 class ViewAbstractTest extends TableTestCase
 {
-    /**
-     * @var \PSX\Sql\TableManagerInterface
-     */
-    protected $manager;
+    private TableManagerInterface $manager;
 
     protected function setUp(): void
     {

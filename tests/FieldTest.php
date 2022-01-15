@@ -53,7 +53,7 @@ class FieldTest extends TableTestCase
                 'dateTime' => new Field\DateTime('dateTime'),
                 'number' => new Field\Number('number'),
                 'integer' => new Field\Integer('integer'),
-                'replace' => new Field\Replace('http://foobar.com/entry/{integer}'),
+                'replace' => new Field\Format('integer', 'http://foobar.com/entry/%s'),
                 'value' => new Field\Value('bar'),
             ]),
         ];

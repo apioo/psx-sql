@@ -22,6 +22,7 @@ namespace PSX\Sql\Tests;
 
 use PSX\Sql\Reference;
 use PSX\Sql\TableInterface;
+use PSX\Sql\Tests\Generator\HandlerCommentTable;
 use PSX\Sql\Tests\Generator\TableCommandTestTable;
 use PSX\Sql\ViewAbstract;
 
@@ -36,20 +37,13 @@ class TestView extends ViewAbstract
 {
     public function getNestedResult()
     {
-        $sql = '  SELECT id,
-                         userId,
-                         title,
-                         date
-                    FROM psx_handler_comment
-                ORDER BY id DESC';
-
-        $definition = $this->doCollection($sql, [], [
+        $definition = $this->doCollection([$this->getTable(HandlerCommentTable::class), 'findAll'], [], [
             'id' => $this->fieldInteger('id'),
             'title' => $this->fieldCallback('title', function($title){
                 return ucfirst($title);
             }),
             'author' => [
-                'id' => $this->fieldReplace('urn:profile:{userId}'),
+                'id' => $this->fieldFormat('userId', 'urn:profile:%s'),
                 'date' => $this->fieldDateTime('date'),
             ],
             'note' => $this->doEntity([$this->getTable(TableCommandTestTable::class), 'findOneById'], [new Reference('id')], [
@@ -65,20 +59,13 @@ class TestView extends ViewAbstract
 
     public function getNestedResultKey()
     {
-        $sql = '  SELECT id,
-                         userId,
-                         title,
-                         date
-                    FROM psx_handler_comment
-                ORDER BY id DESC';
-
-        $definition = $this->doCollection($sql, [], [
+        $definition = $this->doCollection([$this->getTable(HandlerCommentTable::class), 'findAll'], [], [
             'id' => $this->fieldInteger('id'),
             'title' => $this->fieldCallback('title', function($title){
                 return ucfirst($title);
             }),
             'author' => [
-                'id' => $this->fieldReplace('urn:profile:{userId}'),
+                'id' => $this->fieldFormat('userId', 'urn:profile:%s'),
                 'date' => $this->fieldDateTime('date'),
             ],
             'note' => $this->doEntity([$this->getTable(TableCommandTestTable::class), 'findOneById'], [new Reference('id')], [
@@ -94,20 +81,13 @@ class TestView extends ViewAbstract
 
     public function getNestedResultFilter()
     {
-        $sql = '  SELECT id,
-                         userId,
-                         title,
-                         date
-                    FROM psx_handler_comment
-                ORDER BY id DESC';
-
-        $definition = $this->doCollection($sql, [], [
+        $definition = $this->doCollection([$this->getTable(HandlerCommentTable::class), 'findAll'], [], [
             'id' => $this->fieldInteger('id'),
             'title' => $this->fieldCallback('title', function($title){
                 return ucfirst($title);
             }),
             'author' => [
-                'id' => $this->fieldReplace('urn:profile:{userId}'),
+                'id' => $this->fieldFormat('userId', 'urn:profile:%s'),
                 'date' => $this->fieldDateTime('date'),
             ],
             'note' => $this->doEntity([$this->getTable(TableCommandTestTable::class), 'findOneById'], [new Reference('id')], [
@@ -148,7 +128,7 @@ class TestView extends ViewAbstract
             'integer' => $this->fieldInteger('integer'),
             'json' => $this->fieldJson('json'),
             'number' => $this->fieldNumber('number'),
-            'replace' => $this->fieldReplace('http://foo.com/{replace}'),
+            'replace' => $this->fieldFormat('replace', 'http://foo.com/%s'),
             'type' => $this->fieldInteger('type'),
             'value' => $this->fieldValue('bar'),
         ]);

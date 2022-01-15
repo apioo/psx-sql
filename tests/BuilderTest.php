@@ -71,7 +71,7 @@ class BuilderTest extends TableTestCase
                 ]),
                 'date' => new Field\DateTime('createDate'),
                 'links' => [
-                    'self' => new Field\Replace('http://foobar.com/news/{id}'),
+                    'self' => new Field\Format('id', 'http://foobar.com/news/%s'),
                 ]
             ])
         ];

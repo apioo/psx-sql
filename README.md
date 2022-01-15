@@ -243,8 +243,8 @@ class SqlTableTestRow extends \PSX\Record\Record
 
 ## Views
 
-It is also possible to build view classes which is not based on a specific 
-table.
+It is also possible to build view classes which do not work on a specific table but instead
+can combine multiple tables to produce a complex result.
 
 ```php
 <?php
@@ -256,68 +256,49 @@ use PSX\Sql\ViewAbstract;
 
 class AcmeView extends ViewAbstract
 {
-    /**
-     * Example howto build a nested result based on different tables. It 
-     * contains also some field transformations
-     */
     public function getNestedResult()
     {
-        $definition = [
-            'totalEntries' => $this->getCount(),
-            'entries' => $this->doCollection('SELECT id, authorId, title, createDate FROM news ORDER BY createDate DESC', [], [
-                'entryId' => 'id',
-                'title' => $this->fieldCallback('title', function($title){
-                    return ucfirst($title);
-                }),
-                'isNew' => $this->fieldValue(true),
-                'author' => $this->doEntity('SELECT name, uri FROM author WHERE id = :id', ['id' => new Reference('authorId')], [
-                    'displayName' => 'name',
-                    'uri' => 'uri',
-                ]),
-                'date' => $this->fieldDateTime('createDate'),
-                'links' => [
-                    'self' => $this->fieldReplace('http://foobar.com/news/{id}'),
-                ]
-            ])
-        ];
+        $definition = $this->doCollection([$this->getTable(HandlerCommentTable::class), 'findAll'], [], [
+            'id' => $this->fieldInteger('id'),
+            'title' => $this->fieldCallback('title', function($title){
+                return ucfirst($title);
+            }),
+            'author' => [
+                'id' => $this->fieldFormat('userId', 'urn:profile:%s'),
+                'date' => $this->fieldDateTime('date'),
+            ],
+            'note' => $this->doEntity([$this->getTable(TableCommandTestTable::class), 'findOneById'], [new Reference('id')], [
+                'comments' => true,
+                'title' => 'col_text',
+            ]),
+            'count' => $this->doValue('SELECT COUNT(*) AS cnt FROM psx_handler_comment', [], $this->fieldInteger('cnt')),
+            'tags' => $this->doColumn('SELECT date FROM psx_handler_comment', [], 'date'),
+        ]);
 
         return $this->build($definition);
     }
 }
 ```
 
-The `getNestedResult` method could produce the following json response
+The `getNestedResult` method would produce the following json response
 
 ```json
-{
-    "totalEntries": 2,
-    "entries": [
-        {
-            "entryId": 1,
-            "title": "Foo",
-            "isNew": true,
-            "author": {
-                "displayName": "Foo Bar",
-                "uri": "http:\/\/phpsx.org"
-            },
-            "date": "2016-03-01T00:00:00+01:00",
-            "links": {
-                "self": "http:\/\/foobar.com\/news\/1"
-            }
-        },
-        {
-            "entryId": 2,
-            "title": "Bar",
-            "isNew": true,
-            "author": {
-                "displayName": "Foo Bar",
-                "uri": "http:\/\/phpsx.org"
-            },
-            "date": "2016-03-01T00:00:00+01:00",
-            "links": {
-                "self": "http:\/\/foobar.com\/news\/2"
-            }
-        }
+[
+  {
+    "id": 4,
+    "title": "Blub",
+    "author": {
+      "id": "urn:profile:3",
+      "date": "2013-04-29T16:56:32Z"
+    },
+    "count": 4,
+    "tags": [
+      "2013-04-29 16:56:32",
+      "2013-04-29 16:56:32",
+      "2013-04-29 16:56:32",
+      "2013-04-29 16:56:32"
     ]
-}
+  },
+  ...
+]
 ```

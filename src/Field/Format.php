@@ -21,24 +21,29 @@
 namespace PSX\Sql\Field;
 
 /**
- * Replace
+ * Format
  *
  * @author  Christoph Kappestein <christoph.kappestein@gmail.com>
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    https://phpsx.org
  */
-class Replace extends Value
+class Format extends TransformFieldAbstract
 {
-    public function getResult(array|\ArrayAccess|null $context = null): mixed
+    private string $format;
+
+    public function __construct(string $field, string $format)
     {
-        $value = $this->value;
+        parent::__construct($field);
 
-        if ($context !== null) {
-            foreach ($context as $key => $val) {
-                $value = str_replace('{' . $key . '}', $val, $value);
-            }
+        $this->format = $format;
+    }
+
+    protected function transform(mixed $value): ?string
+    {
+        if (empty($value)) {
+            return null;
+        } else {
+            return sprintf($this->format, $value);
         }
-
-        return $value;
     }
 }

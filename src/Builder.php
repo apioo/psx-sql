@@ -167,9 +167,9 @@ class Builder
         return new Field\Number($value);
     }
 
-    public function fieldReplace(string $value): Field\Replace
+    public function fieldFormat(string $value, string $format): Field\Format
     {
-        return new Field\Replace($value);
+        return new Field\Format($value, $format);
     }
 
     public function fieldValue(string $value): Field\Value
