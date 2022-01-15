@@ -36,7 +36,6 @@ trait TableQueryTrait
 {
     /**
      * @throws QueryException
-     * @internal
      */
     protected function doFindAll(?Condition $condition = null, ?int $startIndex = null, ?int $count = null, ?string $sortBy = null, ?int $sortOrder = null, ?Fields $fields = null): iterable
     {
@@ -86,7 +85,6 @@ trait TableQueryTrait
 
     /**
      * @throws QueryException
-     * @internal
      */
     protected function doFindBy(Condition $condition, ?int $startIndex = null, ?int $count = null, ?string $sortBy = null, ?int $sortOrder = null, ?Fields $fields = null): iterable
     {
@@ -95,7 +93,6 @@ trait TableQueryTrait
 
     /**
      * @throws QueryException
-     * @internal
      */
     protected function doFindOneBy(Condition $condition, ?Fields $fields = null): mixed
     {

@@ -39,7 +39,6 @@ trait TableManipulationTrait
 
     /**
      * @throws ManipulationException
-     * @internal
      */
     protected function doCreate(RecordInterface $record): int
     {
@@ -57,7 +56,6 @@ trait TableManipulationTrait
 
     /**
      * @throws ManipulationException
-     * @internal
      */
     protected function doUpdate(RecordInterface $record): int
     {
@@ -73,7 +71,6 @@ trait TableManipulationTrait
 
     /**
      * @throws ManipulationException
-     * @internal
      */
     protected function doDelete(RecordInterface $record): int
     {
