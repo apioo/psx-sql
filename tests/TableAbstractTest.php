@@ -22,6 +22,8 @@ namespace PSX\Sql\Tests;
 
 use PSX\Sql\TableInterface;
 use PSX\Sql\TableManager;
+use PSX\Sql\Tests\Generator\HandlerCommentRow;
+use PSX\Sql\Tests\Generator\HandlerCommentTable;
 
 /**
  * TableAbstractTest
@@ -72,12 +74,10 @@ class TableAbstractTest extends TableTestCase
      *  title = 'blub',
      *  date = '2013-04-29 16:56:32'
      * </code>
-     *
-     * @return \PSX\Sql\TableInterface
      */
-    protected function getTable()
+    protected function getTable(): HandlerCommentTable
     {
-        return $this->manager->getTable(TestTable::class);
+        return $this->manager->getTable(HandlerCommentTable::class);
     }
 
     public function testGetName()
@@ -120,7 +120,7 @@ class TableAbstractTest extends TableTestCase
         $this->assertEquals(4, $table->getCount());
         
         $table->beginTransaction();
-        $table->delete(['id' => 1]);
+        $table->delete(new HandlerCommentRow(['id' => 1]));
         $table->commit();
 
         $this->assertEquals(3, $table->getCount());
@@ -133,7 +133,7 @@ class TableAbstractTest extends TableTestCase
         $this->assertEquals(4, $table->getCount());
 
         $table->beginTransaction();
-        $table->delete(['id' => 1]);
+        $table->delete(new HandlerCommentRow(['id' => 1]));
         $table->rollback();
 
         $this->assertEquals(4, $table->getCount());

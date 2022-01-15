@@ -44,7 +44,7 @@ class TestView extends ViewAbstract
                 ORDER BY id DESC';
 
         $definition = $this->doCollection($sql, [], [
-            'id' => $this->fieldType('id', TableInterface::TYPE_INT),
+            'id' => $this->fieldInteger('id'),
             'title' => $this->fieldCallback('title', function($title){
                 return ucfirst($title);
             }),
@@ -73,7 +73,7 @@ class TestView extends ViewAbstract
                 ORDER BY id DESC';
 
         $definition = $this->doCollection($sql, [], [
-            'id' => $this->fieldType('id', TableInterface::TYPE_INT),
+            'id' => $this->fieldInteger('id'),
             'title' => $this->fieldCallback('title', function($title){
                 return ucfirst($title);
             }),
@@ -102,7 +102,7 @@ class TestView extends ViewAbstract
                 ORDER BY id DESC';
 
         $definition = $this->doCollection($sql, [], [
-            'id' => $this->fieldType('id', TableInterface::TYPE_INT),
+            'id' => $this->fieldInteger('id'),
             'title' => $this->fieldCallback('title', function($title){
                 return ucfirst($title);
             }),
@@ -149,7 +149,7 @@ class TestView extends ViewAbstract
             'json' => $this->fieldJson('json'),
             'number' => $this->fieldNumber('number'),
             'replace' => $this->fieldReplace('http://foo.com/{replace}'),
-            'type' => $this->fieldType('type', TableInterface::TYPE_INT),
+            'type' => $this->fieldInteger('type'),
             'value' => $this->fieldValue('bar'),
         ]);
 

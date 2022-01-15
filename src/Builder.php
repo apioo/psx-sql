@@ -172,14 +172,6 @@ class Builder
         return new Field\Replace($value);
     }
 
-    /**
-     * @deprecated
-     */
-    public function fieldType(string $value, int $type): Field\Type
-    {
-        return new Field\Type($value, $this->connection, $type);
-    }
-
     public function fieldValue(string $value): Field\Value
     {
         return new Field\Value($value);

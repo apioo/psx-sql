@@ -21,14 +21,9 @@
 namespace PSX\Sql\Tests;
 
 use DateTime;
-use PSX\Record\Record;
 use PSX\Record\RecordInterface;
-use PSX\Sql\Condition;
 use PSX\Sql\Exception\NoFieldsAvailableException;
-use PSX\Sql\Exception\NoPrimaryKeyAvailableException;
-use PSX\Sql\Table;
-use PSX\Sql\TableInterface;
-use PSX\Sql\TableManipulationInterface;
+use PSX\Sql\Tests\Generator\HandlerCommentRow;
 
 /**
  * TableManipulationTestTrait
@@ -43,11 +38,7 @@ trait TableManipulationTestTrait
     {
         $table = $this->getTable();
 
-        if (!$table instanceof TableManipulationInterface) {
-            $this->markTestSkipped('Table not a manipulation interface');
-        }
-
-        $record = new Record([
+        $record = new HandlerCommentRow([
             'id' => 5,
             'userId' => 2,
             'title' => 'foobar',
@@ -72,21 +63,12 @@ trait TableManipulationTestTrait
         $this->expectException(NoFieldsAvailableException::class);
 
         $table = $this->getTable();
-
-        if (!$table instanceof TableManipulationInterface) {
-            $this->markTestSkipped('Table not a manipulation interface');
-        }
-
-        $table->create(array());
+        $table->create(new HandlerCommentRow());
     }
 
     public function testUpdate()
     {
         $table = $this->getTable();
-
-        if (!$table instanceof TableManipulationInterface) {
-            $this->markTestSkipped('Table not a manipulation interface');
-        }
 
         $row = $table->find(1);
         $row->userId = 2;
@@ -107,21 +89,12 @@ trait TableManipulationTestTrait
         $this->expectException(NoFieldsAvailableException::class);
 
         $table = $this->getTable();
-
-        if (!$table instanceof TableManipulationInterface) {
-            $this->markTestSkipped('Table not a manipulation interface');
-        }
-
-        $table->update(array());
+        $table->update(new HandlerCommentRow());
     }
 
     public function testDelete()
     {
         $table = $this->getTable();
-
-        if (!$table instanceof TableManipulationInterface) {
-            $this->markTestSkipped('Table not a manipulation interface');
-        }
 
         $row = $table->find(1);
 
@@ -137,27 +110,22 @@ trait TableManipulationTestTrait
         $this->expectException(NoFieldsAvailableException::class);
 
         $table = $this->getTable();
-
-        if (!$table instanceof TableManipulationInterface) {
-            $this->markTestSkipped('Table not a manipulation interface');
-        }
-
-        $table->delete(array());
+        $table->delete(new HandlerCommentRow());
     }
 
     public function testUpdateNoPrimaryKey()
     {
-        $this->expectException(NoPrimaryKeyAvailableException::class);
+        $this->expectException(NoFieldsAvailableException::class);
 
-        $table = new Table($this->manager, 'psx_handler_comment', array('foo' => TableInterface::TYPE_VARCHAR));
-        $table->update(array('foo' => 'bar'));
+        $table = $this->getTable();
+        $table->update(new HandlerCommentRow(['foo' => 'bar']));
     }
 
     public function testDeleteNoPrimaryKey()
     {
-        $this->expectException(NoPrimaryKeyAvailableException::class);
+        $this->expectException(NoFieldsAvailableException::class);
 
-        $table = new Table($this->manager, 'psx_handler_comment', array('foo' => TableInterface::TYPE_VARCHAR));
-        $table->delete(array('foo' => 'bar'));
+        $table = $this->getTable();
+        $table->delete(new HandlerCommentRow(['foo' => 'bar']));
     }
 }

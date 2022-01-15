@@ -20,10 +20,10 @@
 
 namespace PSX\Sql;
 
+use Doctrine\DBAL\Exception as DBALException;
+use Doctrine\DBAL\Driver\Exception as DBALDriverException;
 use Doctrine\DBAL\Query\QueryBuilder;
-use PSX\Record\Record;
-use PSX\Record\RecordInterface;
-use PSX\Sql\Exception\NoPrimaryKeyAvailableException;
+use PSX\Sql\Exception\QueryException;
 
 /**
  * TableQueryTrait
@@ -31,15 +31,14 @@ use PSX\Sql\Exception\NoPrimaryKeyAvailableException;
  * @author  Christoph Kappestein <christoph.kappestein@gmail.com>
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    https://phpsx.org
- *
- * @template T
  */
 trait TableQueryTrait
 {
     /**
-     * @return iterable<T>
+     * @throws QueryException
+     * @internal
      */
-    public function findAll(?Condition $condition = null, ?int $startIndex = null, ?int $count = null, ?string $sortBy = null, ?int $sortOrder = null, ?Fields $fields = null): iterable
+    protected function doFindAll(?Condition $condition = null, ?int $startIndex = null, ?int $count = null, ?string $sortBy = null, ?int $sortOrder = null, ?Fields $fields = null): iterable
     {
         $startIndex = $startIndex !== null ? $startIndex : 0;
         $count = !empty($count) ? $count : $this->limit();
@@ -66,33 +65,41 @@ trait TableQueryTrait
             $sortBy = $this->getPrimaryKeys()[0] ?? null;
         }
 
-        [$sql, $parameters] = $this->getQuery(
-            $this->getName(), 
-            $columns, 
-            $startIndex, 
-            $count, 
-            $sortBy, 
-            $sortOrder, 
-            $condition
-        );
+        try {
+            [$sql, $parameters] = $this->getQuery(
+                $this->getName(),
+                $columns,
+                $startIndex,
+                $count,
+                $sortBy,
+                $sortOrder,
+                $condition
+            );
 
-        return $this->project($sql, $parameters);
+            return $this->project($sql, $parameters);
+        } catch (DBALException $e) {
+            throw new QueryException($e->getMessage(), 0, $e);
+        } catch (DBALDriverException $e) {
+            throw new QueryException($e->getMessage(), 0, $e);
+        }
     }
 
     /**
-     * @return iterable<T>
+     * @throws QueryException
+     * @internal
      */
-    public function findBy(?Condition $condition, ?int $startIndex = null, ?int $count = null, ?string $sortBy = null, ?int $sortOrder = null, ?Fields $fields = null): iterable
+    protected function doFindBy(Condition $condition, ?int $startIndex = null, ?int $count = null, ?string $sortBy = null, ?int $sortOrder = null, ?Fields $fields = null): iterable
     {
-        return $this->findAll($condition, $startIndex, $count, $sortBy, $sortOrder, $fields);
+        return $this->doFindAll($condition, $startIndex, $count, $sortBy, $sortOrder, $fields);
     }
 
     /**
-     * @return T|null
+     * @throws QueryException
+     * @internal
      */
-    public function findOneBy(Condition $condition, ?Fields $fields = null): mixed
+    protected function doFindOneBy(Condition $condition, ?Fields $fields = null): mixed
     {
-        $result = $this->findAll($condition, 0, 1, null, null, $fields);
+        $result = $this->doFindAll($condition, 0, 1, null, null, $fields);
         foreach ($result as $row) {
             return $row;
         }
@@ -101,50 +108,27 @@ trait TableQueryTrait
     }
 
     /**
-     * @return T|null
-     * @throws NoPrimaryKeyAvailableException
-     */
-    public function find(...$identifiers): mixed
-    {
-        $condition = new Condition();
-        foreach ($this->getPrimaryKeys() as $index => $primaryKey) {
-            if (!isset($identifiers[$index])) {
-                throw new NoPrimaryKeyAvailableException('Needed primary key ' . $primaryKey . ' not provided');
-            }
-
-            $condition->equals($primaryKey, $identifiers[$index]);
-        }
-
-        if (!$condition->hasCondition()) {
-            throw new NoPrimaryKeyAvailableException('No primary keys available on table');
-        }
-
-        return $this->findOneBy($condition);
-    }
-
-    /**
-     * @throws \Doctrine\DBAL\Exception
+     * @throws QueryException
      */
     public function getCount(?Condition $condition = null): int
     {
-        [$sql, $parameters] = $this->getQueryCount(
-            $this->getName(),
-            $condition
-        );
+        try {
+            [$sql, $parameters] = $this->getQueryCount(
+                $this->getName(),
+                $condition
+            );
 
-        return (int) $this->connection->fetchOne($sql, $parameters);
-    }
-
-    public function getColumnNames(): array
-    {
-        return array_keys($this->getColumns());
+            return (int) $this->connection->fetchOne($sql, $parameters);
+        } catch (DBALException $e) {
+            throw new QueryException($e->getMessage(), 0, $e);
+        }
     }
 
     /**
      * Returns an array which contains as first value a SQL query and as second an array of parameters. Uses by default
      * the dbal query builder to create the SQL query. The query is used for the default query methods
      *
-     * @throws \Doctrine\DBAL\Exception
+     * @throws DBALException
      */
     protected function getQuery(string $table, array $fields, int $startIndex, int $count, ?string $sortBy, int $sortOrder, ?Condition $condition = null): array
     {
@@ -164,26 +148,29 @@ trait TableQueryTrait
      * Returns an array which contains as first value a SQL query and as second an array of parameters. Uses by default
      * the dbal query builder to create the SQL query. The query is used for the count method
      *
-     * @throws \Doctrine\DBAL\Exception
+     * @throws QueryException
      */
     protected function getQueryCount(string $table, ?Condition $condition = null): array
     {
-        $builder = $this->newQueryBuilder($table)
-            ->select($this->connection->getDatabasePlatform()->getCountExpression('*'));
+        try {
+            $builder = $this->newQueryBuilder($table)
+                ->select($this->connection->getDatabasePlatform()->getCountExpression('*'));
 
-        return $this->convertBuilder($builder, $condition);
+            return $this->convertBuilder($builder, $condition);
+        } catch (DBALException $e) {
+            throw new QueryException($e->getMessage(), 0, $e);
+        }
     }
 
     /**
-     * @throws \Doctrine\DBAL\Exception
-     * @throws \Doctrine\DBAL\Driver\Exception
+     * @throws DBALException
+     * @throws DBALDriverException
      */
     protected function project(string $sql, array $params = array(), array $columns = null): array
     {
         $result  = array();
         $columns = $columns === null ? $this->getColumns() : $columns;
         $stmt    = $this->connection->executeQuery($sql, $params ?: array());
-        $class   = $this->getRecordClass();
 
         while ($row = $stmt->fetchAssociative()) {
             foreach ($row as $key => $value) {
@@ -194,7 +181,7 @@ trait TableQueryTrait
                 $row[$key] = $value;
             }
 
-            $result[] = new $class($row);
+            $result[] = $this->newRecord($row);
         }
 
         $stmt->free();
@@ -223,16 +210,10 @@ trait TableQueryTrait
             ->from($table, null);
     }
 
-    /**
-     * Returns the default record class
-     */
-    protected function getRecordClass(): string
-    {
-        return Record::class;
-    }
+    abstract protected function newRecord(array $row): object;
 
     /**
-     * @throws \Doctrine\DBAL\Exception
+     * @throws DBALException
      */
     private function convertBuilder(QueryBuilder $builder, ?Condition $condition = null): array
     {

@@ -21,6 +21,7 @@
 namespace PSX\Sql\Tests;
 
 use PSX\Sql\TableManager;
+use PSX\Sql\Tests\Generator\TableCommandTestTable;
 
 /**
  * SerializeTest
@@ -35,7 +36,7 @@ class SerializeTest extends TableTestCase
     {
         $tableManager = new TableManager(getConnection());
 
-        $table = $tableManager->getTable('PSX\Sql\Tests\TestTableCommand');
+        $table = $tableManager->getTable(TableCommandTestTable::class);
         $row   = $table->find(1);
 
         $this->assertIsString($row->col_bigint);

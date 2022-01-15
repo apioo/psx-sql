@@ -20,6 +20,7 @@
 
 namespace PSX\Sql;
 
+use PSX\Sql\Exception\BuilderException;
 use PSX\Sql\Provider\ProviderCollectionInterface;
 use PSX\Sql\Provider\ProviderColumnInterface;
 use PSX\Sql\Provider\ProviderEntityInterface;
@@ -49,33 +50,21 @@ trait ViewTrait
         return $this->builder->build($definition);
     }
 
-    /**
-     * @throws Exception\BuilderException
-     */
     protected function doCollection(callable|string|array $source, array $arguments, array $definition, string|\Closure|null $key = null, ?\Closure $filter = null): ProviderCollectionInterface
     {
         return $this->builder->doCollection($source, $arguments, $definition, $key, $filter);
     }
 
-    /**
-     * @throws Exception\BuilderException
-     */
     protected function doEntity(callable|string|array $source, array $arguments, array $definition): ProviderEntityInterface
     {
         return $this->builder->doEntity($source, $arguments, $definition);
     }
 
-    /**
-     * @throws Exception\BuilderException
-     */
     protected function doColumn(mixed $source, array $arguments, mixed $definition): ProviderColumnInterface
     {
         return $this->builder->doColumn($source, $arguments, $definition);
     }
 
-    /**
-     * @throws Exception\BuilderException
-     */
     protected function doValue(mixed $source, array $arguments, mixed $definition): ProviderValueInterface
     {
         return $this->builder->doValue($source, $arguments, $definition);
@@ -119,11 +108,6 @@ trait ViewTrait
     protected function fieldReplace(string $value): Field\Replace
     {
         return $this->builder->fieldReplace($value);
-    }
-
-    protected function fieldType(string $value, int $type): Field\Type
-    {
-        return $this->builder->fieldType($value, $type);
     }
 
     protected function fieldValue(mixed $value): Field\Value

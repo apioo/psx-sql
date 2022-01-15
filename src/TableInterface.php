@@ -26,12 +26,8 @@ namespace PSX\Sql;
  * @author  Christoph Kappestein <christoph.kappestein@gmail.com>
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    https://phpsx.org
- *
- * @template T
- * @extends TableQueryInterface<T>
- * @extends TableManipulationInterface<T>
  */
-interface TableInterface extends TableQueryInterface, TableManipulationInterface, ViewInterface
+interface TableInterface extends ViewInterface
 {
     public const PRIMARY_KEY     = 0x10000000;
     public const AUTO_INCREMENT  = 0x20000000;
@@ -74,8 +70,8 @@ interface TableInterface extends TableQueryInterface, TableManipulationInterface
     public function getName(): string;
 
     /**
-     * Returns the columns of the table where the key is the name of the column
-     * and the value contains OR connected information. I.e.:
+     * Returns the columns of the table where the key is the name of the column and the value contains OR connected
+     * information. I.e.:
      * <code>
      * array(
      *  'id'    => self::TYPE_INT | 10 | self::PRIMARY_KEY,
@@ -83,8 +79,7 @@ interface TableInterface extends TableQueryInterface, TableManipulationInterface
      * )
      * </code>
      *
-     * For better understanding here a 32 bit integer representation of the
-     * example above:
+     * For better understanding here a 32 bit integer representation of the example above:
      * <code>
      *             UNAP     T                L
      * array(      |||| |-------| |----------------------|
@@ -105,13 +100,6 @@ interface TableInterface extends TableQueryInterface, TableManipulationInterface
     public function getColumns(): array;
 
     /**
-     * Returns a pretty representation of the table name. If the table is
-     * seperated with underscores the last part could be the display name i.e.
-     * "foo_bar" should return "bar"
-     */
-    public function getDisplayName(): string;
-
-    /**
      * Returns the name of the primary key columns
      */
     public function getPrimaryKeys(): array;
@@ -120,6 +108,16 @@ interface TableInterface extends TableQueryInterface, TableManipulationInterface
      * Returns whether the table has the $column
      */
     public function hasColumn(string $column): bool;
+
+    /**
+     * Returns all column name for this table
+     */
+    public function getColumnNames(): array;
+
+    /**
+     * Returns the number of rows matching the given condition
+     */
+    public function getCount(?Condition $condition = null): int;
 
     /**
      * Start a transaction

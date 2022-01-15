@@ -24,19 +24,18 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types;
+use PhpParser\Builder;
 use PhpParser\BuilderFactory;
+use PhpParser\Node;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\PrettyPrinter;
-use PhpParser\Node;
-use PhpParser\Builder;
-use PSX\DateTime\Date;
-use PSX\DateTime\DateTime;
-use PSX\DateTime\Time;
 use PSX\Record\Record;
 use PSX\Sql\Condition;
+use PSX\Sql\Exception\ManipulationException;
+use PSX\Sql\Exception\QueryException;
+use PSX\Sql\Fields;
 use PSX\Sql\TableAbstract;
 use PSX\Sql\TableInterface;
-use PSX\Sql\TableQueryInterface;
 use PSX\Sql\TypeMapper;
 
 /**
@@ -157,73 +156,26 @@ class Generator
 
         $class = $this->factory->class($className);
         $class->extend('\\' . TableAbstract::class);
-        $class->setDocComment($this->buildComment(['extends' => '\\' . TableAbstract::class . '<' . $rowClass . '>']));
 
         $this->buildConstants($class, $table);
         $this->buildGetName($class, $table);
         $this->buildGetColumns($class, $table);
+        $this->buildFindAll($class, $rowClass);
+        $this->buildFindBy($class, $rowClass);
+        $this->buildFindOneBy($class, $rowClass);
+        $this->buildFind($class, $table, $rowClass);
 
         foreach ($table->getColumns() as $column) {
             $this->buildFindByForColumn($class, $column, $rowClass);
             $this->buildFindOneByForColumn($class, $column, $rowClass);
         }
 
-        $this->buildGetRecordClass($class, $rowClass);
+        $this->buildCreate($class, $rowClass);
+        $this->buildUpdate($class, $rowClass);
+        $this->buildDelete($class, $rowClass);
+        $this->buildNewRecord($class, $rowClass);
 
         return $class;
-    }
-
-    private function buildFindByForColumn(Builder\Class_ $class, Column $column, string $rowClass)
-    {
-        $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('findBy'), [
-            new Node\Arg(new Node\Expr\Variable('condition')),
-            new Node\Arg(new Node\Expr\ConstFetch(new Node\Name('null'))),
-            new Node\Arg(new Node\Expr\Variable('startIndex')),
-            new Node\Arg(new Node\Expr\Variable('count')),
-            new Node\Arg(new Node\Expr\Variable('sortBy')),
-            new Node\Arg(new Node\Expr\Variable('sortOrder')),
-        ]);
-
-        $type = $this->getTypeForColumn($column);
-
-        $method = $this->factory->method('findBy' . ucfirst($this->normalizeName($column->getName())));
-        $method->makePublic();
-        $method->setReturnType('iterable');
-        $method->setDocComment($this->buildComment(['return' => $rowClass . '[]']));
-        $method->addParam(new Node\Param(new Node\Expr\Variable('value'), null, new Node\Identifier($type)));
-        $method->addParam(new Node\Param(new Node\Expr\Variable('startIndex'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('int'))));
-        $method->addParam(new Node\Param(new Node\Expr\Variable('count'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('int'))));
-        $method->addParam(new Node\Param(new Node\Expr\Variable('sortBy'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('string'))));
-        $method->addParam(new Node\Param(new Node\Expr\Variable('sortOrder'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('int'))));
-        $method->addStmt(new Node\Stmt\Expression(new Node\Expr\Assign(new Node\Expr\Variable('condition'), new Node\Expr\New_(new Node\Name('\\' . Condition::class)))));
-        $method->addStmt(new Node\Stmt\Expression(new Node\Expr\MethodCall(new Node\Expr\Variable('condition'), new Node\Identifier($this->getOperatorForColumn($column)), [
-            new Node\Arg(new Node\Scalar\String_($column->getName())),
-            new Node\Arg(new Node\Expr\Variable('value'))
-        ])));
-        $method->addStmt(new Node\Stmt\Return_($methodCall));
-        $class->addStmt($method);
-    }
-
-    private function buildFindOneByForColumn(Builder\Class_ $class, Column $column, string $rowClass)
-    {
-        $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('findOneBy'), [
-            new Node\Arg(new Node\Expr\Variable('condition')),
-            new Node\Arg(new Node\Expr\ConstFetch(new Node\Name('null'))),
-        ]);
-
-        $type = $this->getTypeForColumn($column);
-
-        $method = $this->factory->method('findOneBy' . ucfirst($this->normalizeName($column->getName())));
-        $method->makePublic();
-        $method->setReturnType(new Node\NullableType($rowClass));
-        $method->addParam(new Node\Param(new Node\Expr\Variable('value'), null, new Node\Identifier($type)));
-        $method->addStmt(new Node\Stmt\Expression(new Node\Expr\Assign(new Node\Expr\Variable('condition'), new Node\Expr\New_(new Node\Name('\\' . Condition::class)))));
-        $method->addStmt(new Node\Stmt\Expression(new Node\Expr\MethodCall(new Node\Expr\Variable('condition'), new Node\Identifier($this->getOperatorForColumn($column)), [
-            new Node\Arg(new Node\Scalar\String_($column->getName())),
-            new Node\Arg(new Node\Expr\Variable('value'))
-        ])));
-        $method->addStmt(new Node\Stmt\Return_($methodCall));
-        $class->addStmt($method);
     }
 
     private function buildConstants(Builder\Class_ $class, Table $table)
@@ -240,11 +192,11 @@ class Generator
 
     private function buildGetName(Builder\Class_ $class, Table $table)
     {
-        $getName = $this->factory->method('getName');
-        $getName->makePublic();
-        $getName->setReturnType('string');
-        $getName->addStmt(new Node\Stmt\Return_(new Node\Expr\ClassConstFetch(new Node\Name('self'), 'NAME')));
-        $class->addStmt($getName);
+        $method = $this->factory->method('getName');
+        $method->makePublic();
+        $method->setReturnType('string');
+        $method->addStmt(new Node\Stmt\Return_(new Node\Expr\ClassConstFetch(new Node\Name('self'), 'NAME')));
+        $class->addStmt($method);
     }
 
     private function buildGetColumns(Builder\Class_ $class, Table $table)
@@ -262,20 +214,222 @@ class Generator
             );
         }
 
-        $getColumns = $this->factory->method('getColumns');
-        $getColumns->makePublic();
-        $getColumns->setReturnType('array');
-        $getColumns->addStmt(new Node\Stmt\Return_(new Node\Expr\Array_($items)));
-        $class->addStmt($getColumns);
+        $method = $this->factory->method('getColumns');
+        $method->makePublic();
+        $method->setReturnType('array');
+        $method->addStmt(new Node\Stmt\Return_(new Node\Expr\Array_($items)));
+        $class->addStmt($method);
     }
 
-    private function buildGetRecordClass(Builder\Class_ $class, string $rowClass)
+    private function buildFind(Builder\Class_ $class, Table $table, string $rowClass)
     {
-        $getRecordClass = $this->factory->method('getRecordClass');
-        $getRecordClass->makeProtected();
-        $getRecordClass->setReturnType(new Node\Name('string'));
-        $getRecordClass->addStmt(new Node\Stmt\Return_(new Node\Scalar\String_($rowClass)));
-        $class->addStmt($getRecordClass);
+        $primaryColumns = $table->getPrimaryKeyColumns();
+        $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('doFindOneBy'), [
+            new Node\Arg(new Node\Expr\Variable('condition')),
+        ]);
+
+        $method = $this->factory->method('find');
+        $method->makePublic();
+        $method->setReturnType(new Node\NullableType($rowClass));
+        $method->setDocComment($this->buildComment(['throws' => '\\' . QueryException::class]));
+
+        foreach ($primaryColumns as $primaryColumn) {
+            $column = $table->getColumn($primaryColumn);
+            if ($column instanceof Column) {
+                $type = $this->getTypeForColumn($column);
+                $method->addParam(new Node\Param(new Node\Expr\Variable($column->getName()), null, new Node\Identifier($type)));
+            }
+        }
+
+        $method->addStmt(new Node\Stmt\Expression(new Node\Expr\Assign(new Node\Expr\Variable('condition'), new Node\Expr\New_(new Node\Name('\\' . Condition::class)))));
+        foreach ($primaryColumns as $primaryColumn) {
+            $column = $table->getColumn($primaryColumn);
+            if ($column instanceof Column) {
+                $method->addStmt(new Node\Stmt\Expression(new Node\Expr\MethodCall(new Node\Expr\Variable('condition'), new Node\Identifier($this->getOperatorForColumn($column)), [
+                    new Node\Arg(new Node\Scalar\String_($column->getName())),
+                    new Node\Arg(new Node\Expr\Variable($column->getName()))
+                ])));
+            }
+        }
+
+        $method->addStmt(new Node\Stmt\Return_($methodCall));
+        $class->addStmt($method);
+    }
+
+    private function buildFindAll(Builder\Class_ $class, string $rowClass)
+    {
+        $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('doFindAll'), [
+            new Node\Arg(new Node\Expr\Variable('condition')),
+            new Node\Arg(new Node\Expr\Variable('startIndex')),
+            new Node\Arg(new Node\Expr\Variable('count')),
+            new Node\Arg(new Node\Expr\Variable('sortBy')),
+            new Node\Arg(new Node\Expr\Variable('sortOrder')),
+            new Node\Arg(new Node\Expr\Variable('fields')),
+        ]);
+
+        $method = $this->factory->method('findAll');
+        $method->makePublic();
+        $method->setReturnType('iterable');
+        $method->setDocComment($this->buildComment(['return' => $rowClass . '[]', 'throws' => '\\' . QueryException::class]));
+        $method->addParam(new Node\Param(new Node\Expr\Variable('condition'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Name('\\' . Condition::class))));
+        $method->addParam(new Node\Param(new Node\Expr\Variable('startIndex'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('int'))));
+        $method->addParam(new Node\Param(new Node\Expr\Variable('count'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('int'))));
+        $method->addParam(new Node\Param(new Node\Expr\Variable('sortBy'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('string'))));
+        $method->addParam(new Node\Param(new Node\Expr\Variable('sortOrder'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('int'))));
+        $method->addParam(new Node\Param(new Node\Expr\Variable('fields'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Name('\\' . Fields::class))));
+        $method->addStmt(new Node\Stmt\Return_($methodCall));
+        $class->addStmt($method);
+    }
+
+    private function buildFindBy(Builder\Class_ $class, string $rowClass)
+    {
+        $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('doFindBy'), [
+            new Node\Arg(new Node\Expr\Variable('condition')),
+            new Node\Arg(new Node\Expr\Variable('startIndex')),
+            new Node\Arg(new Node\Expr\Variable('count')),
+            new Node\Arg(new Node\Expr\Variable('sortBy')),
+            new Node\Arg(new Node\Expr\Variable('sortOrder')),
+            new Node\Arg(new Node\Expr\Variable('fields')),
+        ]);
+
+        $method = $this->factory->method('findBy');
+        $method->makePublic();
+        $method->setReturnType('iterable');
+        $method->setDocComment($this->buildComment(['return' => $rowClass . '[]', 'throws' => '\\' . QueryException::class]));
+        $method->addParam(new Node\Param(new Node\Expr\Variable('condition'), null, new Node\Name('\\' . Condition::class)));
+        $method->addParam(new Node\Param(new Node\Expr\Variable('startIndex'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('int'))));
+        $method->addParam(new Node\Param(new Node\Expr\Variable('count'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('int'))));
+        $method->addParam(new Node\Param(new Node\Expr\Variable('sortBy'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('string'))));
+        $method->addParam(new Node\Param(new Node\Expr\Variable('sortOrder'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('int'))));
+        $method->addParam(new Node\Param(new Node\Expr\Variable('fields'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Name('\\' . Fields::class))));
+        $method->addStmt(new Node\Stmt\Return_($methodCall));
+        $class->addStmt($method);
+    }
+
+    private function buildFindOneBy(Builder\Class_ $class, string $rowClass)
+    {
+        $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('doFindOneBy'), [
+            new Node\Arg(new Node\Expr\Variable('condition')),
+            new Node\Arg(new Node\Expr\Variable('fields')),
+        ]);
+
+        $method = $this->factory->method('findOneBy');
+        $method->makePublic();
+        $method->setReturnType(new Node\NullableType($rowClass));
+        $method->setDocComment($this->buildComment(['throws' => '\\' . QueryException::class]));
+        $method->addParam(new Node\Param(new Node\Expr\Variable('condition'), null, new Node\Name('\\' . Condition::class)));
+        $method->addParam(new Node\Param(new Node\Expr\Variable('fields'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Name('\\' . Fields::class))));
+        $method->addStmt(new Node\Stmt\Return_($methodCall));
+        $class->addStmt($method);
+    }
+
+    private function buildFindByForColumn(Builder\Class_ $class, Column $column, string $rowClass)
+    {
+        $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('doFindBy'), [
+            new Node\Arg(new Node\Expr\Variable('condition')),
+            new Node\Arg(new Node\Expr\Variable('startIndex')),
+            new Node\Arg(new Node\Expr\Variable('count')),
+            new Node\Arg(new Node\Expr\Variable('sortBy')),
+            new Node\Arg(new Node\Expr\Variable('sortOrder')),
+        ]);
+
+        $type = $this->getTypeForColumn($column);
+
+        $method = $this->factory->method('findBy' . ucfirst($this->normalizeName($column->getName())));
+        $method->makePublic();
+        $method->setReturnType('iterable');
+        $method->setDocComment($this->buildComment(['return' => $rowClass . '[]', 'throws' => '\\' . QueryException::class]));
+        $method->addParam(new Node\Param(new Node\Expr\Variable('value'), null, new Node\Identifier($type)));
+        $method->addParam(new Node\Param(new Node\Expr\Variable('startIndex'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('int'))));
+        $method->addParam(new Node\Param(new Node\Expr\Variable('count'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('int'))));
+        $method->addParam(new Node\Param(new Node\Expr\Variable('sortBy'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('string'))));
+        $method->addParam(new Node\Param(new Node\Expr\Variable('sortOrder'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('int'))));
+        $method->addStmt(new Node\Stmt\Expression(new Node\Expr\Assign(new Node\Expr\Variable('condition'), new Node\Expr\New_(new Node\Name('\\' . Condition::class)))));
+        $method->addStmt(new Node\Stmt\Expression(new Node\Expr\MethodCall(new Node\Expr\Variable('condition'), new Node\Identifier($this->getOperatorForColumn($column)), [
+            new Node\Arg(new Node\Scalar\String_($column->getName())),
+            new Node\Arg(new Node\Expr\Variable('value'))
+        ])));
+        $method->addStmt(new Node\Stmt\Return_($methodCall));
+        $class->addStmt($method);
+    }
+
+    private function buildFindOneByForColumn(Builder\Class_ $class, Column $column, string $rowClass)
+    {
+        $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('doFindOneBy'), [
+            new Node\Arg(new Node\Expr\Variable('condition')),
+        ]);
+
+        $type = $this->getTypeForColumn($column);
+
+        $method = $this->factory->method('findOneBy' . ucfirst($this->normalizeName($column->getName())));
+        $method->makePublic();
+        $method->setReturnType(new Node\NullableType($rowClass));
+        $method->setDocComment($this->buildComment(['throws' => '\\' . QueryException::class]));
+        $method->addParam(new Node\Param(new Node\Expr\Variable('value'), null, new Node\Identifier($type)));
+        $method->addStmt(new Node\Stmt\Expression(new Node\Expr\Assign(new Node\Expr\Variable('condition'), new Node\Expr\New_(new Node\Name('\\' . Condition::class)))));
+        $method->addStmt(new Node\Stmt\Expression(new Node\Expr\MethodCall(new Node\Expr\Variable('condition'), new Node\Identifier($this->getOperatorForColumn($column)), [
+            new Node\Arg(new Node\Scalar\String_($column->getName())),
+            new Node\Arg(new Node\Expr\Variable('value'))
+        ])));
+        $method->addStmt(new Node\Stmt\Return_($methodCall));
+        $class->addStmt($method);
+    }
+
+    private function buildCreate(Builder\Class_ $class, string $rowClass)
+    {
+        $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('doCreate'), [
+            new Node\Arg(new Node\Expr\Variable('record')),
+        ]);
+
+        $method = $this->factory->method('create');
+        $method->makePublic();
+        $method->setReturnType(new Node\Name('int'));
+        $method->setDocComment($this->buildComment(['throws' => '\\' . ManipulationException::class]));
+        $method->addParam(new Node\Param(new Node\Expr\Variable('record'), null, new Node\Identifier($rowClass)));
+        $method->addStmt(new Node\Stmt\Return_($methodCall));
+        $class->addStmt($method);
+    }
+
+    private function buildUpdate(Builder\Class_ $class, string $rowClass)
+    {
+        $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('doUpdate'), [
+            new Node\Arg(new Node\Expr\Variable('record')),
+        ]);
+
+        $method = $this->factory->method('update');
+        $method->makePublic();
+        $method->setReturnType(new Node\Name('int'));
+        $method->setDocComment($this->buildComment(['throws' => '\\' . ManipulationException::class]));
+        $method->addParam(new Node\Param(new Node\Expr\Variable('record'), null, new Node\Identifier($rowClass)));
+        $method->addStmt(new Node\Stmt\Return_($methodCall));
+        $class->addStmt($method);
+    }
+
+    private function buildDelete(Builder\Class_ $class, string $rowClass)
+    {
+        $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('doDelete'), [
+            new Node\Arg(new Node\Expr\Variable('record')),
+        ]);
+
+        $method = $this->factory->method('delete');
+        $method->makePublic();
+        $method->setReturnType(new Node\Name('int'));
+        $method->setDocComment($this->buildComment(['throws' => '\\' . ManipulationException::class]));
+        $method->addParam(new Node\Param(new Node\Expr\Variable('record'), null, new Node\Identifier($rowClass)));
+        $method->addStmt(new Node\Stmt\Return_($methodCall));
+        $class->addStmt($method);
+    }
+
+    private function buildNewRecord(Builder\Class_ $class, string $rowClass)
+    {
+        $method = $this->factory->method('newRecord');
+        $method->makeProtected();
+        $method->setReturnType(new Node\Name($rowClass));
+        $method->addParam(new Node\Param(new Node\Expr\Variable('row'), null, 'array'));
+        $method->addStmt(new Node\Stmt\Return_(new Node\Expr\New_(new Node\Name($rowClass), [
+            new Node\Arg(new Node\Expr\Variable('row'))
+        ])));
+        $class->addStmt($method);
     }
 
     private function normalizeName(string $name): string
@@ -383,11 +537,14 @@ class Generator
     {
         $type = 0;
 
-        if ($column->getLength() > 0) {
+        $dbalType = $column->getType();
+        if ($dbalType instanceof Types\IntegerType || $dbalType instanceof Types\FloatType) {
+            $type+= $column->getPrecision();
+        } else {
             $type+= $column->getLength();
         }
 
-        $type = $type | TypeMapper::getTypeByDoctrineType($column->getType()->getName());
+        $type = $type | TypeMapper::getTypeByDoctrineType($dbalType->getName());
 
         if ($primaryColumns !== null && in_array($column->getName(), $primaryColumns)) {
             $type = $type | TableInterface::PRIMARY_KEY;

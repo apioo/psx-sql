@@ -27,6 +27,7 @@ use PSX\Sql\Table\Reader;
 use PSX\Sql\TableInterface;
 use PSX\Sql\TableManager;
 use PSX\Sql\Test\DatabaseTestCaseTrait;
+use PSX\Sql\Tests\Generator\HandlerCommentTable;
 
 /**
  * TableManagerTest
@@ -41,7 +42,7 @@ class TableManagerTest extends TableTestCase
     {
         $manager = new TableManager(getConnection());
 
-        $table = $manager->getTable(TestTable::class);
+        $table = $manager->getTable(HandlerCommentTable::class);
 
         $this->assertInstanceOf(TableInterface::class, $table);
         $this->assertEquals('psx_handler_comment', $table->getName());

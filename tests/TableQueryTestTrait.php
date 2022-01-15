@@ -20,12 +20,10 @@
 
 namespace PSX\Sql\Tests;
 
-use PSX\Record\Record;
-use PSX\Record\RecordInterface;
 use PSX\Sql\Condition;
 use PSX\Sql\Fields;
 use PSX\Sql\Sql;
-use PSX\Sql\TableQueryInterface;
+use PSX\Sql\Tests\Generator\HandlerCommentRow;
 
 /**
  * TableQueryTestTrait
@@ -39,36 +37,31 @@ trait TableQueryTestTrait
     public function testFindAll()
     {
         $table = $this->getTable();
-
-        if (!$table instanceof TableQueryInterface) {
-            $this->markTestSkipped('Table not a query interface');
-        }
-
         $result = $table->findAll();
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(4, count($result));
 
         $expect = array(
-            new Record(array(
+            new HandlerCommentRow(array(
                 'id' => 4,
                 'userId' => 3,
                 'title' => 'blub',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
             )),
-            new Record(array(
+            new HandlerCommentRow(array(
                 'id' => 3,
                 'userId' => 2,
                 'title' => 'test',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
             )),
-            new Record(array(
+            new HandlerCommentRow(array(
                 'id' => 2,
                 'userId' => 1,
                 'title' => 'bar',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
             )),
-            new Record(array(
+            new HandlerCommentRow(array(
                 'id' => 1,
                 'userId' => 1,
                 'title' => 'foo',
@@ -82,18 +75,13 @@ trait TableQueryTestTrait
     public function testFindAllStartIndex()
     {
         $table = $this->getTable();
-
-        if (!$table instanceof TableQueryInterface) {
-            $this->markTestSkipped('Table not a query interface');
-        }
-
         $result = $table->findAll(startIndex: 3);
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(1, count($result));
 
         $expect = array(
-            new Record(array(
+            new HandlerCommentRow(array(
                 'id' => 1,
                 'userId' => 1,
                 'title' => 'foo',
@@ -107,24 +95,19 @@ trait TableQueryTestTrait
     public function testFindAllCount()
     {
         $table = $this->getTable();
-
-        if (!$table instanceof TableQueryInterface) {
-            $this->markTestSkipped('Table not a query interface');
-        }
-
         $result = $table->findAll(startIndex: 0, count: 2);
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(2, count($result));
 
         $expect = array(
-            new Record(array(
+            new HandlerCommentRow(array(
                 'id' => 4,
                 'userId' => 3,
                 'title' => 'blub',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
             )),
-            new Record(array(
+            new HandlerCommentRow(array(
                 'id' => 3,
                 'userId' => 2,
                 'title' => 'test',
@@ -138,24 +121,19 @@ trait TableQueryTestTrait
     public function testFindAllStartIndexAndCountDefault()
     {
         $table = $this->getTable();
-
-        if (!$table instanceof TableQueryInterface) {
-            $this->markTestSkipped('Table not a query interface');
-        }
-
         $result = $table->findAll(startIndex: 2, count: 2);
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(2, count($result));
 
         $expect = array(
-            new Record(array(
+            new HandlerCommentRow(array(
                 'id' => 2,
                 'userId' => 1,
                 'title' => 'bar',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
             )),
-            new Record(array(
+            new HandlerCommentRow(array(
                 'id' => 1,
                 'userId' => 1,
                 'title' => 'foo',
@@ -169,24 +147,19 @@ trait TableQueryTestTrait
     public function testFindAllStartIndexAndCountDesc()
     {
         $table = $this->getTable();
-
-        if (!$table instanceof TableQueryInterface) {
-            $this->markTestSkipped('Table not a query interface');
-        }
-
         $result = $table->findAll(startIndex: 2, count: 2, sortBy: 'id', sortOrder: Sql::SORT_DESC);
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(2, count($result));
 
         $expect = array(
-            new Record(array(
+            new HandlerCommentRow(array(
                 'id' => 2,
                 'userId' => 1,
                 'title' => 'bar',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
             )),
-            new Record(array(
+            new HandlerCommentRow(array(
                 'id' => 1,
                 'userId' => 1,
                 'title' => 'foo',
@@ -200,24 +173,19 @@ trait TableQueryTestTrait
     public function testFindAllStartIndexAndCountAsc()
     {
         $table = $this->getTable();
-
-        if (!$table instanceof TableQueryInterface) {
-            $this->markTestSkipped('Table not a query interface');
-        }
-
         $result = $table->findAll(startIndex: 2, count: 2, sortBy: 'id', sortOrder: Sql::SORT_ASC);
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(2, count($result));
 
         $expect = array(
-            new Record(array(
+            new HandlerCommentRow(array(
                 'id' => 3,
                 'userId' => 2,
                 'title' => 'test',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
             )),
-            new Record(array(
+            new HandlerCommentRow(array(
                 'id' => 4,
                 'userId' => 3,
                 'title' => 'blub',
@@ -231,24 +199,19 @@ trait TableQueryTestTrait
     public function testFindAllSortDesc()
     {
         $table = $this->getTable();
-
-        if (!$table instanceof TableQueryInterface) {
-            $this->markTestSkipped('Table not a query interface');
-        }
-
         $result = $table->findAll(startIndex: 0, count: 2, sortBy: 'id', sortOrder: Sql::SORT_DESC);
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(2, count($result));
 
         $expect = array(
-            new Record(array(
+            new HandlerCommentRow(array(
                 'id' => 4,
                 'userId' => 3,
                 'title' => 'blub',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
             )),
-            new Record(array(
+            new HandlerCommentRow(array(
                 'id' => 3,
                 'userId' => 2,
                 'title' => 'test',
@@ -271,24 +234,19 @@ trait TableQueryTestTrait
     public function testFindAllSortAsc()
     {
         $table = $this->getTable();
-
-        if (!$table instanceof TableQueryInterface) {
-            $this->markTestSkipped('Table not a query interface');
-        }
-
         $result = $table->findAll(startIndex: 0, count: 2, sortBy: 'id', sortOrder: Sql::SORT_ASC);
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(2, count($result));
 
         $expect = array(
-            new Record(array(
+            new HandlerCommentRow(array(
                 'id' => 1,
                 'userId' => 1,
                 'title' => 'foo',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
             )),
-            new Record(array(
+            new HandlerCommentRow(array(
                 'id' => 2,
                 'userId' => 1,
                 'title' => 'bar',
@@ -301,12 +259,7 @@ trait TableQueryTestTrait
 
     public function testFindAllCondition()
     {
-        $table = $this->getTable();
-
-        if (!$table instanceof TableQueryInterface) {
-            $this->markTestSkipped('Table not a query interface');
-        }
-
+        $table  = $this->getTable();
         $con    = new Condition(array('userId', '=', 1));
         $result = $table->findAll(condition: $con, startIndex: 0, count: 16, sortBy: 'id', sortOrder: Sql::SORT_DESC);
 
@@ -314,13 +267,13 @@ trait TableQueryTestTrait
         $this->assertEquals(2, count($result));
 
         $expect = array(
-            new Record(array(
+            new HandlerCommentRow(array(
                 'id' => 2,
                 'userId' => 1,
                 'title' => 'bar',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
             )),
-            new Record(array(
+            new HandlerCommentRow(array(
                 'id' => 1,
                 'userId' => 1,
                 'title' => 'foo',
@@ -334,10 +287,6 @@ trait TableQueryTestTrait
     public function testFindAllConditionAndConjunction()
     {
         $table = $this->getTable();
-
-        if (!$table instanceof TableQueryInterface) {
-            $this->markTestSkipped('Table not a query interface');
-        }
 
         $con = new Condition();
         $con->add('userId', '=', 1, 'AND');
@@ -357,7 +306,7 @@ trait TableQueryTestTrait
         $this->assertEquals(1, count($result));
 
         $expect = array(
-            new Record(array(
+            new HandlerCommentRow(array(
                 'id' => 1,
                 'userId' => 1,
                 'title' => 'foo',
@@ -372,10 +321,6 @@ trait TableQueryTestTrait
     {
         $table = $this->getTable();
 
-        if (!$table instanceof TableQueryInterface) {
-            $this->markTestSkipped('Table not a query interface');
-        }
-
         $con = new Condition();
         $con->add('userId', '=', 1, 'OR');
         $con->add('userId', '=', 3);
@@ -385,19 +330,19 @@ trait TableQueryTestTrait
         $this->assertEquals(3, count($result));
 
         $expect = array(
-            new Record(array(
+            new HandlerCommentRow(array(
                 'id' => 4,
                 'userId' => 3,
                 'title' => 'blub',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
             )),
-            new Record(array(
+            new HandlerCommentRow(array(
                 'id' => 2,
                 'userId' => 1,
                 'title' => 'bar',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
             )),
-            new Record(array(
+            new HandlerCommentRow(array(
                 'id' => 1,
                 'userId' => 1,
                 'title' => 'foo',
@@ -410,23 +355,18 @@ trait TableQueryTestTrait
 
     public function testFindAllFieldWhitelist()
     {
-        $table = $this->getTable();
-
-        if (!$table instanceof TableQueryInterface) {
-            $this->markTestSkipped('Table not a query interface');
-        }
-
+        $table  = $this->getTable();
         $result = $table->findAll(startIndex: 0, count: 2, sortBy: 'id', sortOrder: Sql::SORT_DESC, fields: Fields::whitelist(['id', 'title']));
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(2, count($result));
 
         $expect = array(
-            new Record(array(
+            new HandlerCommentRow(array(
                 'id' => 4,
                 'title' => 'blub',
             )),
-            new Record(array(
+            new HandlerCommentRow(array(
                 'id' => 3,
                 'title' => 'test',
             )),
@@ -437,23 +377,18 @@ trait TableQueryTestTrait
 
     public function testFindAllFieldBlacklist()
     {
-        $table = $this->getTable();
-
-        if (!$table instanceof TableQueryInterface) {
-            $this->markTestSkipped('Table not a query interface');
-        }
-
+        $table  = $this->getTable();
         $result = $table->findAll(startIndex: 0, count: 2, sortBy: 'id', sortOrder: Sql::SORT_DESC, fields: Fields::blacklist(['id', 'title']));
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(2, count($result));
 
         $expect = array(
-            new Record(array(
+            new HandlerCommentRow(array(
                 'userId' => 3,
                 'date' => new \DateTime('2013-04-29 16:56:32'),
             )),
-            new Record(array(
+            new HandlerCommentRow(array(
                 'userId' => 2,
                 'date' => new \DateTime('2013-04-29 16:56:32'),
             )),
@@ -464,25 +399,20 @@ trait TableQueryTestTrait
 
     public function testFindBy()
     {
-        $table = $this->getTable();
-
-        if (!$table instanceof TableQueryInterface) {
-            $this->markTestSkipped('Table not a query interface');
-        }
-
+        $table  = $this->getTable();
         $result = $table->findBy(condition: new Condition(['userId', '=', 1]));
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(2, count($result));
 
         $expect = array(
-            new Record(array(
+            new HandlerCommentRow(array(
                 'id' => 2,
                 'userId' => 1,
                 'title' => 'bar',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
             )),
-            new Record(array(
+            new HandlerCommentRow(array(
                 'id' => 1,
                 'userId' => 1,
                 'title' => 'foo',
@@ -495,23 +425,18 @@ trait TableQueryTestTrait
 
     public function testFindByFieldWhitelist()
     {
-        $table = $this->getTable();
-
-        if (!$table instanceof TableQueryInterface) {
-            $this->markTestSkipped('Table not a query interface');
-        }
-
+        $table  = $this->getTable();
         $result = $table->findBy(condition: new Condition(['userId', '=', 1]), fields: Fields::whitelist(['id', 'title']));
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(2, count($result));
 
         $expect = array(
-            new Record(array(
+            new HandlerCommentRow(array(
                 'id' => 2,
                 'title' => 'bar',
             )),
-            new Record(array(
+            new HandlerCommentRow(array(
                 'id' => 1,
                 'title' => 'foo',
             )),
@@ -522,19 +447,14 @@ trait TableQueryTestTrait
 
     public function testFindByStartIndexCountOrder()
     {
-        $table = $this->getTable();
-
-        if (!$table instanceof TableQueryInterface) {
-            $this->markTestSkipped('Table not a query interface');
-        }
-
+        $table  = $this->getTable();
         $result = $table->findBy(condition: new Condition(['userId', '=', 1]), startIndex: 0, count: 1, sortBy: 'id', sortOrder: Sql::SORT_ASC);
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(1, count($result));
 
         $expect = array(
-            new Record(array(
+            new HandlerCommentRow(array(
                 'id' => 1,
                 'userId' => 1,
                 'title' => 'foo',
@@ -548,15 +468,10 @@ trait TableQueryTestTrait
     public function testFindOneBy()
     {
         $table = $this->getTable();
-
-        if (!$table instanceof TableQueryInterface) {
-            $this->markTestSkipped('Table not a query interface');
-        }
-
-        $row = $table->findOneBy(condition: new Condition(['id', '=', 1]));
+        $row   = $table->findOneBy(condition: new Condition(['id', '=', 1]));
 
         $expect = array(
-            new Record(array(
+            new HandlerCommentRow(array(
                 'id' => 1,
                 'userId' => 1,
                 'title' => 'foo',
@@ -570,15 +485,10 @@ trait TableQueryTestTrait
     public function testFindOneByFieldWhitelist()
     {
         $table = $this->getTable();
-
-        if (!$table instanceof TableQueryInterface) {
-            $this->markTestSkipped('Table not a query interface');
-        }
-
-        $row = $table->findOneBy(condition: new Condition(['id', '=', 1]), fields: Fields::whitelist(['id', 'title']));
+        $row   = $table->findOneBy(condition: new Condition(['id', '=', 1]), fields: Fields::whitelist(['id', 'title']));
 
         $expect = array(
-            new Record(array(
+            new HandlerCommentRow(array(
                 'id' => 1,
                 'title' => 'foo',
             )),
@@ -590,15 +500,10 @@ trait TableQueryTestTrait
     public function testFind()
     {
         $table = $this->getTable();
-
-        if (!$table instanceof TableQueryInterface) {
-            $this->markTestSkipped('Table not a query interface');
-        }
-
-        $row = $table->find(1);
+        $row   = $table->find(1);
 
         $expect = array(
-            new Record(array(
+            new HandlerCommentRow(array(
                 'id' => 1,
                 'userId' => 1,
                 'title' => 'foo',
@@ -612,11 +517,6 @@ trait TableQueryTestTrait
     public function testGetColumnNames()
     {
         $table = $this->getTable();
-
-        if (!$table instanceof TableQueryInterface) {
-            $this->markTestSkipped('Table not a query interface');
-        }
-
         $columnNames = $table->getColumnNames();
 
         $this->assertEquals(array('id', 'userId', 'title', 'date'), $columnNames);
@@ -626,9 +526,6 @@ trait TableQueryTestTrait
     {
         $table = $this->getTable();
 
-        if (!$table instanceof TableQueryInterface) {
-            $this->markTestSkipped('Table not a query interface');
-        }
 
         $this->assertEquals(4, $table->getCount());
         $this->assertEquals(2, $table->getCount(new Condition(array('userId', '=', 1))));

@@ -25,6 +25,7 @@ use PSX\DateTime\DateTime;
 use PSX\Record\Record;
 use PSX\Sql\Generator\Generator;
 use PSX\Sql\TableManager;
+use PSX\Sql\TableManagerInterface;
 use PSX\Sql\Tests\TableTestCase;
 
 /**
@@ -36,10 +37,7 @@ use PSX\Sql\Tests\TableTestCase;
  */
 class GeneratorTest extends TableTestCase
 {
-    /**
-     * @var \PSX\Sql\TableManagerInterface
-     */
-    protected $manager;
+    private TableManagerInterface $manager;
 
     protected function setUp(): void
     {

@@ -18,35 +18,15 @@
  * limitations under the License.
  */
 
-namespace PSX\Sql;
+namespace PSX\Sql\Exception;
 
 /**
- * Table
+ * QueryException
  *
  * @author  Christoph Kappestein <christoph.kappestein@gmail.com>
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    https://phpsx.org
  */
-class Table extends TableAbstract
+class QueryException extends \Exception
 {
-    private string $name;
-    private array $columns;
-
-    public function __construct(TableManager $tableManager, string $name, array $columns)
-    {
-        parent::__construct($tableManager);
-
-        $this->name    = $name;
-        $this->columns = $columns;
-    }
-
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    public function getColumns(): array
-    {
-        return $this->columns;
-    }
 }

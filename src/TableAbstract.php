@@ -28,22 +28,11 @@ use Doctrine\DBAL\Connection;
  * @author  Christoph Kappestein <christoph.kappestein@gmail.com>
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    https://phpsx.org
- *
- * @template T
- * @implements TableInterface<T>
  */
 abstract class TableAbstract implements TableInterface
 {
-    /**
-     * @use TableQueryTrait<T>
-     */
     use TableQueryTrait;
-
-    /**
-     * @use TableManipulationTrait<T>
-     */
     use TableManipulationTrait;
-
     use ViewTrait;
 
     protected Connection $connection;
@@ -76,6 +65,11 @@ abstract class TableAbstract implements TableInterface
         $columns = $this->getColumns();
 
         return isset($columns[$column]);
+    }
+
+    public function getColumnNames(): array
+    {
+        return array_keys($this->getColumns());
     }
 
     public function beginTransaction(): void

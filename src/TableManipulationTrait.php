@@ -20,13 +20,11 @@
 
 namespace PSX\Sql;
 
-use ArrayObject;
-use InvalidArgumentException;
-use JsonSerializable;
+use Doctrine\DBAL\Exception as DBALException;
 use PSX\Record\RecordInterface;
+use PSX\Sql\Exception\ManipulationException;
 use PSX\Sql\Exception\NoFieldsAvailableException;
 use PSX\Sql\Exception\NoPrimaryKeyAvailableException;
-use stdClass;
 
 /**
  * TableManipulationTrait
@@ -34,51 +32,59 @@ use stdClass;
  * @author  Christoph Kappestein <christoph.kappestein@gmail.com>
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    https://phpsx.org
- *
- * @template T
  */
 trait TableManipulationTrait
 {
     protected ?int $lastInsertId = null;
 
     /**
-     * @throws NoFieldsAvailableException
-     * @throws \Doctrine\DBAL\Exception
+     * @throws ManipulationException
+     * @internal
      */
-    public function create(RecordInterface|stdClass|ArrayObject|array $record): int
+    protected function doCreate(RecordInterface $record): int
     {
-        $fields = $this->getFields($record);
-        $result = $this->connection->insert($this->getName(), $fields);
+        try {
+            $fields = $this->getFields($record);
+            $result = $this->connection->insert($this->getName(), $fields);
 
-        $this->lastInsertId = (int) $this->connection->lastInsertId();
+            $this->lastInsertId = (int) $this->connection->lastInsertId();
 
-        return $result;
+            return $result;
+        } catch (DBALException $e) {
+            throw new ManipulationException($e->getMessage(), 0, $e);
+        }
     }
 
     /**
-     * @throws NoPrimaryKeyAvailableException
-     * @throws NoFieldsAvailableException
-     * @throws \Doctrine\DBAL\Exception
+     * @throws ManipulationException
+     * @internal
      */
-    public function update(RecordInterface|stdClass|ArrayObject|array $record): int
+    protected function doUpdate(RecordInterface $record): int
     {
-        $fields = $this->getFields($record);
-        $criteria = $this->getCriteria($fields);
+        try {
+            $fields = $this->getFields($record);
+            $criteria = $this->getCriteria($fields);
 
-        return $this->connection->update($this->getName(), $fields, $criteria);
+            return $this->connection->update($this->getName(), $fields, $criteria);
+        } catch (DBALException $e) {
+            throw new ManipulationException($e->getMessage(), 0, $e);
+        }
     }
 
     /**
-     * @throws NoPrimaryKeyAvailableException
-     * @throws NoFieldsAvailableException
-     * @throws \Doctrine\DBAL\Exception
+     * @throws ManipulationException
+     * @internal
      */
-    public function delete(RecordInterface|stdClass|ArrayObject|array $record): int
+    protected function doDelete(RecordInterface $record): int
     {
-        $fields = $this->getFields($record);
-        $criteria = $this->getCriteria($fields);
+        try {
+            $fields = $this->getFields($record);
+            $criteria = $this->getCriteria($fields);
 
-        return $this->connection->delete($this->getName(), $criteria);
+            return $this->connection->delete($this->getName(), $criteria);
+        } catch (DBALException $e) {
+            throw new ManipulationException($e->getMessage(), 0, $e);
+        }
     }
 
     public function getLastInsertId(): ?int
@@ -111,9 +117,9 @@ trait TableManipulationTrait
     /**
      * @throws NoFieldsAvailableException
      */
-    private function getFields(RecordInterface|stdClass|ArrayObject|array $record): array
+    private function getFields(RecordInterface $record): array
     {
-        $fields = $this->serializeFields($this->getArray($record));
+        $fields = $this->serializeFields($record->getProperties());
         if (empty($fields)) {
             throw new NoFieldsAvailableException('No valid field set');
         }
@@ -148,18 +154,5 @@ trait TableManipulationTrait
         }
 
         return $data;
-    }
-
-    protected function getArray(RecordInterface|stdClass|ArrayObject|array $record): array
-    {
-        if ($record instanceof RecordInterface) {
-            return $record->getProperties();
-        } elseif ($record instanceof \stdClass) {
-            return (array) $record;
-        } elseif ($record instanceof \ArrayObject) {
-            return $record->getArrayCopy();
-        } else {
-            return $record;
-        }
     }
 }
