@@ -51,72 +51,75 @@ class ViewAbstractTest extends TableTestCase
         $result = $this->getTable()->getNestedResult();
         $actual = json_encode($result, JSON_PRETTY_PRINT);
         $expect = <<<JSON
-[
-    {
-        "id": 4,
-        "title": "Blub",
-        "author": {
-            "id": "urn:profile:3",
-            "date": "2013-04-29T16:56:32Z"
+{
+    "totalResults": 4,
+    "entries": [
+        {
+            "id": 4,
+            "title": "Blub",
+            "author": {
+                "id": "urn:profile:3",
+                "date": "2013-04-29T16:56:32Z"
+            },
+            "count": 4,
+            "tags": [
+                "2013-04-29 16:56:32",
+                "2013-04-29 16:56:32",
+                "2013-04-29 16:56:32",
+                "2013-04-29 16:56:32"
+            ]
         },
-        "count": 4,
-        "tags": [
-            "2013-04-29 16:56:32",
-            "2013-04-29 16:56:32",
-            "2013-04-29 16:56:32",
-            "2013-04-29 16:56:32"
-        ]
-    },
-    {
-        "id": 3,
-        "title": "Test",
-        "author": {
-            "id": "urn:profile:2",
-            "date": "2013-04-29T16:56:32Z"
+        {
+            "id": 3,
+            "title": "Test",
+            "author": {
+                "id": "urn:profile:2",
+                "date": "2013-04-29T16:56:32Z"
+            },
+            "count": 4,
+            "tags": [
+                "2013-04-29 16:56:32",
+                "2013-04-29 16:56:32",
+                "2013-04-29 16:56:32",
+                "2013-04-29 16:56:32"
+            ]
         },
-        "count": 4,
-        "tags": [
-            "2013-04-29 16:56:32",
-            "2013-04-29 16:56:32",
-            "2013-04-29 16:56:32",
-            "2013-04-29 16:56:32"
-        ]
-    },
-    {
-        "id": 2,
-        "title": "Bar",
-        "author": {
-            "id": "urn:profile:1",
-            "date": "2013-04-29T16:56:32Z"
+        {
+            "id": 2,
+            "title": "Bar",
+            "author": {
+                "id": "urn:profile:1",
+                "date": "2013-04-29T16:56:32Z"
+            },
+            "count": 4,
+            "tags": [
+                "2013-04-29 16:56:32",
+                "2013-04-29 16:56:32",
+                "2013-04-29 16:56:32",
+                "2013-04-29 16:56:32"
+            ]
         },
-        "count": 4,
-        "tags": [
-            "2013-04-29 16:56:32",
-            "2013-04-29 16:56:32",
-            "2013-04-29 16:56:32",
-            "2013-04-29 16:56:32"
-        ]
-    },
-    {
-        "id": 1,
-        "title": "Foo",
-        "author": {
-            "id": "urn:profile:1",
-            "date": "2013-04-29T16:56:32Z"
-        },
-        "note": {
-            "comments": true,
-            "title": "foobar"
-        },
-        "count": 4,
-        "tags": [
-            "2013-04-29 16:56:32",
-            "2013-04-29 16:56:32",
-            "2013-04-29 16:56:32",
-            "2013-04-29 16:56:32"
-        ]
-    }
-]
+        {
+            "id": 1,
+            "title": "Foo",
+            "author": {
+                "id": "urn:profile:1",
+                "date": "2013-04-29T16:56:32Z"
+            },
+            "note": {
+                "comments": true,
+                "title": "foobar"
+            },
+            "count": 4,
+            "tags": [
+                "2013-04-29 16:56:32",
+                "2013-04-29 16:56:32",
+                "2013-04-29 16:56:32",
+                "2013-04-29 16:56:32"
+            ]
+        }
+    ]
+}
 JSON;
 
         $this->assertJsonStringEqualsJsonString($expect, $actual, $actual);

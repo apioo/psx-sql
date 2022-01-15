@@ -37,22 +37,25 @@ class TestView extends ViewAbstract
 {
     public function getNestedResult()
     {
-        $definition = $this->doCollection([$this->getTable(HandlerCommentTable::class), 'findAll'], [], [
-            'id' => $this->fieldInteger('id'),
-            'title' => $this->fieldCallback('title', function($title){
-                return ucfirst($title);
-            }),
-            'author' => [
-                'id' => $this->fieldFormat('userId', 'urn:profile:%s'),
-                'date' => $this->fieldDateTime('date'),
-            ],
-            'note' => $this->doEntity([$this->getTable(TableCommandTestTable::class), 'findOneById'], [new Reference('id')], [
-                'comments' => true,
-                'title' => 'col_text',
-            ]),
-            'count' => $this->doValue('SELECT COUNT(*) AS cnt FROM psx_handler_comment', [], $this->fieldInteger('cnt')),
-            'tags' => $this->doColumn('SELECT date FROM psx_handler_comment', [], 'date'),
-        ]);
+        $definition = [
+            'totalResults' => $this->getTable(HandlerCommentTable::class)->getCount(),
+            'entries' => $this->doCollection([$this->getTable(HandlerCommentTable::class), 'findAll'], [], [
+                'id' => $this->fieldInteger('id'),
+                'title' => $this->fieldCallback('title', function($title){
+                    return ucfirst($title);
+                }),
+                'author' => [
+                    'id' => $this->fieldFormat('userId', 'urn:profile:%s'),
+                    'date' => $this->fieldDateTime('date'),
+                ],
+                'note' => $this->doEntity([$this->getTable(TableCommandTestTable::class), 'findOneById'], [new Reference('id')], [
+                    'comments' => true,
+                    'title' => 'col_text',
+                ]),
+                'count' => $this->doValue('SELECT COUNT(*) AS cnt FROM psx_handler_comment', [], $this->fieldInteger('cnt')),
+                'tags' => $this->doColumn('SELECT date FROM psx_handler_comment', [], 'date'),
+            ])
+        ];
 
         return $this->build($definition);
     }
