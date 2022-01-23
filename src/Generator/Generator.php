@@ -156,6 +156,7 @@ class Generator
 
         $class = $this->factory->class($className);
         $class->extend('\\' . TableAbstract::class);
+        $class->setDocComment($this->buildComment(['extends' => '\\' . TableAbstract::class . '<' . $rowClass . '>']));
 
         $this->buildConstants($class, $table);
         $this->buildGetName($class, $table);
@@ -269,8 +270,8 @@ class Generator
 
         $method = $this->factory->method('findAll');
         $method->makePublic();
-        $method->setReturnType('iterable');
-        $method->setDocComment($this->buildComment(['return' => $rowClass . '[]', 'throws' => '\\' . QueryException::class]));
+        $method->setReturnType('array');
+        $method->setDocComment($this->buildComment(['return' => 'array<' . $rowClass . '>', 'throws' => '\\' . QueryException::class]));
         $method->addParam(new Node\Param(new Node\Expr\Variable('condition'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Name('\\' . Condition::class))));
         $method->addParam(new Node\Param(new Node\Expr\Variable('startIndex'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('int'))));
         $method->addParam(new Node\Param(new Node\Expr\Variable('count'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('int'))));
@@ -294,8 +295,8 @@ class Generator
 
         $method = $this->factory->method('findBy');
         $method->makePublic();
-        $method->setReturnType('iterable');
-        $method->setDocComment($this->buildComment(['return' => $rowClass . '[]', 'throws' => '\\' . QueryException::class]));
+        $method->setReturnType('array');
+        $method->setDocComment($this->buildComment(['return' => 'array<' . $rowClass . '>', 'throws' => '\\' . QueryException::class]));
         $method->addParam(new Node\Param(new Node\Expr\Variable('condition'), null, new Node\Name('\\' . Condition::class)));
         $method->addParam(new Node\Param(new Node\Expr\Variable('startIndex'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('int'))));
         $method->addParam(new Node\Param(new Node\Expr\Variable('count'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('int'))));
@@ -337,8 +338,8 @@ class Generator
 
         $method = $this->factory->method('findBy' . ucfirst($this->normalizeName($column->getName())));
         $method->makePublic();
-        $method->setReturnType('iterable');
-        $method->setDocComment($this->buildComment(['return' => $rowClass . '[]', 'throws' => '\\' . QueryException::class]));
+        $method->setReturnType('array');
+        $method->setDocComment($this->buildComment(['return' => 'array<' . $rowClass . '>', 'throws' => '\\' . QueryException::class]));
         $method->addParam(new Node\Param(new Node\Expr\Variable('value'), null, new Node\Identifier($type)));
         $method->addParam(new Node\Param(new Node\Expr\Variable('startIndex'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('int'))));
         $method->addParam(new Node\Param(new Node\Expr\Variable('count'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('int'))));

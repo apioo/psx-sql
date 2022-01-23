@@ -20,6 +20,8 @@
 
 namespace PSX\Sql;
 
+use PSX\Sql\Exception\NoLastInsertIdAvailable;
+
 /**
  * Represents a class which describes a table
  *
@@ -133,4 +135,9 @@ interface TableInterface extends ViewInterface
      * Rollback a transaction
      */
     public function rollBack(): void;
+
+    /**
+     * @throws NoLastInsertIdAvailable
+     */
+    public function getLastInsertId(): int;
 }
