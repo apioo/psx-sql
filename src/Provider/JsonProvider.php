@@ -83,6 +83,9 @@ class JsonProvider
             return $this->builder->doValue($payload->{'$value'}, $params, $definition);
         } elseif (isset($payload->{'$field'}) && is_string($payload->{'$field'})) {
             $key = $payload->{'$key'} ?? $propertyName;
+            if ($key === null) {
+                throw new BuilderException('Provided no key for field');
+            }
             switch ($payload->{'$field'}) {
                 case 'boolean':
                     return $this->builder->fieldBoolean($key);
