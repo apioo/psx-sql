@@ -106,7 +106,7 @@ class JsonProvider
                 case 'value':
                     return $this->builder->fieldValue($key);
                 default:
-                    throw new BuilderException('Provided a not valid $field value');
+                    return $key;
             }
         } else {
             $definition = [];
