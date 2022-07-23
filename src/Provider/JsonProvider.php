@@ -58,13 +58,14 @@ class JsonProvider
     /**
      * @throws BuilderException
      */
-    private function buildDefinition(\stdClass $payload, array $context): mixed
+    private function buildDefinition(\stdClass $payload, array $context, ?string $propertyName = null): mixed
     {
         if (isset($payload->{'$collection'}) && is_string($payload->{'$collection'})) {
             $params = $this->parseParams($payload->{'$params'} ?? null, $context);
+            $key = $payload->{'$key'} ?? null;
             $definition = $this->parseDefinitions($payload->{'$definition'} ?? null, $context);
 
-            return $this->builder->doCollection($payload->{'$collection'}, $params, $definition);
+            return $this->builder->doCollection($payload->{'$collection'}, $params, $definition, $key);
         } elseif (isset($payload->{'$entity'}) && is_string($payload->{'$entity'})) {
             $params = $this->parseParams($payload->{'$params'} ?? null, $context);
             $definition = $this->parseDefinitions($payload->{'$definition'} ?? null, $context);
@@ -81,7 +82,7 @@ class JsonProvider
 
             return $this->builder->doValue($payload->{'$value'}, $params, $definition);
         } elseif (isset($payload->{'$field'}) && is_string($payload->{'$field'})) {
-            $key = $payload->{'$key'} ?? '';
+            $key = $payload->{'$key'} ?? $propertyName;
             switch ($payload->{'$field'}) {
                 case 'boolean':
                     return $this->builder->fieldBoolean($key);
@@ -108,7 +109,7 @@ class JsonProvider
             $definition = [];
             foreach ($payload as $key => $value) {
                 if ($value instanceof \stdClass) {
-                    $definition[$key] = $this->buildDefinition($value, $context);
+                    $definition[$key] = $this->buildDefinition($value, $context, $key);
                 } else {
                     $definition[$key] = $value;
                 }
