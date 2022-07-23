@@ -59,10 +59,16 @@ class Collection extends DBALAbstract implements ProviderCollectionInterface
         $parameters = ParameterResolver::resolve($this->parameters, $context);
         $types      = self::getTypes($parameters);
 
-        return $this->connection->fetchAll(
+        $return = $this->connection->fetchAllAssociative(
             $this->sql,
             $parameters,
             $types
         );
+
+        if ($return === false) {
+            return [];
+        }
+
+        return $return;
     }
 }

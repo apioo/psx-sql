@@ -34,9 +34,15 @@ class Value extends DBALAbstract implements ProviderValueInterface
 {
     public function getResult(array|\ArrayAccess|null $context = null): array
     {
-        return (array) $this->connection->fetchAssoc(
+        $return = $this->connection->fetchAssociative(
             $this->sql,
             ParameterResolver::resolve($this->parameters, $context)
         );
+
+        if ($return === false) {
+            return [];
+        }
+
+        return $return;
     }
 }
