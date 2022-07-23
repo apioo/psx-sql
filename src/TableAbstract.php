@@ -359,7 +359,7 @@ abstract class TableAbstract implements TableInterface
 
             $this->lastInsertId = (int) $this->connection->lastInsertId();
 
-            return $result;
+            return (int) $result;
         } catch (DBALException $e) {
             throw new ManipulationException($e->getMessage(), 0, $e);
         }
@@ -374,7 +374,7 @@ abstract class TableAbstract implements TableInterface
             $fields = $this->getFields($record);
             $criteria = $this->getCriteria($fields);
 
-            return $this->connection->update($this->getName(), $fields, $criteria);
+            return (int) $this->connection->update($this->getName(), $fields, $criteria);
         } catch (DBALException $e) {
             throw new ManipulationException($e->getMessage(), 0, $e);
         }
@@ -389,7 +389,7 @@ abstract class TableAbstract implements TableInterface
             $fields = $this->getFields($record);
             $criteria = $this->getCriteria($fields);
 
-            return $this->connection->delete($this->getName(), $criteria);
+            return (int) $this->connection->delete($this->getName(), $criteria);
         } catch (DBALException $e) {
             throw new ManipulationException($e->getMessage(), 0, $e);
         }
