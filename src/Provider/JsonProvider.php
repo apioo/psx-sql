@@ -108,6 +108,8 @@ class JsonProvider
                 default:
                     return $key;
             }
+        } elseif (isset($payload->{'$context'}) && is_string($payload->{'$context'})) {
+            return $context[$payload->{'$context'}] ?? ($payload->{'$default'} ?? null);
         } else {
             $definition = [];
             foreach ($payload as $key => $value) {
@@ -145,11 +147,11 @@ class JsonProvider
             if ($value instanceof \stdClass) {
                 if (isset($value->{'$ref'}) && is_string($value->{'$ref'})) {
                     $result[$key] = new Reference($value->{'$ref'});
+                } elseif (isset($value->{'$context'}) && is_string($value->{'$context'})) {
+                    $result[$key] = $context[$value->{'$context'}] ?? ($value->{'$default'} ?? null);
                 } else {
                     throw new BuilderException('When using an object at a $params value it must contain a $ref key');
                 }
-            } elseif (is_string($value) && isset($context[$value])) {
-                $result[$key] = $context[$value];
             } else {
                 $result[$key] = $value;
             }
