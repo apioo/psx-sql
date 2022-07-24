@@ -45,7 +45,7 @@ class ParameterResolver
         foreach ($parameters as $key => $value) {
             if ($value instanceof Reference) {
                 $val = $value->getValue();
-                if (isset($context[$val])) {
+                if (array_key_exists($val, $context)) {
                     $params[$key] = $context[$val];
                 } else {
                     throw new RuntimeException('Reference invalid context key "' . $val . '"');
