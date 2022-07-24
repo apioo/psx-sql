@@ -33,7 +33,7 @@ use RuntimeException;
 class ParameterResolver
 {
     /**
-     * Resolves parameters agains a context
+     * Resolves parameters against a context
      *
      * @param array $parameters
      * @param array|\ArrayAccess|null $context
@@ -45,8 +45,10 @@ class ParameterResolver
         foreach ($parameters as $key => $value) {
             if ($value instanceof Reference) {
                 $val = $value->getValue();
-                if (array_key_exists($val, $context)) {
+                if (is_array($context) && array_key_exists($val, $context)) {
                     $params[$key] = $context[$val];
+                } elseif ($context instanceof \ArrayAccess && $context->offsetExists($val)) {
+                    $params[$key] = $context->offsetGet($val);
                 } else {
                     throw new RuntimeException('Reference invalid context key "' . $val . '"');
                 }
