@@ -34,10 +34,12 @@ use PSX\Sql\Reference;
  */
 class JsonProvider
 {
+    private Connection $connection;
     private Builder $builder;
 
     public function __construct(Connection $connection)
     {
+        $this->connection = $connection;
         $this->builder = new Builder($connection);
     }
 
@@ -63,9 +65,11 @@ class JsonProvider
         if (isset($payload->{'$collection'}) && is_string($payload->{'$collection'})) {
             $params = $this->parseParams($payload->{'$params'} ?? null, $context);
             $key = $payload->{'$key'} ?? null;
+
+            $query = $this->parseLimitQuery($payload->{'$collection'}, $payload, $context);
             $definition = $this->parseDefinitions($payload->{'$definition'} ?? null, $context);
 
-            return $this->builder->doCollection($payload->{'$collection'}, $params, $definition, $key);
+            return $this->builder->doCollection($query, $params, $definition, $key);
         } elseif (isset($payload->{'$entity'}) && is_string($payload->{'$entity'})) {
             $params = $this->parseParams($payload->{'$params'} ?? null, $context);
             $definition = $this->parseDefinitions($payload->{'$definition'} ?? null, $context);
@@ -73,9 +77,11 @@ class JsonProvider
             return $this->builder->doEntity($payload->{'$entity'}, $params, $definition);
         } elseif (isset($payload->{'$column'}) && is_string($payload->{'$column'})) {
             $params = $this->parseParams($payload->{'$params'} ?? null, $context);
+
+            $query = $this->parseLimitQuery($payload->{'$column'}, $payload, $context);
             $definition = $this->parseDefinitions($payload->{'$definition'} ?? null, $context);
 
-            return $this->builder->doColumn($payload->{'$column'}, $params, $definition);
+            return $this->builder->doColumn($query, $params, $definition);
         } elseif (isset($payload->{'$value'}) && is_string($payload->{'$value'})) {
             $params = $this->parseParams($payload->{'$params'} ?? null, $context);
             $definition = $this->parseDefinitions($payload->{'$definition'} ?? null, $context);
@@ -158,5 +164,35 @@ class JsonProvider
         }
 
         return $result;
+    }
+
+    private function parseLimitQuery(string $query, \stdClass $payload, array $context): string
+    {
+        $limit = $this->parseInt($payload->{'$limit'} ?? null, $context);
+        $offset = $this->parseInt($payload->{'$offset'} ?? null, $context);
+
+        if (!empty($limit)) {
+            return $this->connection->getDatabasePlatform()->modifyLimitQuery($query, $limit, $offset);
+        } else {
+            return $query;
+        }
+    }
+
+    private function parseInt(mixed $value, array $context): ?int
+    {
+        if (is_int($value)) {
+            return $value;
+        } elseif ($value instanceof \stdClass && isset($value->{'$context'}) && is_string($value->{'$context'})) {
+            if (isset($context[$value->{'$context'}])) {
+                return (int) $context[$value->{'$context'}];
+            }
+
+            $default = $value->{'$default'} ?? null;
+            if (is_int($default)) {
+                return $default;
+            }
+        }
+
+        return null;
     }
 }
