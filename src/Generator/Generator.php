@@ -99,6 +99,7 @@ class Generator
         foreach ($columns as $column) {
             $name = lcfirst($this->normalizeName($column->getName()));
             $type = $this->getTypeForColumn($column);
+            $isNullable = $column->getNotnull() === false;
 
             $serialize[$name] = $column->getName();
 
@@ -106,7 +107,7 @@ class Generator
             $param = $this->factory->param($name);
             if (!empty($type)) {
                 if ($type !== 'mixed') {
-                    $param->setType(new Node\NullableType($type));
+                    $param->setType($isNullable ? new Node\NullableType($type) : $type);
                 } else {
                     $param->setType($type);
                 }
@@ -126,13 +127,14 @@ class Generator
             $getter = $this->factory->method('get' . ucfirst($name));
             if (!empty($type)) {
                 if ($type !== 'mixed') {
-                    $getter->setReturnType(new Node\NullableType($type));
+                    $getter->setReturnType($isNullable ? new Node\NullableType($type) : $type);
                 } else {
                     $getter->setReturnType($type);
                 }
             } else {
                 $getter->setReturnType('void');
             }
+
             $getter->makePublic();
             $getter->addStmt(new Node\Stmt\Return_(
                 new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('getProperty'), [

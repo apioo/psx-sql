@@ -48,13 +48,13 @@ function getConnection()
     $table->addColumn('userId', \Doctrine\DBAL\Types\Types::INTEGER, ['length' => 10]);
     $table->addColumn('title', \Doctrine\DBAL\Types\Types::STRING, ['length' => 32]);
     $table->addColumn('date', \Doctrine\DBAL\Types\Types::DATETIME_MUTABLE);
-    $table->setPrimaryKey(array('id'));
+    $table->setPrimaryKey(['id']);
 
     $table = $toSchema->createTable('psx_sql_table_test');
     $table->addColumn('id', \Doctrine\DBAL\Types\Types::INTEGER, ['length' => 10, 'autoincrement' => true]);
     $table->addColumn('title', \Doctrine\DBAL\Types\Types::STRING, ['length' => 32]);
     $table->addColumn('date', \Doctrine\DBAL\Types\Types::DATETIME_MUTABLE);
-    $table->setPrimaryKey(array('id'));
+    $table->setPrimaryKey(['id']);
 
     $table = $toSchema->createTable('psx_table_command_test');
     $table->addColumn('id', \Doctrine\DBAL\Types\Types::INTEGER, ['length' => 10, 'autoincrement' => true]);
@@ -76,20 +76,20 @@ function getConnection()
     $table->addColumn('col_object', \Doctrine\DBAL\Types\Types::OBJECT);
     $table->addColumn('col_json', \Doctrine\DBAL\Types\Types::JSON);
     $table->addColumn('col_guid', \Doctrine\DBAL\Types\Types::GUID);
-    $table->setPrimaryKey(array('id'));
+    $table->setPrimaryKey(['id']);
 
     $table = $toSchema->createTable('psx_sql_provider_news');
     $table->addColumn('id', \Doctrine\DBAL\Types\Types::INTEGER, ['length' => 10, 'autoincrement' => true]);
     $table->addColumn('authorId', \Doctrine\DBAL\Types\Types::INTEGER, ['length' => 10]);
     $table->addColumn('title', \Doctrine\DBAL\Types\Types::STRING, ['length' => 32]);
     $table->addColumn('createDate', \Doctrine\DBAL\Types\Types::DATETIME_MUTABLE);
-    $table->setPrimaryKey(array('id'));
+    $table->setPrimaryKey(['id']);
 
     $table = $toSchema->createTable('psx_sql_provider_author');
     $table->addColumn('id', \Doctrine\DBAL\Types\Types::INTEGER, ['length' => 10, 'autoincrement' => true]);
     $table->addColumn('name', \Doctrine\DBAL\Types\Types::STRING, ['length' => 64]);
-    $table->addColumn('uri', \Doctrine\DBAL\Types\Types::STRING, ['length' => 64]);
-    $table->setPrimaryKey(array('id'));
+    $table->addColumn('uri', \Doctrine\DBAL\Types\Types::STRING, ['length' => 64, 'notnull' => false]);
+    $table->setPrimaryKey(['id']);
 
     $queries = $fromSchema->getMigrateToSql($toSchema, $connection->getDatabasePlatform());
     foreach ($queries as $query) {
