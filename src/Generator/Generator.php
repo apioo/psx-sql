@@ -426,6 +426,7 @@ class Generator
         $method = $this->factory->method('newRecord');
         $method->makeProtected();
         $method->setReturnType(new Node\Name($rowClass));
+        $method->setDocComment($this->buildComment(['param' => 'array<string, mixed> $row']));
         $method->addParam(new Node\Param(new Node\Expr\Variable('row'), null, 'array'));
         $method->addStmt(new Node\Stmt\Return_(new Node\Expr\New_(new Node\Name($rowClass), [
             new Node\Arg(new Node\Expr\Variable('row'))

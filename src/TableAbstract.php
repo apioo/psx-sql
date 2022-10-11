@@ -329,6 +329,9 @@ abstract class TableAbstract implements TableInterface
             ->from($table, null);
     }
 
+    /**
+     * @param array<string, mixed> $row
+     */
     abstract protected function newRecord(array $row): object;
 
     /**
