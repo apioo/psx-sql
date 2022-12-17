@@ -337,14 +337,14 @@ abstract class TableAbstract implements TableInterface
     /**
      * @throws DBALException
      */
-    private function convertBuilder(QueryBuilder $builder, ?Condition $condition = null): array
+    private function convertBuilder(QueryBuilder $builder, ?Condition $condition = null, int $baseIndex = 0): array
     {
         if ($condition !== null && $condition->hasCondition()) {
             $builder->where($condition->getExpression($this->connection->getDatabasePlatform()));
 
             $values = $condition->getValues();
             foreach ($values as $key => $value) {
-                $builder->setParameter($key, $value);
+                $builder->setParameter($baseIndex + $key, $value);
             }
         }
 
@@ -386,6 +386,30 @@ abstract class TableAbstract implements TableInterface
     /**
      * @throws ManipulationException
      */
+    protected function doUpdateBy(Condition $condition, RecordInterface $record): int
+    {
+        try {
+            $queryBuilder = $this->connection->createQueryBuilder();
+            $queryBuilder->update($this->getName());
+
+            $index = 0;
+            foreach ($record->getProperties() as $column => $value) {
+                $queryBuilder->set($column, '?');
+                $queryBuilder->setParameter($index, $value);
+                $index++;
+            }
+
+            [$sql, $parameters] = $this->convertBuilder($queryBuilder, $condition, $index);
+
+            return (int) $this->connection->executeStatement($sql, $parameters);
+        } catch (DBALException $e) {
+            throw new ManipulationException($e->getMessage(), 0, $e);
+        }
+    }
+
+    /**
+     * @throws ManipulationException
+     */
     protected function doDelete(RecordInterface $record): int
     {
         try {
@@ -393,6 +417,23 @@ abstract class TableAbstract implements TableInterface
             $criteria = $this->getCriteria($fields);
 
             return (int) $this->connection->delete($this->getName(), $criteria);
+        } catch (DBALException $e) {
+            throw new ManipulationException($e->getMessage(), 0, $e);
+        }
+    }
+
+    /**
+     * @throws ManipulationException
+     */
+    protected function doDeleteBy(Condition $condition): int
+    {
+        try {
+            $queryBuilder = $this->connection->createQueryBuilder();
+            $queryBuilder->delete($this->getName());
+
+            [$sql, $parameters] = $this->convertBuilder($queryBuilder, $condition);
+
+            return (int) $this->connection->executeStatement($sql, $parameters);
         } catch (DBALException $e) {
             throw new ManipulationException($e->getMessage(), 0, $e);
         }

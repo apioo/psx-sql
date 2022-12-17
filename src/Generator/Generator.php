@@ -171,11 +171,15 @@ class Generator
         foreach ($table->getColumns() as $column) {
             $this->buildFindByForColumn($class, $column, $rowClass);
             $this->buildFindOneByForColumn($class, $column, $rowClass);
+            $this->buildUpdateByForColumn($class, $column, $rowClass);
+            $this->buildDeleteByForColumn($class, $column, $rowClass);
         }
 
         $this->buildCreate($class, $rowClass);
         $this->buildUpdate($class, $rowClass);
+        $this->buildUpdateBy($class, $rowClass);
         $this->buildDelete($class, $rowClass);
+        $this->buildDeleteBy($class, $rowClass);
         $this->buildNewRecord($class, $rowClass);
 
         return $class;
@@ -378,6 +382,52 @@ class Generator
         $class->addStmt($method);
     }
 
+    private function buildUpdateByForColumn(Builder\Class_ $class, Column $column, string $rowClass)
+    {
+        $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('doUpdateBy'), [
+            new Node\Arg(new Node\Expr\Variable('condition')),
+            new Node\Arg(new Node\Expr\Variable('record')),
+        ]);
+
+        $type = $this->getTypeForColumn($column);
+
+        $method = $this->factory->method('updateBy' . ucfirst($this->normalizeName($column->getName())));
+        $method->makePublic();
+        $method->setReturnType(new Node\Name('int'));
+        $method->setDocComment($this->buildComment(['throws' => '\\' . ManipulationException::class]));
+        $method->addParam(new Node\Param(new Node\Expr\Variable('value'), null, new Node\Identifier($type)));
+        $method->addParam(new Node\Param(new Node\Expr\Variable('record'), null, new Node\Identifier($rowClass)));
+        $method->addStmt(new Node\Stmt\Expression(new Node\Expr\Assign(new Node\Expr\Variable('condition'), new Node\Expr\New_(new Node\Name('\\' . Condition::class)))));
+        $method->addStmt(new Node\Stmt\Expression(new Node\Expr\MethodCall(new Node\Expr\Variable('condition'), new Node\Identifier($this->getOperatorForColumn($column)), [
+            new Node\Arg(new Node\Scalar\String_($column->getName())),
+            new Node\Arg(new Node\Expr\Variable('value'))
+        ])));
+        $method->addStmt(new Node\Stmt\Return_($methodCall));
+        $class->addStmt($method);
+    }
+
+    private function buildDeleteByForColumn(Builder\Class_ $class, Column $column, string $rowClass)
+    {
+        $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('doDeleteBy'), [
+            new Node\Arg(new Node\Expr\Variable('condition')),
+        ]);
+
+        $type = $this->getTypeForColumn($column);
+
+        $method = $this->factory->method('deleteBy' . ucfirst($this->normalizeName($column->getName())));
+        $method->makePublic();
+        $method->setReturnType(new Node\Name('int'));
+        $method->setDocComment($this->buildComment(['throws' => '\\' . ManipulationException::class]));
+        $method->addParam(new Node\Param(new Node\Expr\Variable('value'), null, new Node\Identifier($type)));
+        $method->addStmt(new Node\Stmt\Expression(new Node\Expr\Assign(new Node\Expr\Variable('condition'), new Node\Expr\New_(new Node\Name('\\' . Condition::class)))));
+        $method->addStmt(new Node\Stmt\Expression(new Node\Expr\MethodCall(new Node\Expr\Variable('condition'), new Node\Identifier($this->getOperatorForColumn($column)), [
+            new Node\Arg(new Node\Scalar\String_($column->getName())),
+            new Node\Arg(new Node\Expr\Variable('value'))
+        ])));
+        $method->addStmt(new Node\Stmt\Return_($methodCall));
+        $class->addStmt($method);
+    }
+
     private function buildCreate(Builder\Class_ $class, string $rowClass)
     {
         $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('doCreate'), [
@@ -408,6 +458,23 @@ class Generator
         $class->addStmt($method);
     }
 
+    private function buildUpdateBy(Builder\Class_ $class, string $rowClass)
+    {
+        $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('doUpdateBy'), [
+            new Node\Arg(new Node\Expr\Variable('condition')),
+            new Node\Arg(new Node\Expr\Variable('record')),
+        ]);
+
+        $method = $this->factory->method('updateBy');
+        $method->makePublic();
+        $method->setReturnType(new Node\Name('int'));
+        $method->setDocComment($this->buildComment(['throws' => '\\' . ManipulationException::class]));
+        $method->addParam(new Node\Param(new Node\Expr\Variable('condition'), null, new Node\Identifier('\\' . Condition::class)));
+        $method->addParam(new Node\Param(new Node\Expr\Variable('record'), null, new Node\Identifier($rowClass)));
+        $method->addStmt(new Node\Stmt\Return_($methodCall));
+        $class->addStmt($method);
+    }
+
     private function buildDelete(Builder\Class_ $class, string $rowClass)
     {
         $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('doDelete'), [
@@ -419,6 +486,21 @@ class Generator
         $method->setReturnType(new Node\Name('int'));
         $method->setDocComment($this->buildComment(['throws' => '\\' . ManipulationException::class]));
         $method->addParam(new Node\Param(new Node\Expr\Variable('record'), null, new Node\Identifier($rowClass)));
+        $method->addStmt(new Node\Stmt\Return_($methodCall));
+        $class->addStmt($method);
+    }
+
+    private function buildDeleteBy(Builder\Class_ $class, string $rowClass)
+    {
+        $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('doDeleteBy'), [
+            new Node\Arg(new Node\Expr\Variable('condition')),
+        ]);
+
+        $method = $this->factory->method('deleteBy');
+        $method->makePublic();
+        $method->setReturnType(new Node\Name('int'));
+        $method->setDocComment($this->buildComment(['throws' => '\\' . ManipulationException::class]));
+        $method->addParam(new Node\Param(new Node\Expr\Variable('condition'), null, new Node\Identifier('\\' . Condition::class)));
         $method->addStmt(new Node\Stmt\Return_($methodCall));
         $class->addStmt($method);
     }

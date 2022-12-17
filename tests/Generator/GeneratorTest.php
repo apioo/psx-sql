@@ -44,33 +44,56 @@ class GeneratorTest extends TableTestCase
         parent::setUp();
 
         $this->manager = new TableManager($this->connection);
+        $this->generate();
     }
 
-    public function testGenerate()
+    private function generate()
     {
         $generator = new Generator($this->connection, 'PSX\Sql\Tests\Generator', 'psx_');
 
         foreach ($generator->generate() as $className => $source) {
             $file = __DIR__ . '/' . $className . '.php';
             file_put_contents($file, '<?php' . "\n\n" . $source);
-
-            $this->assertFileExists($file);
         }
+    }
 
-        // test repository
-        /** @var TableCommandTestTable $repository */
-        $repository = $this->manager->getTable(TableCommandTestTable::class);
-        $row = $repository->findOneById(1);
+    public function testFindOneBy()
+    {
+        $row = $this->getTable()->findOneById(1);
 
         $this->assertEquals(1, $row->getId());
         $this->assertRecord($row);
+    }
 
-        $affected = $repository->create($this->newRecord());
-        $row = $repository->findOneById($repository->getLastInsertId());
+    public function testCreate()
+    {
+        $affected = $this->getTable()->create($this->newRecord());
+        $row = $this->getTable()->findOneById($this->getTable()->getLastInsertId());
 
         $this->assertEquals(1, $affected);
-        $this->assertEquals($repository->getLastInsertId(), $row->getId());
+        $this->assertEquals($this->getTable()->getLastInsertId(), $row->getId());
         $this->assertRecord($row);
+    }
+
+    public function testUpdateBy()
+    {
+        $row = new TableCommandTestRow();
+        $row->setColString('foobaz');
+        $return = $this->getTable()->updateByColGuid('ebe865da-4982-4353-bc44-dcdf7239e386', $row);
+        $this->assertEquals(1, $return);
+
+        $row = $this->getTable()->findOneByColString('foobaz');
+        $this->assertNotNull($row);
+        $this->assertEquals('foobaz', $row->getColString());
+    }
+
+    public function testDeleteBy()
+    {
+        $return = $this->getTable()->deleteByColGuid('ebe865da-4982-4353-bc44-dcdf7239e386');
+        $this->assertEquals(1, $return);
+
+        $row = $this->getTable()->findOneByColGuid('ebe865da-4982-4353-bc44-dcdf7239e386');
+        $this->assertNull($row);
     }
 
     private function assertRecord(TableCommandTestRow $row)
@@ -119,5 +142,10 @@ class GeneratorTest extends TableTestCase
         $row->setColTime(new \DateTime());
 
         return $row;
+    }
+
+    private function getTable(): TableCommandTestTable
+    {
+        return $this->manager->getTable(TableCommandTestTable::class);
     }
 }
