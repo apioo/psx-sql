@@ -35,6 +35,10 @@ class Json extends TransformFieldAbstract
             return null;
         }
 
+        if (is_array($value) || $value instanceof \stdClass) {
+            return $value;
+        }
+
         return json_decode($value);
     }
 }
