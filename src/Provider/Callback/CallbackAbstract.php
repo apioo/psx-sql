@@ -45,7 +45,11 @@ abstract class CallbackAbstract
 
     public function getResult(array|\ArrayAccess|null $context = null): mixed
     {
-        return call_user_func_array($this->callback, ParameterResolver::resolve($this->parameters, $context));
+        try {
+            return call_user_func_array($this->callback, ParameterResolver::resolve($this->parameters, $context));
+        } catch (\TypeError $e) {
+            return null;
+        }
     }
 
     public function getDefinition(): mixed
