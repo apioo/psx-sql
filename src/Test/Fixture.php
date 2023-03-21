@@ -32,12 +32,9 @@ use Doctrine\DBAL\Platforms;
  */
 class Fixture
 {
-    /**
-     * @param \Doctrine\DBAL\Connection $connection
-     */
     public static function truncate(Connection $connection)
     {
-        $tables   = $connection->getSchemaManager()->listTableNames();
+        $tables   = $connection->createSchemaManager()->listTableNames();
         $platform = $connection->getDatabasePlatform();
 
         if ($platform instanceof Platforms\MySqlPlatform) {
@@ -66,11 +63,7 @@ class Fixture
         }
     }
 
-    /**
-     * @param \Doctrine\DBAL\Connection $connection
-     * @param array|\ArrayObject $data
-     */
-    public static function insert(Connection $connection, $data)
+    public static function insert(Connection $connection, array $data): void
     {
         foreach ($data as $tableName => $rows) {
             foreach ($rows as $row) {

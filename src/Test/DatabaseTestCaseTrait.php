@@ -20,6 +20,8 @@
 
 namespace PSX\Sql\Test;
 
+use Doctrine\DBAL\Connection;
+
 /**
  * DatabaseTestCaseTrait
  *
@@ -29,10 +31,7 @@ namespace PSX\Sql\Test;
  */
 trait DatabaseTestCaseTrait
 {
-    /**
-     * @var \Doctrine\DBAL\Connection
-     */
-    protected $connection;
+    protected Connection $connection;
 
     protected function setUpFixture()
     {
@@ -42,13 +41,7 @@ trait DatabaseTestCaseTrait
         Fixture::insert($this->connection, $this->getDataSet());
     }
 
-    /**
-     * @return array|\ArrayObject
-     */
-    abstract public function getDataSet();
+    abstract public function getDataSet(): array;
 
-    /**
-     * @return \Doctrine\DBAL\Connection
-     */
-    abstract public function getConnection();
+    abstract public function getConnection(): Connection;
 }
