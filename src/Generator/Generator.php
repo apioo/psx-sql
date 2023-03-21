@@ -208,11 +208,11 @@ class Generator
 
     private function buildGetColumns(Builder\Class_ $class, Table $table)
     {
-        $primaryColumns = $table->getPrimaryKeyColumns();
+        $primaryIndex = $table->getPrimaryKey();
 
         $items = [];
         foreach ($table->getColumns() as $column) {
-            $columnType = $this->getType($column, $primaryColumns);
+            $columnType = $this->getType($column, $primaryIndex->getColumns());
 
             $constName = 'COLUMN_' . strtoupper($column->getName());
             $items[] = new Node\Expr\ArrayItem(
@@ -230,7 +230,7 @@ class Generator
 
     private function buildFind(Builder\Class_ $class, Table $table, string $rowClass)
     {
-        $primaryColumns = $table->getPrimaryKeyColumns();
+        $primaryIndex = $table->getPrimaryKey();
         $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('doFindOneBy'), [
             new Node\Arg(new Node\Expr\Variable('condition')),
         ]);
@@ -240,8 +240,8 @@ class Generator
         $method->setReturnType(new Node\NullableType($rowClass));
         $method->setDocComment($this->buildComment(['throws' => '\\' . QueryException::class]));
 
-        foreach ($primaryColumns as $primaryColumn) {
-            $column = $table->getColumn($primaryColumn->getName());
+        foreach ($primaryIndex->getColumns() as $primaryColumn) {
+            $column = $table->getColumn($primaryColumn);
             if ($column instanceof Column) {
                 $type = $this->getTypeForColumn($column);
                 $method->addParam(new Node\Param(new Node\Expr\Variable($column->getName()), null, new Node\Identifier($type)));
@@ -249,8 +249,8 @@ class Generator
         }
 
         $method->addStmt(new Node\Stmt\Expression(new Node\Expr\Assign(new Node\Expr\Variable('condition'), new Node\Expr\New_(new Node\Name('\\' . Condition::class)))));
-        foreach ($primaryColumns as $primaryColumn) {
-            $column = $table->getColumn($primaryColumn->getName());
+        foreach ($primaryIndex->getColumns() as $primaryColumn) {
+            $column = $table->getColumn($primaryColumn);
             if ($column instanceof Column) {
                 $method->addStmt(new Node\Stmt\Expression(new Node\Expr\MethodCall(new Node\Expr\Variable('condition'), new Node\Identifier($this->getOperatorForColumn($column)), [
                     new Node\Arg(new Node\Scalar\String_($column->getName())),

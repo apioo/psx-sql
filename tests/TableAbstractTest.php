@@ -22,6 +22,7 @@ namespace PSX\Sql\Tests;
 
 use PSX\Sql\TableInterface;
 use PSX\Sql\TableManager;
+use PSX\Sql\TableManagerInterface;
 use PSX\Sql\Tests\Generator\HandlerCommentRow;
 use PSX\Sql\Tests\Generator\HandlerCommentTable;
 
@@ -37,10 +38,7 @@ class TableAbstractTest extends TableTestCase
     use TableQueryTestTrait;
     use TableManipulationTestTrait;
 
-    /**
-     * @var \PSX\Sql\TableManagerInterface
-     */
-    protected $manager;
+    protected TableManagerInterface $manager;
 
     protected function setUp(): void
     {
