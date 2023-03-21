@@ -37,7 +37,7 @@ class Fixture
         $tables   = $connection->createSchemaManager()->listTableNames();
         $platform = $connection->getDatabasePlatform();
 
-        if ($platform instanceof Platforms\MySqlPlatform) {
+        if ($platform instanceof Platforms\MySQLPlatform) {
             $connection->executeQuery('SET FOREIGN_KEY_CHECKS = 0');
 
             foreach ($tables as $table) {
@@ -45,7 +45,7 @@ class Fixture
             }
 
             $connection->executeQuery('SET FOREIGN_KEY_CHECKS = 1');
-        } elseif ($platform instanceof Platforms\PostgreSqlPlatform) {
+        } elseif ($platform instanceof Platforms\PostgreSQLPlatform) {
             foreach ($tables as $table) {
                 $connection->executeQuery('TRUNCATE ' . $table . ' RESTART IDENTITY CASCADE');
             }

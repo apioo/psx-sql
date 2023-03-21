@@ -241,7 +241,7 @@ class Generator
         $method->setDocComment($this->buildComment(['throws' => '\\' . QueryException::class]));
 
         foreach ($primaryColumns as $primaryColumn) {
-            $column = $table->getColumn($primaryColumn);
+            $column = $table->getColumn($primaryColumn->getName());
             if ($column instanceof Column) {
                 $type = $this->getTypeForColumn($column);
                 $method->addParam(new Node\Param(new Node\Expr\Variable($column->getName()), null, new Node\Identifier($type)));
@@ -250,7 +250,7 @@ class Generator
 
         $method->addStmt(new Node\Stmt\Expression(new Node\Expr\Assign(new Node\Expr\Variable('condition'), new Node\Expr\New_(new Node\Name('\\' . Condition::class)))));
         foreach ($primaryColumns as $primaryColumn) {
-            $column = $table->getColumn($primaryColumn);
+            $column = $table->getColumn($primaryColumn->getName());
             if ($column instanceof Column) {
                 $method->addStmt(new Node\Stmt\Expression(new Node\Expr\MethodCall(new Node\Expr\Variable('condition'), new Node\Identifier($this->getOperatorForColumn($column)), [
                     new Node\Arg(new Node\Scalar\String_($column->getName())),

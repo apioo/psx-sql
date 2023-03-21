@@ -43,7 +43,7 @@ class Csv extends TransformFieldAbstract
         if (empty($value)) {
             return [];
         } else {
-            return explode($this->delimiter, $value);
+            return explode(!empty($this->delimiter) ? $this->delimiter : ',', $value);
         }
     }
 }
