@@ -22,6 +22,7 @@ namespace PSX\Sql\Generator;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Column;
+use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types;
 use PhpParser\Builder;
@@ -185,7 +186,7 @@ class Generator
         return $class;
     }
 
-    private function buildConstants(Builder\Class_ $class, Table $table)
+    private function buildConstants(Builder\Class_ $class, Table $table): void
     {
         $constName = 'NAME';
         $class->addStmt(new Node\Stmt\ClassConst([new Node\Const_($constName, new Node\Scalar\String_($table->getName()))], Class_::MODIFIER_PUBLIC));
@@ -197,7 +198,7 @@ class Generator
         }
     }
 
-    private function buildGetName(Builder\Class_ $class, Table $table)
+    private function buildGetName(Builder\Class_ $class, Table $table): void
     {
         $method = $this->factory->method('getName');
         $method->makePublic();
@@ -206,13 +207,13 @@ class Generator
         $class->addStmt($method);
     }
 
-    private function buildGetColumns(Builder\Class_ $class, Table $table)
+    private function buildGetColumns(Builder\Class_ $class, Table $table): void
     {
         $primaryIndex = $table->getPrimaryKey();
 
         $items = [];
         foreach ($table->getColumns() as $column) {
-            $columnType = $this->getType($column, $primaryIndex->getColumns());
+            $columnType = $this->getType($column, $primaryIndex?->getColumns());
 
             $constName = 'COLUMN_' . strtoupper($column->getName());
             $items[] = new Node\Expr\ArrayItem(
@@ -228,9 +229,13 @@ class Generator
         $class->addStmt($method);
     }
 
-    private function buildFind(Builder\Class_ $class, Table $table, string $rowClass)
+    private function buildFind(Builder\Class_ $class, Table $table, string $rowClass): void
     {
         $primaryIndex = $table->getPrimaryKey();
+        if (!$primaryIndex instanceof Index) {
+            return;
+        }
+
         $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('doFindOneBy'), [
             new Node\Arg(new Node\Expr\Variable('condition')),
         ]);
@@ -263,7 +268,7 @@ class Generator
         $class->addStmt($method);
     }
 
-    private function buildFindAll(Builder\Class_ $class, string $rowClass)
+    private function buildFindAll(Builder\Class_ $class, string $rowClass): void
     {
         $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('doFindAll'), [
             new Node\Arg(new Node\Expr\Variable('condition')),
@@ -288,7 +293,7 @@ class Generator
         $class->addStmt($method);
     }
 
-    private function buildFindBy(Builder\Class_ $class, string $rowClass)
+    private function buildFindBy(Builder\Class_ $class, string $rowClass): void
     {
         $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('doFindBy'), [
             new Node\Arg(new Node\Expr\Variable('condition')),
@@ -313,7 +318,7 @@ class Generator
         $class->addStmt($method);
     }
 
-    private function buildFindOneBy(Builder\Class_ $class, string $rowClass)
+    private function buildFindOneBy(Builder\Class_ $class, string $rowClass): void
     {
         $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('doFindOneBy'), [
             new Node\Arg(new Node\Expr\Variable('condition')),
@@ -330,7 +335,7 @@ class Generator
         $class->addStmt($method);
     }
 
-    private function buildFindByForColumn(Builder\Class_ $class, Column $column, string $rowClass)
+    private function buildFindByForColumn(Builder\Class_ $class, Column $column, string $rowClass): void
     {
         $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('doFindBy'), [
             new Node\Arg(new Node\Expr\Variable('condition')),
@@ -360,7 +365,7 @@ class Generator
         $class->addStmt($method);
     }
 
-    private function buildFindOneByForColumn(Builder\Class_ $class, Column $column, string $rowClass)
+    private function buildFindOneByForColumn(Builder\Class_ $class, Column $column, string $rowClass): void
     {
         $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('doFindOneBy'), [
             new Node\Arg(new Node\Expr\Variable('condition')),
@@ -382,7 +387,7 @@ class Generator
         $class->addStmt($method);
     }
 
-    private function buildUpdateByForColumn(Builder\Class_ $class, Column $column, string $rowClass)
+    private function buildUpdateByForColumn(Builder\Class_ $class, Column $column, string $rowClass): void
     {
         $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('doUpdateBy'), [
             new Node\Arg(new Node\Expr\Variable('condition')),
@@ -406,7 +411,7 @@ class Generator
         $class->addStmt($method);
     }
 
-    private function buildDeleteByForColumn(Builder\Class_ $class, Column $column, string $rowClass)
+    private function buildDeleteByForColumn(Builder\Class_ $class, Column $column, string $rowClass): void
     {
         $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('doDeleteBy'), [
             new Node\Arg(new Node\Expr\Variable('condition')),
@@ -428,7 +433,7 @@ class Generator
         $class->addStmt($method);
     }
 
-    private function buildCreate(Builder\Class_ $class, string $rowClass)
+    private function buildCreate(Builder\Class_ $class, string $rowClass): void
     {
         $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('doCreate'), [
             new Node\Arg(new Node\Expr\Variable('record')),
@@ -443,7 +448,7 @@ class Generator
         $class->addStmt($method);
     }
 
-    private function buildUpdate(Builder\Class_ $class, string $rowClass)
+    private function buildUpdate(Builder\Class_ $class, string $rowClass): void
     {
         $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('doUpdate'), [
             new Node\Arg(new Node\Expr\Variable('record')),
@@ -458,7 +463,7 @@ class Generator
         $class->addStmt($method);
     }
 
-    private function buildUpdateBy(Builder\Class_ $class, string $rowClass)
+    private function buildUpdateBy(Builder\Class_ $class, string $rowClass): void
     {
         $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('doUpdateBy'), [
             new Node\Arg(new Node\Expr\Variable('condition')),
@@ -475,7 +480,7 @@ class Generator
         $class->addStmt($method);
     }
 
-    private function buildDelete(Builder\Class_ $class, string $rowClass)
+    private function buildDelete(Builder\Class_ $class, string $rowClass): void
     {
         $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('doDelete'), [
             new Node\Arg(new Node\Expr\Variable('record')),
@@ -490,7 +495,7 @@ class Generator
         $class->addStmt($method);
     }
 
-    private function buildDeleteBy(Builder\Class_ $class, string $rowClass)
+    private function buildDeleteBy(Builder\Class_ $class, string $rowClass): void
     {
         $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('doDeleteBy'), [
             new Node\Arg(new Node\Expr\Variable('condition')),
@@ -505,7 +510,7 @@ class Generator
         $class->addStmt($method);
     }
 
-    private function buildNewRecord(Builder\Class_ $class, string $rowClass)
+    private function buildNewRecord(Builder\Class_ $class, string $rowClass): void
     {
         $method = $this->factory->method('newRecord');
         $method->makeProtected();
@@ -547,7 +552,7 @@ class Generator
         return '/**' . "\n" . implode("\n", $lines) . "\n" . ' */';
     }
 
-    private function prettyPrint($class)
+    private function prettyPrint($class): string
     {
         if ($this->namespace !== null) {
             $namespace = $this->factory->namespace($this->namespace);
@@ -619,7 +624,7 @@ class Generator
         return 'equals';
     }
 
-    private function getType(Column $column, ?array $primaryColumns)
+    private function getType(Column $column, ?array $primaryColumns): int
     {
         $type = 0;
 
