@@ -22,7 +22,7 @@ namespace PSX\Sql;
 
 use Countable;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use InvalidArgumentException;
 use PSX\Sql\Condition\ExpressionAbstract;
 use PSX\Sql\Condition\ExpressionInterface;
@@ -285,7 +285,7 @@ class Condition extends ExpressionAbstract implements Countable
     public function getStatement(?AbstractPlatform $platform = null): string
     {
         if ($platform === null) {
-            $platform = new MySqlPlatform();
+            $platform = new MySQLPlatform();
         }
 
         return 'WHERE ' . $this->getExpression($platform);
