@@ -20,6 +20,7 @@
 
 namespace PSX\Sql\Tests;
 
+use Doctrine\DBAL\Connection;
 use PHPUnit\Framework\TestCase;
 use PSX\Sql\Builder;
 use PSX\Sql\Test\DatabaseTestCaseTrait;
@@ -42,12 +43,12 @@ abstract class ProviderTestCase extends TestCase
         $this->setUpFixture();
     }
 
-    public function getDataSet()
+    public function getDataSet(): array
     {
         return include __DIR__ . '/provider_fixture.php';
     }
 
-    public function getConnection()
+    public function getConnection(): Connection
     {
         return getConnection();
     }
