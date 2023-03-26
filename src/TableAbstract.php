@@ -393,7 +393,7 @@ abstract class TableAbstract implements TableInterface
             $queryBuilder->update($this->getName());
 
             $index = 0;
-            foreach ($record->getProperties() as $column => $value) {
+            foreach ($record->getAll() as $column => $value) {
                 $queryBuilder->set($column, '?');
                 $queryBuilder->setParameter($index, $value);
                 $index++;
@@ -466,7 +466,7 @@ abstract class TableAbstract implements TableInterface
      */
     private function getFields(RecordInterface $record): array
     {
-        $fields = $this->serializeFields($record->getProperties());
+        $fields = $this->serializeFields($record->getAll());
         if (empty($fields)) {
             throw new NoFieldsAvailableException('No valid field set');
         }
