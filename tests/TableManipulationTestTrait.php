@@ -21,6 +21,9 @@
 namespace PSX\Sql\Tests;
 
 use DateTime;
+use PSX\DateTime\LocalDate;
+use PSX\DateTime\LocalDateTime;
+use PSX\DateTime\Tests\LocalDateTimeTest;
 use PSX\Record\RecordInterface;
 use PSX\Sql\Exception\NoFieldsAvailableException;
 use PSX\Sql\Tests\Generator\HandlerCommentRow;
@@ -38,7 +41,7 @@ trait TableManipulationTestTrait
     {
         $table = $this->getTable();
 
-        $record = new HandlerCommentRow([
+        $record = HandlerCommentRow::fromArray([
             'id' => 5,
             'userId' => 2,
             'title' => 'foobar',
@@ -51,11 +54,11 @@ trait TableManipulationTestTrait
 
         $row = $table->find(5);
 
-        $this->assertInstanceOf(RecordInterface::class, $row);
-        $this->assertEquals(5, $row->id);
-        $this->assertEquals(2, $row->userId);
-        $this->assertEquals('foobar', $row->title);
-        $this->assertInstanceOf(DateTime::class, $row->date);
+        $this->assertInstanceOf(HandlerCommentRow::class, $row);
+        $this->assertEquals(5, $row->getId());
+        $this->assertEquals(2, $row->getUserId());
+        $this->assertEquals('foobar', $row->getTitle());
+        $this->assertInstanceOf(LocalDateTime::class, $row->getDate());
     }
 
     public function testCreateEmpty()
@@ -71,17 +74,17 @@ trait TableManipulationTestTrait
         $table = $this->getTable();
 
         $row = $table->find(1);
-        $row->userId = 2;
-        $row->title = 'foobar';
-        $row->date = new DateTime();
+        $row->setUserId(2);
+        $row->setTitle('foobar');
+        $row->setDate(LocalDateTime::now());
 
         $table->update($row);
 
         $row = $table->find(1);
 
-        $this->assertEquals(2, $row->userId);
-        $this->assertEquals('foobar', $row->title);
-        $this->assertInstanceOf('DateTime', $row->date);
+        $this->assertEquals(2, $row->getUserId());
+        $this->assertEquals('foobar', $row->getTitle());
+        $this->assertInstanceOf(LocalDateTime::class, $row->getDate());
     }
 
     public function testUpdateEmpty()

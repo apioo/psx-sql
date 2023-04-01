@@ -118,7 +118,7 @@ class TableAbstractTest extends TableTestCase
         $this->assertEquals(4, $table->getCount());
         
         $table->beginTransaction();
-        $table->delete(new HandlerCommentRow(['id' => 1]));
+        $table->deleteById(1);
         $table->commit();
 
         $this->assertEquals(3, $table->getCount());
@@ -131,7 +131,7 @@ class TableAbstractTest extends TableTestCase
         $this->assertEquals(4, $table->getCount());
 
         $table->beginTransaction();
-        $table->delete(new HandlerCommentRow(['id' => 1]));
+        $table->deleteById(1);
         $table->rollback();
 
         $this->assertEquals(4, $table->getCount());

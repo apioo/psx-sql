@@ -42,32 +42,32 @@ trait TableQueryTestTrait
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(4, count($result));
 
-        $expect = array(
-            new HandlerCommentRow(array(
+        $expect = [
+            HandlerCommentRow::fromArray([
                 'id' => 4,
                 'userId' => 3,
                 'title' => 'blub',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
-            )),
-            new HandlerCommentRow(array(
+            ]),
+            HandlerCommentRow::fromArray([
                 'id' => 3,
                 'userId' => 2,
                 'title' => 'test',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
-            )),
-            new HandlerCommentRow(array(
+            ]),
+            HandlerCommentRow::fromArray([
                 'id' => 2,
                 'userId' => 1,
                 'title' => 'bar',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
-            )),
-            new HandlerCommentRow(array(
+            ]),
+            HandlerCommentRow::fromArray([
                 'id' => 1,
                 'userId' => 1,
                 'title' => 'foo',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
-            )),
-        );
+            ]),
+        ];
 
         $this->assertEquals($expect, $result);
     }
@@ -80,14 +80,14 @@ trait TableQueryTestTrait
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(1, count($result));
 
-        $expect = array(
-            new HandlerCommentRow(array(
+        $expect = [
+            HandlerCommentRow::fromArray([
                 'id' => 1,
                 'userId' => 1,
                 'title' => 'foo',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
-            )),
-        );
+            ]),
+        ];
 
         $this->assertEquals($expect, $result);
     }
@@ -100,20 +100,20 @@ trait TableQueryTestTrait
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(2, count($result));
 
-        $expect = array(
-            new HandlerCommentRow(array(
+        $expect = [
+            HandlerCommentRow::fromArray([
                 'id' => 4,
                 'userId' => 3,
                 'title' => 'blub',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
-            )),
-            new HandlerCommentRow(array(
+            ]),
+            HandlerCommentRow::fromArray([
                 'id' => 3,
                 'userId' => 2,
                 'title' => 'test',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
-            )),
-        );
+            ]),
+        ];
 
         $this->assertEquals($expect, $result);
     }
@@ -126,20 +126,20 @@ trait TableQueryTestTrait
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(2, count($result));
 
-        $expect = array(
-            new HandlerCommentRow(array(
+        $expect = [
+            HandlerCommentRow::fromArray([
                 'id' => 2,
                 'userId' => 1,
                 'title' => 'bar',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
-            )),
-            new HandlerCommentRow(array(
+            ]),
+            HandlerCommentRow::fromArray([
                 'id' => 1,
                 'userId' => 1,
                 'title' => 'foo',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
-            )),
-        );
+            ]),
+        ];
 
         $this->assertEquals($expect, $result);
     }
@@ -152,20 +152,20 @@ trait TableQueryTestTrait
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(2, count($result));
 
-        $expect = array(
-            new HandlerCommentRow(array(
+        $expect = [
+            HandlerCommentRow::fromArray([
                 'id' => 2,
                 'userId' => 1,
                 'title' => 'bar',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
-            )),
-            new HandlerCommentRow(array(
+            ]),
+            HandlerCommentRow::fromArray([
                 'id' => 1,
                 'userId' => 1,
                 'title' => 'foo',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
-            )),
-        );
+            ]),
+        ];
 
         $this->assertEquals($expect, $result);
     }
@@ -178,20 +178,20 @@ trait TableQueryTestTrait
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(2, count($result));
 
-        $expect = array(
-            new HandlerCommentRow(array(
+        $expect = [
+            HandlerCommentRow::fromArray([
                 'id' => 3,
                 'userId' => 2,
                 'title' => 'test',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
-            )),
-            new HandlerCommentRow(array(
+            ]),
+            HandlerCommentRow::fromArray([
                 'id' => 4,
                 'userId' => 3,
                 'title' => 'blub',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
-            )),
-        );
+            ]),
+        ];
 
         $this->assertEquals($expect, $result);
     }
@@ -204,31 +204,31 @@ trait TableQueryTestTrait
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(2, count($result));
 
-        $expect = array(
-            new HandlerCommentRow(array(
+        $expect = [
+            HandlerCommentRow::fromArray([
                 'id' => 4,
                 'userId' => 3,
                 'title' => 'blub',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
-            )),
-            new HandlerCommentRow(array(
+            ]),
+            HandlerCommentRow::fromArray([
                 'id' => 3,
                 'userId' => 2,
                 'title' => 'test',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
-            )),
-        );
+            ]),
+        ];
 
         $this->assertEquals($expect, $result);
 
         foreach ($result as $row) {
-            $this->assertTrue($row->id != null);
-            $this->assertTrue($row->title != null);
+            $this->assertTrue($row->getId() != null);
+            $this->assertTrue($row->getTitle() != null);
         }
 
         // check order
-        $this->assertEquals(4, $result[0]->id);
-        $this->assertEquals(3, $result[1]->id);
+        $this->assertEquals(4, $result[0]->getId());
+        $this->assertEquals(3, $result[1]->getId());
     }
 
     public function testFindAllSortAsc()
@@ -239,47 +239,47 @@ trait TableQueryTestTrait
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(2, count($result));
 
-        $expect = array(
-            new HandlerCommentRow(array(
+        $expect = [
+            HandlerCommentRow::fromArray([
                 'id' => 1,
                 'userId' => 1,
                 'title' => 'foo',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
-            )),
-            new HandlerCommentRow(array(
+            ]),
+            HandlerCommentRow::fromArray([
                 'id' => 2,
                 'userId' => 1,
                 'title' => 'bar',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
-            )),
-        );
+            ]),
+        ];
 
         $this->assertEquals($expect, $result);
     }
 
     public function testFindAllCondition()
     {
-        $table  = $this->getTable();
-        $con    = new Condition(array('userId', '=', 1));
+        $table = $this->getTable();
+        $con = new Condition(['userId', '=', 1]);
         $result = $table->findAll(condition: $con, startIndex: 0, count: 16, sortBy: 'id', sortOrder: Sql::SORT_DESC);
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(2, count($result));
 
-        $expect = array(
-            new HandlerCommentRow(array(
+        $expect = [
+            HandlerCommentRow::fromArray([
                 'id' => 2,
                 'userId' => 1,
                 'title' => 'bar',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
-            )),
-            new HandlerCommentRow(array(
+            ]),
+            HandlerCommentRow::fromArray([
                 'id' => 1,
                 'userId' => 1,
                 'title' => 'foo',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
-            )),
-        );
+            ]),
+        ];
 
         $this->assertEquals($expect, $result);
     }
@@ -305,14 +305,14 @@ trait TableQueryTestTrait
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(1, count($result));
 
-        $expect = array(
-            new HandlerCommentRow(array(
+        $expect = [
+            HandlerCommentRow::fromArray([
                 'id' => 1,
                 'userId' => 1,
                 'title' => 'foo',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
-            )),
-        );
+            ]),
+        ];
 
         $this->assertEquals($expect, $result);
     }
@@ -329,138 +329,138 @@ trait TableQueryTestTrait
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(3, count($result));
 
-        $expect = array(
-            new HandlerCommentRow(array(
+        $expect = [
+            HandlerCommentRow::fromArray([
                 'id' => 4,
                 'userId' => 3,
                 'title' => 'blub',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
-            )),
-            new HandlerCommentRow(array(
+            ]),
+            HandlerCommentRow::fromArray([
                 'id' => 2,
                 'userId' => 1,
                 'title' => 'bar',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
-            )),
-            new HandlerCommentRow(array(
+            ]),
+            HandlerCommentRow::fromArray([
                 'id' => 1,
                 'userId' => 1,
                 'title' => 'foo',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
-            )),
-        );
+            ]),
+        ];
 
         $this->assertEquals($expect, $result);
     }
 
     public function testFindAllFieldWhitelist()
     {
-        $table  = $this->getTable();
+        $table = $this->getTable();
         $result = $table->findAll(startIndex: 0, count: 2, sortBy: 'id', sortOrder: Sql::SORT_DESC, fields: Fields::whitelist(['id', 'title']));
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(2, count($result));
 
-        $expect = array(
-            new HandlerCommentRow(array(
+        $expect = [
+            HandlerCommentRow::fromArray([
                 'id' => 4,
                 'title' => 'blub',
-            )),
-            new HandlerCommentRow(array(
+            ]),
+            HandlerCommentRow::fromArray([
                 'id' => 3,
                 'title' => 'test',
-            )),
-        );
+            ]),
+        ];
 
         $this->assertEquals($expect, $result);
     }
 
     public function testFindAllFieldBlacklist()
     {
-        $table  = $this->getTable();
+        $table = $this->getTable();
         $result = $table->findAll(startIndex: 0, count: 2, sortBy: 'id', sortOrder: Sql::SORT_DESC, fields: Fields::blacklist(['id', 'title']));
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(2, count($result));
 
-        $expect = array(
-            new HandlerCommentRow(array(
+        $expect = [
+            HandlerCommentRow::fromArray([
                 'userId' => 3,
                 'date' => new \DateTime('2013-04-29 16:56:32'),
-            )),
-            new HandlerCommentRow(array(
+            ]),
+            HandlerCommentRow::fromArray([
                 'userId' => 2,
                 'date' => new \DateTime('2013-04-29 16:56:32'),
-            )),
-        );
+            ]),
+        ];
 
         $this->assertEquals($expect, $result);
     }
 
     public function testFindBy()
     {
-        $table  = $this->getTable();
+        $table = $this->getTable();
         $result = $table->findBy(condition: new Condition(['userId', '=', 1]));
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(2, count($result));
 
-        $expect = array(
-            new HandlerCommentRow(array(
+        $expect = [
+            HandlerCommentRow::fromArray([
                 'id' => 2,
                 'userId' => 1,
                 'title' => 'bar',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
-            )),
-            new HandlerCommentRow(array(
+            ]),
+            HandlerCommentRow::fromArray([
                 'id' => 1,
                 'userId' => 1,
                 'title' => 'foo',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
-            )),
-        );
+            ]),
+        ];
 
         $this->assertEquals($expect, $result);
     }
 
     public function testFindByFieldWhitelist()
     {
-        $table  = $this->getTable();
+        $table = $this->getTable();
         $result = $table->findBy(condition: new Condition(['userId', '=', 1]), fields: Fields::whitelist(['id', 'title']));
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(2, count($result));
 
-        $expect = array(
-            new HandlerCommentRow(array(
+        $expect = [
+            HandlerCommentRow::fromArray([
                 'id' => 2,
                 'title' => 'bar',
-            )),
-            new HandlerCommentRow(array(
+            ]),
+            HandlerCommentRow::fromArray([
                 'id' => 1,
                 'title' => 'foo',
-            )),
-        );
+            ]),
+        ];
 
         $this->assertEquals($expect, $result);
     }
 
     public function testFindByStartIndexCountOrder()
     {
-        $table  = $this->getTable();
+        $table = $this->getTable();
         $result = $table->findBy(condition: new Condition(['userId', '=', 1]), startIndex: 0, count: 1, sortBy: 'id', sortOrder: Sql::SORT_ASC);
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(1, count($result));
 
-        $expect = array(
-            new HandlerCommentRow(array(
+        $expect = [
+            HandlerCommentRow::fromArray([
                 'id' => 1,
                 'userId' => 1,
                 'title' => 'foo',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
-            )),
-        );
+            ]),
+        ];
 
         $this->assertEquals($expect, $result);
     }
@@ -468,50 +468,50 @@ trait TableQueryTestTrait
     public function testFindOneBy()
     {
         $table = $this->getTable();
-        $row   = $table->findOneBy(condition: new Condition(['id', '=', 1]));
+        $row = $table->findOneBy(condition: new Condition(['id', '=', 1]));
 
-        $expect = array(
-            new HandlerCommentRow(array(
+        $expect = [
+            HandlerCommentRow::fromArray([
                 'id' => 1,
                 'userId' => 1,
                 'title' => 'foo',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
-            )),
-        );
+            ]),
+        ];
 
-        $this->assertEquals($expect, array($row));
+        $this->assertEquals($expect, [$row]);
     }
 
     public function testFindOneByFieldWhitelist()
     {
         $table = $this->getTable();
-        $row   = $table->findOneBy(condition: new Condition(['id', '=', 1]), fields: Fields::whitelist(['id', 'title']));
+        $row = $table->findOneBy(condition: new Condition(['id', '=', 1]), fields: Fields::whitelist(['id', 'title']));
 
-        $expect = array(
-            new HandlerCommentRow(array(
+        $expect = [
+            HandlerCommentRow::fromArray([
                 'id' => 1,
                 'title' => 'foo',
-            )),
-        );
+            ]),
+        ];
 
-        $this->assertEquals($expect, array($row));
+        $this->assertEquals($expect, [$row]);
     }
 
     public function testFind()
     {
         $table = $this->getTable();
-        $row   = $table->find(1);
+        $row = $table->find(1);
 
-        $expect = array(
-            new HandlerCommentRow(array(
+        $expect = [
+            HandlerCommentRow::fromArray([
                 'id' => 1,
                 'userId' => 1,
                 'title' => 'foo',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
-            )),
-        );
+            ]),
+        ];
 
-        $this->assertEquals($expect, array($row));
+        $this->assertEquals($expect, [$row]);
     }
 
     public function testGetColumnNames()
@@ -519,7 +519,7 @@ trait TableQueryTestTrait
         $table = $this->getTable();
         $columnNames = $table->getColumnNames();
 
-        $this->assertEquals(array('id', 'userId', 'title', 'date'), $columnNames);
+        $this->assertEquals(['id', 'userId', 'title', 'date'], $columnNames);
     }
 
     public function testGetCount()
@@ -528,7 +528,7 @@ trait TableQueryTestTrait
 
 
         $this->assertEquals(4, $table->getCount());
-        $this->assertEquals(2, $table->getCount(new Condition(array('userId', '=', 1))));
-        $this->assertEquals(1, $table->getCount(new Condition(array('userId', '=', 3))));
+        $this->assertEquals(2, $table->getCount(new Condition(['userId', '=', 1])));
+        $this->assertEquals(1, $table->getCount(new Condition(['userId', '=', 3])));
     }
 }

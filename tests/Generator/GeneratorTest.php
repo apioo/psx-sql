@@ -22,6 +22,9 @@ namespace PSX\Sql\Tests\Generator;
 
 use PSX\DateTime\Date;
 use PSX\DateTime\DateTime;
+use PSX\DateTime\LocalDate;
+use PSX\DateTime\LocalDateTime;
+use PSX\DateTime\LocalTime;
 use PSX\Record\Record;
 use PSX\Sql\Generator\Generator;
 use PSX\Sql\TableManager;
@@ -104,9 +107,9 @@ class GeneratorTest extends TableTestCase
         $this->assertSame('foo', stream_get_contents($row->getColBinary()));
         $this->assertSame('foobar', stream_get_contents($row->getColBlob()));
         $this->assertSame(true, $row->getColBoolean());
-        $this->assertInstanceOf(\DateTime::class, $row->getColDate());
-        $this->assertInstanceOf(\DateTime::class, $row->getColDatetime());
-        $this->assertInstanceOf(\DateTime::class, $row->getColDatetimetz());
+        $this->assertInstanceOf(LocalDate::class, $row->getColDate());
+        $this->assertInstanceOf(LocalDateTime::class, $row->getColDatetime());
+        $this->assertInstanceOf(LocalDateTime::class, $row->getColDatetimetz());
         $this->assertSame(10.0, $row->getColDecimal());
         $this->assertSame(10.37, $row->getColFloat());
         $this->assertSame('ebe865da-4982-4353-bc44-dcdf7239e386', $row->getColGuid());
@@ -116,7 +119,7 @@ class GeneratorTest extends TableTestCase
         $this->assertSame(255, $row->getColSmallint());
         $this->assertSame('foobar', $row->getColString());
         $this->assertSame('foobar', $row->getColText());
-        $this->assertInstanceOf(\DateTime::class, $row->getColTime());
+        $this->assertInstanceOf(LocalTime::class, $row->getColTime());
     }
 
     private function newRecord(): TableCommandTestRow
@@ -127,9 +130,9 @@ class GeneratorTest extends TableTestCase
         $row->setColBinary('foo');
         $row->setColBlob('foobar');
         $row->setColBoolean(true);
-        $row->setColDate(new \DateTime());
-        $row->setColDatetime(new \DateTime());
-        $row->setColDatetimetz(new \DateTime());
+        $row->setColDate(LocalDate::now());
+        $row->setColDatetime(LocalDateTime::now());
+        $row->setColDatetimetz(LocalDateTime::now());
         $row->setColDecimal(10.0);
         $row->setColFloat(10.37);
         $row->setColGuid('ebe865da-4982-4353-bc44-dcdf7239e386');
@@ -139,7 +142,7 @@ class GeneratorTest extends TableTestCase
         $row->setColSmallint(255);
         $row->setColString('foobar');
         $row->setColText('foobar');
-        $row->setColTime(new \DateTime());
+        $row->setColTime(LocalTime::now());
 
         return $row;
     }

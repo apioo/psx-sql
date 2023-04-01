@@ -20,6 +20,9 @@
 
 namespace PSX\Sql\Tests;
 
+use PSX\DateTime\LocalDate;
+use PSX\DateTime\LocalDateTime;
+use PSX\DateTime\LocalTime;
 use PSX\Sql\TableManager;
 use PSX\Sql\Tests\Generator\TableCommandTestTable;
 
@@ -39,47 +42,46 @@ class SerializeTest extends TableTestCase
         $table = $tableManager->getTable(TableCommandTestTable::class);
         $row   = $table->find(1);
 
-        $this->assertIsString($row->col_bigint);
-        $this->assertEquals('68719476735', $row->col_bigint);
-        $this->assertIsResource($row->col_binary);
-        $this->assertEquals('foo', stream_get_contents($row->col_binary));
-        $this->assertIsResource($row->col_blob);
-        $this->assertEquals('foobar', stream_get_contents($row->col_blob));
-        $this->assertIsBool($row->col_boolean);
-        $this->assertEquals(true, $row->col_boolean);
-        $this->assertInstanceOf('DateTime', $row->col_datetime);
-        $this->assertEquals('2015-01-21 23:59:59', $row->col_datetime->format('Y-m-d H:i:s'));
-        $this->assertEquals('UTC', $row->col_datetime->getTimezone()->getName());
-        $this->assertInstanceOf('DateTime', $row->col_datetimetz);
-        $this->assertEquals('2015-01-21 23:59:59', $row->col_datetimetz->format('Y-m-d H:i:s'));
-        $this->assertInstanceOf('DateTime', $row->col_date);
-        $this->assertEquals('2015-01-21', $row->col_date->format('Y-m-d'));
-        $this->assertIsString($row->col_decimal);
-        $this->assertEquals('10', $row->col_decimal);
-        $this->assertIsFloat($row->col_float);
-        $this->assertEquals(10.37, $row->col_float);
-        $this->assertIsInt($row->col_integer);
-        $this->assertEquals(2147483647, $row->col_integer);
-        $this->assertIsInt($row->col_smallint);
-        $this->assertEquals(255, $row->col_smallint);
-        $this->assertIsString($row->col_text);
-        $this->assertEquals('foobar', $row->col_text);
-        $this->assertInstanceOf('DateTime', $row->col_time);
-        $this->assertEquals('23:59:59', $row->col_time->format('H:i:s'));
-        $this->assertIsString($row->col_string);
-        $this->assertEquals('foobar', $row->col_string);
+        $this->assertIsInt($row->getColBigint());
+        $this->assertEquals(68719476735, $row->getColBigint());
+        $this->assertIsResource($row->getColBinary());
+        $this->assertEquals('foo', stream_get_contents($row->getColBinary()));
+        $this->assertIsResource($row->getColBlob());
+        $this->assertEquals('foobar', stream_get_contents($row->getColBlob()));
+        $this->assertIsBool($row->getColBoolean());
+        $this->assertEquals(true, $row->getColBoolean());
+        $this->assertInstanceOf(LocalDateTime::class, $row->getColDatetime());
+        $this->assertEquals('2015-01-21T23:59:59Z', $row->getColDatetime()->toString());
+        $this->assertInstanceOf(LocalDateTime::class, $row->getColDatetimetz());
+        $this->assertEquals('2015-01-21T23:59:59Z', $row->getColDatetimetz()->toString());
+        $this->assertInstanceOf(LocalDate::class, $row->getColDate());
+        $this->assertEquals('2015-01-21', $row->getColDate()->toString());
+        $this->assertIsFloat($row->getColDecimal());
+        $this->assertEquals(10.0, $row->getColDecimal());
+        $this->assertIsFloat($row->getColFloat());
+        $this->assertEquals(10.37, $row->getColFloat());
+        $this->assertIsInt($row->getColInteger());
+        $this->assertEquals(2147483647, $row->getColInteger());
+        $this->assertIsInt($row->getColSmallint());
+        $this->assertEquals(255, $row->getColSmallint());
+        $this->assertIsString($row->getColText());
+        $this->assertEquals('foobar', $row->getColText());
+        $this->assertInstanceOf(LocalTime::class, $row->getColTime());
+        $this->assertEquals('23:59:59', $row->getColTime()->toString());
+        $this->assertIsString($row->getColString());
+        $this->assertEquals('foobar', $row->getColString());
 
-        $array  = array('foo' => 'bar');
+        $array  = ['foo' => 'bar'];
         $object = new \stdClass();
         $object->foo = 'bar';
 
-        $this->assertIsArray($row->col_array);
-        $this->assertEquals($array, $row->col_array);
-        $this->assertInstanceOf('stdClass', $row->col_object);
-        $this->assertEquals($object, $row->col_object);
-        $this->assertInstanceOf('stdClass', $row->col_json);
-        $this->assertEquals($object, $row->col_json);
-        $this->assertIsString($row->col_guid);
-        $this->assertEquals('ebe865da-4982-4353-bc44-dcdf7239e386', $row->col_guid);
+        $this->assertIsArray($row->getColArray());
+        $this->assertEquals($array, $row->getColArray());
+        $this->assertInstanceOf(\stdClass::class, $row->getColObject());
+        $this->assertEquals($object, $row->getColObject());
+        $this->assertInstanceOf(\stdClass::class, $row->getColJson());
+        $this->assertEquals($object, $row->getColJson());
+        $this->assertIsString($row->getColGuid());
+        $this->assertEquals('ebe865da-4982-4353-bc44-dcdf7239e386', $row->getColGuid());
     }
 }
