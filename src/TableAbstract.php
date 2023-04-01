@@ -24,6 +24,11 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\Exception as DBALDriverException;
 use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\Query\QueryBuilder;
+use PSX\DateTime\Duration;
+use PSX\DateTime\LocalDate;
+use PSX\DateTime\LocalDateTime;
+use PSX\DateTime\LocalTime;
+use PSX\DateTime\Period;
 use PSX\Record\RecordInterface;
 use PSX\Sql\Exception\ManipulationException;
 use PSX\Sql\Exception\NoFieldsAvailableException;
@@ -164,6 +169,14 @@ abstract class TableAbstract implements TableInterface
      */
     protected function serializeType(mixed $value, int $type): string
     {
+        if ($value instanceof LocalDate) {
+            $value = $value->toDateTime();
+        } elseif ($value instanceof LocalDateTime) {
+            $value = $value->toDateTime();
+        } elseif ($value instanceof LocalTime) {
+            $value = $value->toDateTime();
+        }
+
         return $this->connection->convertToDatabaseValue(
             $value,
             TypeMapper::getDoctrineTypeByType($type)
