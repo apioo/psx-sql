@@ -22,6 +22,7 @@ namespace PSX\Sql;
 
 use Doctrine\DBAL\Connection;
 use PSX\Record\Record;
+use PSX\Record\RecordableInterface;
 use PSX\Sql\Exception\BuilderException;
 use PSX\Sql\Provider\ProviderCollectionInterface;
 use PSX\Sql\Provider\ProviderColumnInterface;
@@ -197,6 +198,10 @@ class Builder
 
             if ($key === null) {
                 foreach ($data as $row) {
+                    if ($row instanceof RecordableInterface) {
+                        $row = $row->toRecord();
+                    }
+
                     $result[] = $this->build($definition, $row);
                 }
             } elseif (is_string($key)) {
@@ -205,6 +210,10 @@ class Builder
                 }
             } else {
                 foreach ($data as $row) {
+                    if ($row instanceof RecordableInterface) {
+                        $row = $row->toRecord();
+                    }
+
                     $return = call_user_func_array($key, [$row]);
                     $result[$return] = $this->build($definition, $row);
                 }
@@ -214,6 +223,10 @@ class Builder
                 $result = call_user_func_array($filter, [$result]);
             }
         } elseif ($provider instanceof ProviderEntityInterface) {
+            if ($data instanceof RecordableInterface) {
+                $data = $data->toRecord();
+            }
+
             $result = $this->build($definition, $data);
         } elseif ($provider instanceof ProviderColumnInterface) {
             $result = [];
