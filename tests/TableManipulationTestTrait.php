@@ -41,7 +41,7 @@ trait TableManipulationTestTrait
     {
         $table = $this->getTable();
 
-        $record = HandlerCommentRow::fromArray([
+        $record = HandlerCommentRow::from([
             'id' => 5,
             'userId' => 2,
             'title' => 'foobar',

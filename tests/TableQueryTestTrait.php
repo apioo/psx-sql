@@ -43,25 +43,25 @@ trait TableQueryTestTrait
         $this->assertEquals(4, count($result));
 
         $expect = [
-            HandlerCommentRow::fromArray([
+            HandlerCommentRow::from([
                 'id' => 4,
                 'userId' => 3,
                 'title' => 'blub',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
             ]),
-            HandlerCommentRow::fromArray([
+            HandlerCommentRow::from([
                 'id' => 3,
                 'userId' => 2,
                 'title' => 'test',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
             ]),
-            HandlerCommentRow::fromArray([
+            HandlerCommentRow::from([
                 'id' => 2,
                 'userId' => 1,
                 'title' => 'bar',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
             ]),
-            HandlerCommentRow::fromArray([
+            HandlerCommentRow::from([
                 'id' => 1,
                 'userId' => 1,
                 'title' => 'foo',
@@ -81,7 +81,7 @@ trait TableQueryTestTrait
         $this->assertEquals(1, count($result));
 
         $expect = [
-            HandlerCommentRow::fromArray([
+            HandlerCommentRow::from([
                 'id' => 1,
                 'userId' => 1,
                 'title' => 'foo',
@@ -101,13 +101,13 @@ trait TableQueryTestTrait
         $this->assertEquals(2, count($result));
 
         $expect = [
-            HandlerCommentRow::fromArray([
+            HandlerCommentRow::from([
                 'id' => 4,
                 'userId' => 3,
                 'title' => 'blub',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
             ]),
-            HandlerCommentRow::fromArray([
+            HandlerCommentRow::from([
                 'id' => 3,
                 'userId' => 2,
                 'title' => 'test',
@@ -127,13 +127,13 @@ trait TableQueryTestTrait
         $this->assertEquals(2, count($result));
 
         $expect = [
-            HandlerCommentRow::fromArray([
+            HandlerCommentRow::from([
                 'id' => 2,
                 'userId' => 1,
                 'title' => 'bar',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
             ]),
-            HandlerCommentRow::fromArray([
+            HandlerCommentRow::from([
                 'id' => 1,
                 'userId' => 1,
                 'title' => 'foo',
@@ -153,13 +153,13 @@ trait TableQueryTestTrait
         $this->assertEquals(2, count($result));
 
         $expect = [
-            HandlerCommentRow::fromArray([
+            HandlerCommentRow::from([
                 'id' => 2,
                 'userId' => 1,
                 'title' => 'bar',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
             ]),
-            HandlerCommentRow::fromArray([
+            HandlerCommentRow::from([
                 'id' => 1,
                 'userId' => 1,
                 'title' => 'foo',
@@ -179,13 +179,13 @@ trait TableQueryTestTrait
         $this->assertEquals(2, count($result));
 
         $expect = [
-            HandlerCommentRow::fromArray([
+            HandlerCommentRow::from([
                 'id' => 3,
                 'userId' => 2,
                 'title' => 'test',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
             ]),
-            HandlerCommentRow::fromArray([
+            HandlerCommentRow::from([
                 'id' => 4,
                 'userId' => 3,
                 'title' => 'blub',
@@ -205,13 +205,13 @@ trait TableQueryTestTrait
         $this->assertEquals(2, count($result));
 
         $expect = [
-            HandlerCommentRow::fromArray([
+            HandlerCommentRow::from([
                 'id' => 4,
                 'userId' => 3,
                 'title' => 'blub',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
             ]),
-            HandlerCommentRow::fromArray([
+            HandlerCommentRow::from([
                 'id' => 3,
                 'userId' => 2,
                 'title' => 'test',
@@ -240,13 +240,13 @@ trait TableQueryTestTrait
         $this->assertEquals(2, count($result));
 
         $expect = [
-            HandlerCommentRow::fromArray([
+            HandlerCommentRow::from([
                 'id' => 1,
                 'userId' => 1,
                 'title' => 'foo',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
             ]),
-            HandlerCommentRow::fromArray([
+            HandlerCommentRow::from([
                 'id' => 2,
                 'userId' => 1,
                 'title' => 'bar',
@@ -267,13 +267,13 @@ trait TableQueryTestTrait
         $this->assertEquals(2, count($result));
 
         $expect = [
-            HandlerCommentRow::fromArray([
+            HandlerCommentRow::from([
                 'id' => 2,
                 'userId' => 1,
                 'title' => 'bar',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
             ]),
-            HandlerCommentRow::fromArray([
+            HandlerCommentRow::from([
                 'id' => 1,
                 'userId' => 1,
                 'title' => 'foo',
@@ -306,7 +306,7 @@ trait TableQueryTestTrait
         $this->assertEquals(1, count($result));
 
         $expect = [
-            HandlerCommentRow::fromArray([
+            HandlerCommentRow::from([
                 'id' => 1,
                 'userId' => 1,
                 'title' => 'foo',
@@ -330,19 +330,19 @@ trait TableQueryTestTrait
         $this->assertEquals(3, count($result));
 
         $expect = [
-            HandlerCommentRow::fromArray([
+            HandlerCommentRow::from([
                 'id' => 4,
                 'userId' => 3,
                 'title' => 'blub',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
             ]),
-            HandlerCommentRow::fromArray([
+            HandlerCommentRow::from([
                 'id' => 2,
                 'userId' => 1,
                 'title' => 'bar',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
             ]),
-            HandlerCommentRow::fromArray([
+            HandlerCommentRow::from([
                 'id' => 1,
                 'userId' => 1,
                 'title' => 'foo',
@@ -362,11 +362,11 @@ trait TableQueryTestTrait
         $this->assertEquals(2, count($result));
 
         $expect = [
-            HandlerCommentRow::fromArray([
+            HandlerCommentRow::from([
                 'id' => 4,
                 'title' => 'blub',
             ]),
-            HandlerCommentRow::fromArray([
+            HandlerCommentRow::from([
                 'id' => 3,
                 'title' => 'test',
             ]),
@@ -384,11 +384,11 @@ trait TableQueryTestTrait
         $this->assertEquals(2, count($result));
 
         $expect = [
-            HandlerCommentRow::fromArray([
+            HandlerCommentRow::from([
                 'userId' => 3,
                 'date' => new \DateTime('2013-04-29 16:56:32'),
             ]),
-            HandlerCommentRow::fromArray([
+            HandlerCommentRow::from([
                 'userId' => 2,
                 'date' => new \DateTime('2013-04-29 16:56:32'),
             ]),
@@ -406,13 +406,13 @@ trait TableQueryTestTrait
         $this->assertEquals(2, count($result));
 
         $expect = [
-            HandlerCommentRow::fromArray([
+            HandlerCommentRow::from([
                 'id' => 2,
                 'userId' => 1,
                 'title' => 'bar',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
             ]),
-            HandlerCommentRow::fromArray([
+            HandlerCommentRow::from([
                 'id' => 1,
                 'userId' => 1,
                 'title' => 'foo',
@@ -432,11 +432,11 @@ trait TableQueryTestTrait
         $this->assertEquals(2, count($result));
 
         $expect = [
-            HandlerCommentRow::fromArray([
+            HandlerCommentRow::from([
                 'id' => 2,
                 'title' => 'bar',
             ]),
-            HandlerCommentRow::fromArray([
+            HandlerCommentRow::from([
                 'id' => 1,
                 'title' => 'foo',
             ]),
@@ -454,7 +454,7 @@ trait TableQueryTestTrait
         $this->assertEquals(1, count($result));
 
         $expect = [
-            HandlerCommentRow::fromArray([
+            HandlerCommentRow::from([
                 'id' => 1,
                 'userId' => 1,
                 'title' => 'foo',
@@ -471,7 +471,7 @@ trait TableQueryTestTrait
         $row = $table->findOneBy(condition: new Condition(['id', '=', 1]));
 
         $expect = [
-            HandlerCommentRow::fromArray([
+            HandlerCommentRow::from([
                 'id' => 1,
                 'userId' => 1,
                 'title' => 'foo',
@@ -488,7 +488,7 @@ trait TableQueryTestTrait
         $row = $table->findOneBy(condition: new Condition(['id', '=', 1]), fields: Fields::whitelist(['id', 'title']));
 
         $expect = [
-            HandlerCommentRow::fromArray([
+            HandlerCommentRow::from([
                 'id' => 1,
                 'title' => 'foo',
             ]),
@@ -503,7 +503,7 @@ trait TableQueryTestTrait
         $row = $table->find(1);
 
         $expect = [
-            HandlerCommentRow::fromArray([
+            HandlerCommentRow::from([
                 'id' => 1,
                 'userId' => 1,
                 'title' => 'foo',

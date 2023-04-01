@@ -243,9 +243,9 @@ class Generator
         $stmts[] = new Node\Stmt\Return_(new Node\Expr\Variable('row'));
 
         $param = $this->factory->param('data');
-        $param->setType('array');
+        $param->setType('array|\\' . \ArrayAccess::class);
 
-        $fromArray = $this->factory->method('fromArray');
+        $fromArray = $this->factory->method('from');
         $fromArray->makeStatic();
         $fromArray->makePublic();
         $fromArray->addParam($param);
@@ -623,7 +623,7 @@ class Generator
         $method->setReturnType(new Node\Name($rowClass));
         $method->setDocComment($this->buildComment(['param' => 'array<string, mixed> $row']));
         $method->addParam(new Node\Param(new Node\Expr\Variable('row'), null, 'array'));
-        $method->addStmt(new Node\Stmt\Return_(new Node\Expr\StaticCall(new Node\Name($rowClass), new Node\Name('fromArray'), [
+        $method->addStmt(new Node\Stmt\Return_(new Node\Expr\StaticCall(new Node\Name($rowClass), new Node\Name('from'), [
             new Node\Arg(new Node\Expr\Variable('row'))
         ])));
         $class->addStmt($method);
