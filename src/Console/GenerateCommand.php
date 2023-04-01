@@ -37,14 +37,8 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class GenerateCommand extends Command
 {
-    /**
-     * @var Connection
-     */
-    private $connection;
+    private Connection $connection;
 
-    /**
-     * @param Connection $connection
-     */
     public function __construct(Connection $connection)
     {
         parent::__construct();
