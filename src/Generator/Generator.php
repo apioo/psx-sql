@@ -118,7 +118,7 @@ class Generator
             $setter->setReturnType('void');
             $setter->makePublic();
             $setter->addParam($param);
-            $setter->addStmt(new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('setProperty'), [
+            $setter->addStmt(new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('put'), [
                 new Node\Arg(new Node\Scalar\String_($column->getName())),
                 new Node\Arg(new Node\Expr\Variable($name)),
             ]));
@@ -138,7 +138,7 @@ class Generator
 
             $getter->makePublic();
             $getter->addStmt(new Node\Stmt\Return_(
-                new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('getProperty'), [
+                new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('get'), [
                     new Node\Arg(new Node\Scalar\String_($column->getName())),
                 ])
             ));

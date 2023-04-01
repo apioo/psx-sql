@@ -59,7 +59,7 @@ class Builder
         } elseif (is_array($definition)) {
             $result = new Record();
             foreach ($definition as $key => $value) {
-                $result->setProperty($key, $this->build($value, $context));
+                $result->put($key, $this->build($value, $context));
             }
 
             return $result;
