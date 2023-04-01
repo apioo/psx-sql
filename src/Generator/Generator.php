@@ -30,7 +30,13 @@ use PhpParser\BuilderFactory;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\PrettyPrinter;
+use PSX\DateTime\LocalDate;
+use PSX\DateTime\LocalDateTime;
+use PSX\DateTime\LocalTime;
+use PSX\DateTime\Period;
 use PSX\Record\Record;
+use PSX\Record\RecordableInterface;
+use PSX\Record\RecordInterface;
 use PSX\Sql\Condition;
 use PSX\Sql\Exception\ManipulationException;
 use PSX\Sql\Exception\QueryException;
@@ -93,7 +99,7 @@ class Generator
     private function generateModel(string $className, Table $table): Builder\Class_
     {
         $class = $this->factory->class($className);
-        $class->extend('\\' . Record::class);
+        $class->implement('\\JsonSerializable', '\\' . RecordableInterface::class);
 
         $serialize = [];
         $columns = $table->getColumns();
@@ -102,7 +108,17 @@ class Generator
             $type = $this->getTypeForColumn($column);
             $isNullable = $column->getNotnull() === false;
 
-            $serialize[$name] = $column->getName();
+            $serialize[$name] = $column;
+
+            $prop = $this->factory->property($name);
+            $prop->makePrivate();
+            if ($type === 'mixed') {
+                $prop->setType($type);
+            } else {
+                $prop->setType(new Node\NullableType($type));
+            }
+            $prop->setDefault(null);
+            $class->addStmt($prop);
 
             // setter
             $param = $this->factory->param($name);
@@ -118,10 +134,10 @@ class Generator
             $setter->setReturnType('void');
             $setter->makePublic();
             $setter->addParam($param);
-            $setter->addStmt(new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('put'), [
-                new Node\Arg(new Node\Scalar\String_($column->getName())),
-                new Node\Arg(new Node\Expr\Variable($name)),
-            ]));
+            $setter->addStmt(new Node\Expr\Assign(
+                new Node\Expr\PropertyFetch(new Node\Expr\Variable('this'), $name),
+                new Node\Expr\Variable($name)
+            ));
             $class->addStmt($setter);
 
             // getter
@@ -138,15 +154,105 @@ class Generator
 
             $getter->makePublic();
             $getter->addStmt(new Node\Stmt\Return_(
-                new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('get'), [
-                    new Node\Arg(new Node\Scalar\String_($column->getName())),
-                ])
+                new Node\Expr\PropertyFetch(new Node\Expr\Variable('this'), $name)
             ));
 
             $class->addStmt($getter);
         }
 
+        $this->buildToRecord($class, $serialize);
+        $this->buildJsonSerialize($class);
+        $this->buildFromArray($class, $serialize);
+
         return $class;
+    }
+
+    private function buildToRecord(\PhpParser\Builder\Class_ $class, array $columns): void
+    {
+        if (empty($columns)) {
+            return;
+        }
+
+        $stmts = [];
+        $stmts[] = new Node\Expr\Assign(new Node\Expr\Variable('record'), new Node\Expr\New_(new Node\Name('\\' . Record::class)));
+
+        foreach ($columns as $name => $column) {
+            $stmts[] = new Node\Expr\MethodCall(new Node\Expr\Variable('record'), new Node\Name('put'), [
+                new Node\Arg(new Node\Scalar\String_($column->getName())),
+                new Node\Arg(new Node\Expr\PropertyFetch(new Node\Expr\Variable('this'), $name)),
+            ]);
+        }
+
+        $stmts[] = new Node\Stmt\Return_(new Node\Expr\Variable('record'));
+
+        $toRecord = $this->factory->method('toRecord');
+        $toRecord->makePublic();
+        $toRecord->setReturnType('\\' . RecordInterface::class);
+        $toRecord->addStmts($stmts);
+
+        $class->addStmt($toRecord);
+    }
+
+    private function buildJsonSerialize(\PhpParser\Builder\Class_ $class): void
+    {
+        $toRecord = new Node\Expr\MethodCall(
+            new Node\Expr\MethodCall(
+                new Node\Expr\Variable('this'),
+                new Node\Name('toRecord')
+            ),
+            new Node\Name('getAll')
+        );
+
+        $serialize = $this->factory->method('jsonSerialize');
+        $serialize->makePublic();
+        $serialize->setReturnType('object');
+        $serialize->addStmt(new Node\Stmt\Return_(new Node\Expr\Cast\Object_($toRecord)));
+
+        $class->addStmt($serialize);
+    }
+
+    private function buildFromArray(\PhpParser\Builder\Class_ $class, array $columns): void
+    {
+        if (empty($columns)) {
+            return;
+        }
+
+        $stmts = [];
+        $stmts[] = new Node\Expr\Assign(new Node\Expr\Variable('row'), new Node\Expr\New_(new Node\Name('self')));
+
+        foreach ($columns as $name => $column) {
+            $arg = null;
+            $fetch = new Node\Expr\ArrayDimFetch(new Node\Expr\Variable('data'), new Node\Scalar\String_($column->getName()));
+            if ($column->getType() instanceof Types\DateType) {
+                $arg = new Node\Expr\StaticCall(new Node\Name('\\' . LocalDate::class), new Node\Name('from'), [$fetch]);
+            } elseif ($column->getType() instanceof Types\DateTimeType) {
+                $arg = new Node\Expr\StaticCall(new Node\Name('\\' . LocalDateTime::class), new Node\Name('from'), [$fetch]);
+            } elseif ($column->getType() instanceof Types\TimeType) {
+                $arg = new Node\Expr\StaticCall(new Node\Name('\\' . LocalTime::class), new Node\Name('from'), [$fetch]);
+            }
+
+            if ($arg !== null) {
+                $arg = new Node\Expr\Ternary(new Node\Expr\Isset_([$fetch]), $arg, new Node\Expr\ConstFetch(new Node\Name('null')));
+            } else {
+                $arg = new Node\Expr\BinaryOp\Coalesce($fetch, new Node\Expr\ConstFetch(new Node\Name('null')));
+            }
+
+            $stmts[] = new Node\Expr\Assign(new Node\Expr\PropertyFetch(new Node\Expr\Variable('row'), new Node\Name($name)), $arg);
+        }
+
+        $stmts[] = new Node\Stmt\Return_(new Node\Expr\Variable('row'));
+
+        $param = $this->factory->param('data');
+        $param->setType('array');
+
+        $fromArray = $this->factory->method('fromArray');
+        $fromArray->makeStatic();
+        $fromArray->makePublic();
+        $fromArray->addParam($param);
+        $fromArray->setReturnType('self');
+        $fromArray->addStmts($stmts);
+
+        $class->addStmt($fromArray);
     }
 
     private function generateRepository(string $className, string $rowClass, Table $table): Builder\Class_
@@ -391,7 +497,7 @@ class Generator
     {
         $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('doUpdateBy'), [
             new Node\Arg(new Node\Expr\Variable('condition')),
-            new Node\Arg(new Node\Expr\Variable('record')),
+            new Node\Arg(new Node\Expr\MethodCall(new Node\Expr\Variable('record'), new Node\Name('toRecord'))),
         ]);
 
         $type = $this->getTypeForColumn($column);
@@ -436,7 +542,7 @@ class Generator
     private function buildCreate(Builder\Class_ $class, string $rowClass): void
     {
         $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('doCreate'), [
-            new Node\Arg(new Node\Expr\Variable('record')),
+            new Node\Arg(new Node\Expr\MethodCall(new Node\Expr\Variable('record'), new Node\Name('toRecord'))),
         ]);
 
         $method = $this->factory->method('create');
@@ -451,7 +557,7 @@ class Generator
     private function buildUpdate(Builder\Class_ $class, string $rowClass): void
     {
         $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('doUpdate'), [
-            new Node\Arg(new Node\Expr\Variable('record')),
+            new Node\Arg(new Node\Expr\MethodCall(new Node\Expr\Variable('record'), new Node\Name('toRecord'))),
         ]);
 
         $method = $this->factory->method('update');
@@ -467,7 +573,7 @@ class Generator
     {
         $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('doUpdateBy'), [
             new Node\Arg(new Node\Expr\Variable('condition')),
-            new Node\Arg(new Node\Expr\Variable('record')),
+            new Node\Arg(new Node\Expr\MethodCall(new Node\Expr\Variable('record'), new Node\Name('toRecord'))),
         ]);
 
         $method = $this->factory->method('updateBy');
@@ -483,7 +589,7 @@ class Generator
     private function buildDelete(Builder\Class_ $class, string $rowClass): void
     {
         $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('doDelete'), [
-            new Node\Arg(new Node\Expr\Variable('record')),
+            new Node\Arg(new Node\Expr\MethodCall(new Node\Expr\Variable('record'), new Node\Name('toRecord'))),
         ]);
 
         $method = $this->factory->method('delete');
@@ -517,7 +623,7 @@ class Generator
         $method->setReturnType(new Node\Name($rowClass));
         $method->setDocComment($this->buildComment(['param' => 'array<string, mixed> $row']));
         $method->addParam(new Node\Param(new Node\Expr\Variable('row'), null, 'array'));
-        $method->addStmt(new Node\Stmt\Return_(new Node\Expr\New_(new Node\Name($rowClass), [
+        $method->addStmt(new Node\Stmt\Return_(new Node\Expr\StaticCall(new Node\Name($rowClass), new Node\Name('fromArray'), [
             new Node\Arg(new Node\Expr\Variable('row'))
         ])));
         $class->addStmt($method);
@@ -579,11 +685,11 @@ class Generator
         } elseif ($type instanceof Types\BooleanType) {
             return 'bool';
         } elseif ($type instanceof Types\DateType) {
-            return '\\' . \DateTime::class;
+            return '\\' . LocalDate::class;
         } elseif ($type instanceof Types\DateTimeType) {
-            return '\\' . \DateTime::class;
-        } elseif ($type instanceof Types\DateTimeTzType) {
-            return '\\' . \DateTime::class;
+            return '\\' . LocalDateTime::class;
+        } elseif ($type instanceof Types\DateIntervalType) {
+            return '\\' . Period::class;
         } elseif ($type instanceof Types\DecimalType) {
             return 'float';
         } elseif ($type instanceof Types\FloatType) {
@@ -605,7 +711,7 @@ class Generator
         } elseif ($type instanceof Types\TextType) {
             return 'string';
         } elseif ($type instanceof Types\TimeType) {
-            return '\\' . \DateTime::class;
+            return '\\' . LocalTime::class;
         } else {
             return 'string';
         }
