@@ -61,8 +61,6 @@ interface TableInterface extends ViewInterface
     public const TYPE_BLOB       = 0xC00000;
 
     // formats
-    public const TYPE_ARRAY      = 0xD00000;
-    public const TYPE_OBJECT     = 0xE00000;
     public const TYPE_JSON       = 0xF00000;
     public const TYPE_GUID       = 0x1000000;
 

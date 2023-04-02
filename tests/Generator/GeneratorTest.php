@@ -102,7 +102,6 @@ class GeneratorTest extends TableTestCase
     private function assertRecord(TableCommandTestRow $row)
     {
         $this->assertInstanceOf(TableCommandTestRow::class, $row);
-        $this->assertSame(['foo' => 'bar'], $row->getColArray());
         $this->assertSame(68719476735, $row->getColBigint());
         $this->assertSame('foo', stream_get_contents($row->getColBinary()));
         $this->assertSame('foobar', stream_get_contents($row->getColBlob()));
@@ -115,7 +114,6 @@ class GeneratorTest extends TableTestCase
         $this->assertSame('ebe865da-4982-4353-bc44-dcdf7239e386', $row->getColGuid());
         $this->assertSame(2147483647, $row->getColInteger());
         $this->assertEquals((object) ['foo' => 'bar'], $row->getColJson());
-        $this->assertEquals((object) ['foo' => 'bar'], $row->getColObject());
         $this->assertSame(255, $row->getColSmallint());
         $this->assertSame('foobar', $row->getColString());
         $this->assertSame('foobar', $row->getColText());
@@ -125,7 +123,6 @@ class GeneratorTest extends TableTestCase
     private function newRecord(): TableCommandTestRow
     {
         $row = new TableCommandTestRow();
-        $row->setColArray(['foo' => 'bar']);
         $row->setColBigint(68719476735);
         $row->setColBinary('foo');
         $row->setColBlob('foobar');
@@ -138,7 +135,6 @@ class GeneratorTest extends TableTestCase
         $row->setColGuid('ebe865da-4982-4353-bc44-dcdf7239e386');
         $row->setColInteger(2147483647);
         $row->setColJson((object) ['foo' => 'bar']);
-        $row->setColObject((object) ['foo' => 'bar']);
         $row->setColSmallint(255);
         $row->setColString('foobar');
         $row->setColText('foobar');

@@ -18,23 +18,15 @@
  * limitations under the License.
  */
 
-namespace PSX\Sql\Field;
+namespace PSX\Sql\Exception;
 
 /**
- * Integer
+ * GeneratorException
  *
  * @author  Christoph Kappestein <christoph.kappestein@gmail.com>
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    https://phpsx.org
  */
-class Integer extends TransformFieldAbstract
+class GeneratorException extends \Exception
 {
-    protected function transform(mixed $value): ?int
-    {
-        if ($value === null) {
-            return null;
-        }
-
-        return (int) $value;
-    }
 }

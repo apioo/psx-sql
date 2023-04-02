@@ -72,8 +72,6 @@ function getConnection()
     $table->addColumn('col_text', \Doctrine\DBAL\Types\Types::TEXT);
     $table->addColumn('col_time', \Doctrine\DBAL\Types\Types::TIME_MUTABLE);
     $table->addColumn('col_string', \Doctrine\DBAL\Types\Types::STRING);
-    $table->addColumn('col_array', \Doctrine\DBAL\Types\Types::ARRAY);
-    $table->addColumn('col_object', \Doctrine\DBAL\Types\Types::OBJECT);
     $table->addColumn('col_json', \Doctrine\DBAL\Types\Types::JSON);
     $table->addColumn('col_guid', \Doctrine\DBAL\Types\Types::GUID);
     $table->setPrimaryKey(['id']);

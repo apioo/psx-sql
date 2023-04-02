@@ -71,14 +71,9 @@ class SerializeTest extends TableTestCase
         $this->assertIsString($row->getColString());
         $this->assertEquals('foobar', $row->getColString());
 
-        $array  = ['foo' => 'bar'];
         $object = new \stdClass();
         $object->foo = 'bar';
 
-        $this->assertIsArray($row->getColArray());
-        $this->assertEquals($array, $row->getColArray());
-        $this->assertInstanceOf(\stdClass::class, $row->getColObject());
-        $this->assertEquals($object, $row->getColObject());
         $this->assertInstanceOf(\stdClass::class, $row->getColJson());
         $this->assertEquals($object, $row->getColJson());
         $this->assertIsString($row->getColGuid());

@@ -18,7 +18,7 @@
  * limitations under the License.
  */
 
-namespace PSX\Sql\Console;
+namespace PSX\Sql\Command;
 
 use Doctrine\DBAL\Connection;
 use PSX\Sql\Generator\Generator;
@@ -46,7 +46,7 @@ class GenerateCommand extends Command
         $this->connection = $connection;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('sql:generate')

@@ -36,12 +36,10 @@ abstract class ViewAbstract implements ViewInterface
     protected Connection $connection;
 
     private TableManagerInterface $tableManager;
-    private Builder $builder;
 
     public function __construct(TableManager $tableManager)
     {
         $this->connection   = $tableManager->getConnection();
         $this->tableManager = $tableManager;
-        $this->builder      = new Builder($this->connection);
     }
 }

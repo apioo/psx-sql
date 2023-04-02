@@ -285,12 +285,12 @@ class Condition extends ExpressionAbstract implements Countable
         return $params;
     }
 
-    public static function withAnd(...$conditions): self
+    public static function withAnd(ExpressionInterface ...$conditions): self
     {
         return new self($conditions, LogicOperator::AND);
     }
 
-    public static function withOr(...$conditions): self
+    public static function withOr(ExpressionInterface ...$conditions): self
     {
         return new self($conditions, LogicOperator::OR);
     }

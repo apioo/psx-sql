@@ -24,8 +24,6 @@ return [
             'col_text' => 'foobar',
             'col_time' => '23:59:59',
             'col_string' => 'foobar',
-            'col_array' => 'a:1:{s:3:"foo";s:3:"bar";}',
-            'col_object' => 'O:8:"stdClass":1:{s:3:"foo";s:3:"bar";}',
             'col_json' => '{"foo":"bar"}',
             'col_guid' => 'ebe865da-4982-4353-bc44-dcdf7239e386'
         ]

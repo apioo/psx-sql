@@ -52,13 +52,11 @@ abstract class TableAbstract implements TableInterface
     protected ?int $lastInsertId = null;
 
     private TableManagerInterface $tableManager;
-    private Builder $builder;
 
     public function __construct(TableManager $tableManager)
     {
         $this->connection   = $tableManager->getConnection();
         $this->tableManager = $tableManager;
-        $this->builder      = new Builder($this->connection);
     }
 
     public function getDisplayName(): string

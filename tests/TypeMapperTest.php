@@ -48,23 +48,21 @@ class TypeMapperTest extends TestCase
         TableInterface::TYPE_TEXT     => Types::TEXT,
         TableInterface::TYPE_BLOB     => Types::BLOB,
         TableInterface::TYPE_BINARY   => Types::BINARY,
-        TableInterface::TYPE_ARRAY    => Types::ARRAY,
-        TableInterface::TYPE_OBJECT   => Types::OBJECT,
         TableInterface::TYPE_JSON     => Types::JSON,
         TableInterface::TYPE_GUID     => Types::GUID,
     );
 
     public function testGetTypeByDoctrineType()
     {
-        foreach ($this->types as $type => $name) {
-            $this->assertEquals($type, TypeMapper::getTypeByDoctrineType($name));
+        foreach ($this->types as $type => $class) {
+            $this->assertEquals($type, TypeMapper::getTypeByDoctrineType($class));
         }
     }
 
     public function testGetDoctrineTypeByType()
     {
-        foreach ($this->types as $type => $name) {
-            $this->assertEquals($name, TypeMapper::getDoctrineTypeByType($type));
+        foreach ($this->types as $type => $class) {
+            $this->assertEquals($class, TypeMapper::getDoctrineTypeByType($type));
         }
     }
 }

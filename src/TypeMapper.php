@@ -47,8 +47,6 @@ class TypeMapper
         TableInterface::TYPE_TEXT     => Types::TEXT,
         TableInterface::TYPE_BLOB     => Types::BLOB,
         TableInterface::TYPE_BINARY   => Types::BINARY,
-        TableInterface::TYPE_ARRAY    => Types::ARRAY,
-        TableInterface::TYPE_OBJECT   => Types::OBJECT,
         TableInterface::TYPE_JSON     => Types::JSON,
         TableInterface::TYPE_GUID     => Types::GUID,
     ];

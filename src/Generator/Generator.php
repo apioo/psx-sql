@@ -38,6 +38,7 @@ use PSX\Record\Record;
 use PSX\Record\RecordableInterface;
 use PSX\Record\RecordInterface;
 use PSX\Sql\Condition;
+use PSX\Sql\Exception\GeneratorException;
 use PSX\Sql\Exception\ManipulationException;
 use PSX\Sql\Exception\QueryException;
 use PSX\Sql\OrderBy;
@@ -69,11 +70,11 @@ class Generator
 
     public function generate(): \Generator
     {
-        $schemaManager = $this->connection->getSchemaManager();
+        $schemaManager = $this->connection->createSchemaManager();
         $tableNames = $schemaManager->listTableNames();
         
         foreach ($tableNames as $tableName) {
-            $table = $schemaManager->listTableDetails($tableName);
+            $table = $schemaManager->introspectTable($tableName);
 
             $tableName = $table->getName();
             if ($this->prefix !== null) {
@@ -353,21 +354,17 @@ class Generator
 
         foreach ($primaryIndex->getColumns() as $primaryColumn) {
             $column = $table->getColumn($primaryColumn);
-            if ($column instanceof Column) {
-                $type = $this->getTypeForColumn($column);
-                $method->addParam(new Node\Param(new Node\Expr\Variable($column->getName()), null, new Node\Identifier($type)));
-            }
+            $type = $this->getTypeForColumn($column);
+            $method->addParam(new Node\Param(new Node\Expr\Variable($column->getName()), null, new Node\Identifier($type)));
         }
 
         $method->addStmt(new Node\Stmt\Expression(new Node\Expr\Assign(new Node\Expr\Variable('condition'), new Node\Expr\StaticCall(new Node\Name('\\' . Condition::class), new Node\Identifier('withAnd')))));
         foreach ($primaryIndex->getColumns() as $primaryColumn) {
             $column = $table->getColumn($primaryColumn);
-            if ($column instanceof Column) {
-                $method->addStmt(new Node\Stmt\Expression(new Node\Expr\MethodCall(new Node\Expr\Variable('condition'), new Node\Identifier($this->getOperatorForColumn($column)), [
-                    new Node\Arg(new Node\Scalar\String_($column->getName())),
-                    new Node\Arg(new Node\Expr\Variable($column->getName()))
-                ])));
-            }
+            $method->addStmt(new Node\Stmt\Expression(new Node\Expr\MethodCall(new Node\Expr\Variable('condition'), new Node\Identifier($this->getOperatorForColumn($column)), [
+                new Node\Arg(new Node\Scalar\String_($column->getName())),
+                new Node\Arg(new Node\Expr\Variable($column->getName()))
+            ])));
         }
 
         $method->addStmt(new Node\Stmt\Return_($methodCall));
@@ -652,7 +649,7 @@ class Generator
         return '/**' . "\n" . implode("\n", $lines) . "\n" . ' */';
     }
 
-    private function prettyPrint($class): string
+    private function prettyPrint(Builder\Class_ $class): string
     {
         if ($this->namespace !== null) {
             $namespace = $this->factory->namespace($this->namespace);
@@ -735,7 +732,12 @@ class Generator
             $type+= $column->getLength();
         }
 
-        $type = $type | TypeMapper::getTypeByDoctrineType($dbalType->getName());
+        $typeName = array_search($dbalType::class, Types\Type::getTypesMap());
+        if ($typeName === false) {
+            throw new GeneratorException('Could not determine type name');
+        }
+
+        $type = $type | TypeMapper::getTypeByDoctrineType($typeName);
 
         if ($primaryColumns !== null && in_array($column->getName(), $primaryColumns)) {
             $type = $type | TableInterface::PRIMARY_KEY;
