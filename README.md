@@ -1,6 +1,9 @@
 
 # Sql
 
+This library generates type-safe PHP classes from your database tables and thus allows you to interact with your
+database in a complete type-safe way.
+
 ## About
 
 In traditional ORMs you write a class add specific metadata and generate based on this class your tables, this means our
