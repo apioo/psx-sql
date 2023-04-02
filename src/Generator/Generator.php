@@ -243,7 +243,7 @@ class Generator
                 $arg = $fetch;
             }
 
-            $validatorMethod = $this->getValidatorMethodForType($column);
+            $validatorMethod = $this->getValidatorForType($column);
             if ($validatorMethod !== null) {
                 if ($validatorMethod[0] === '\\') {
                     $arg = new Node\Expr\Ternary(new Node\Expr\BinaryOp\BooleanAnd(new Node\Expr\Isset_([$fetch]), new Node\Expr\Instanceof_($fetch, new Node\Name\FullyQualified(substr($validatorMethod, 1)))), $arg, new Node\Expr\ConstFetch(new Node\Name('null')));
@@ -720,7 +720,7 @@ class Generator
         }
     }
 
-    private function getValidatorMethodForType(Column $column): ?string
+    private function getValidatorForType(Column $column): ?string
     {
         $type = $column->getType();
 
