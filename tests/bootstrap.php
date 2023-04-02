@@ -40,23 +40,22 @@ function getConnection()
     }
 
     $connection = \Doctrine\DBAL\DriverManager::getConnection($params);
-    $fromSchema = $connection->getSchemaManager()->createSchema();
+    $schema = $connection->createSchemaManager()->introspectSchema();
 
-    $toSchema = new \Doctrine\DBAL\Schema\Schema();
-    $table = $toSchema->createTable('psx_handler_comment');
+    $table = $schema->createTable('psx_handler_comment');
     $table->addColumn('id', \Doctrine\DBAL\Types\Types::INTEGER, ['length' => 10, 'autoincrement' => true]);
     $table->addColumn('userId', \Doctrine\DBAL\Types\Types::INTEGER, ['length' => 10]);
     $table->addColumn('title', \Doctrine\DBAL\Types\Types::STRING, ['length' => 32]);
     $table->addColumn('date', \Doctrine\DBAL\Types\Types::DATETIME_MUTABLE);
     $table->setPrimaryKey(['id']);
 
-    $table = $toSchema->createTable('psx_sql_table_test');
+    $table = $schema->createTable('psx_sql_table_test');
     $table->addColumn('id', \Doctrine\DBAL\Types\Types::INTEGER, ['length' => 10, 'autoincrement' => true]);
     $table->addColumn('title', \Doctrine\DBAL\Types\Types::STRING, ['length' => 32]);
     $table->addColumn('date', \Doctrine\DBAL\Types\Types::DATETIME_MUTABLE);
     $table->setPrimaryKey(['id']);
 
-    $table = $toSchema->createTable('psx_table_command_test');
+    $table = $schema->createTable('psx_table_command_test');
     $table->addColumn('id', \Doctrine\DBAL\Types\Types::INTEGER, ['length' => 10, 'autoincrement' => true]);
     $table->addColumn('col_bigint', \Doctrine\DBAL\Types\Types::BIGINT);
     $table->addColumn('col_binary', \Doctrine\DBAL\Types\Types::BINARY);
@@ -76,20 +75,7 @@ function getConnection()
     $table->addColumn('col_guid', \Doctrine\DBAL\Types\Types::GUID);
     $table->setPrimaryKey(['id']);
 
-    $table = $toSchema->createTable('psx_sql_provider_news');
-    $table->addColumn('id', \Doctrine\DBAL\Types\Types::INTEGER, ['length' => 10, 'autoincrement' => true]);
-    $table->addColumn('authorId', \Doctrine\DBAL\Types\Types::INTEGER, ['length' => 10]);
-    $table->addColumn('title', \Doctrine\DBAL\Types\Types::STRING, ['length' => 32]);
-    $table->addColumn('createDate', \Doctrine\DBAL\Types\Types::DATETIME_MUTABLE);
-    $table->setPrimaryKey(['id']);
-
-    $table = $toSchema->createTable('psx_sql_provider_author');
-    $table->addColumn('id', \Doctrine\DBAL\Types\Types::INTEGER, ['length' => 10, 'autoincrement' => true]);
-    $table->addColumn('name', \Doctrine\DBAL\Types\Types::STRING, ['length' => 64]);
-    $table->addColumn('uri', \Doctrine\DBAL\Types\Types::STRING, ['length' => 64, 'notnull' => false]);
-    $table->setPrimaryKey(['id']);
-
-    $queries = $fromSchema->getMigrateToSql($toSchema, $connection->getDatabasePlatform());
+    $queries = $schema->toSql($connection->getDatabasePlatform());
     foreach ($queries as $query) {
         $connection->executeQuery($query);
     }
