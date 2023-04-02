@@ -42,8 +42,8 @@ class SerializeTest extends TableTestCase
         $table = $tableManager->getTable(TableCommandTestTable::class);
         $row   = $table->find(1);
 
-        $this->assertIsInt($row->getColBigint());
-        $this->assertEquals(68719476735, $row->getColBigint());
+        $this->assertIsString($row->getColBigint());
+        $this->assertEquals('68719476735', $row->getColBigint());
         $this->assertIsResource($row->getColBinary());
         $this->assertEquals('foo', stream_get_contents($row->getColBinary()));
         $this->assertIsResource($row->getColBlob());
@@ -56,8 +56,8 @@ class SerializeTest extends TableTestCase
         $this->assertEquals('2015-01-21T23:59:59Z', $row->getColDatetimetz()->toString());
         $this->assertInstanceOf(LocalDate::class, $row->getColDate());
         $this->assertEquals('2015-01-21', $row->getColDate()->toString());
-        $this->assertIsFloat($row->getColDecimal());
-        $this->assertEquals(10.0, $row->getColDecimal());
+        $this->assertIsString($row->getColDecimal());
+        $this->assertEquals('10', $row->getColDecimal());
         $this->assertIsFloat($row->getColFloat());
         $this->assertEquals(10.37, $row->getColFloat());
         $this->assertIsInt($row->getColInteger());

@@ -20,6 +20,7 @@
 
 namespace PSX\Sql\Tests;
 
+use PhpParser\ParserFactory;
 use PHPUnit\Framework\TestCase;
 use PSX\Sql\ComparisonOperator;
 use PSX\Sql\Condition;
@@ -35,6 +36,22 @@ class ConditionTest extends TestCase
 {
     public function testCondition()
     {
+
+        $code = <<<'CODE'
+<?php
+
+function test($foo)
+{
+    return $this->colBigint ?? throw new \RuntimeException('foo');
+}
+CODE;
+
+        $parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7);
+        $ast = $parser->parse($code);
+
+
+
+
         $con = Condition::withAnd()
             ->equals('id', '1');
 

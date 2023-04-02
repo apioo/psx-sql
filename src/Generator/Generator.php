@@ -27,6 +27,7 @@ use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types;
 use PhpParser\Builder;
 use PhpParser\BuilderFactory;
+use PhpParser\Comment\Doc;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\PrettyPrinter;
@@ -40,6 +41,7 @@ use PSX\Record\RecordInterface;
 use PSX\Sql\Condition;
 use PSX\Sql\Exception\GeneratorException;
 use PSX\Sql\Exception\ManipulationException;
+use PSX\Sql\Exception\NoValueAvailable;
 use PSX\Sql\Exception\QueryException;
 use PSX\Sql\OrderBy;
 use PSX\Sql\TableAbstract;
@@ -154,16 +156,21 @@ class Generator
             }
 
             $getter->makePublic();
-            $getter->addStmt(new Node\Stmt\Return_(
-                new Node\Expr\PropertyFetch(new Node\Expr\Variable('this'), $name)
-            ));
+
+            if ($isNullable) {
+                $fetch = new Node\Expr\PropertyFetch(new Node\Expr\Variable('this'), $name);
+            } else {
+                $fetch = new Node\Expr\BinaryOp\Coalesce(new Node\Expr\PropertyFetch(new Node\Expr\Variable('this'), $name), new Node\Expr\Throw_(new Node\Expr\New_(new Node\Name\FullyQualified(NoValueAvailable::class), [new Node\Arg(new Node\Scalar\String_('No value for required column "' . $column->getName() . '" was provided'))])));
+            }
+
+            $getter->addStmt(new Node\Stmt\Return_($fetch));
 
             $class->addStmt($getter);
         }
 
         $this->buildToRecord($class, $serialize);
         $this->buildJsonSerialize($class);
-        $this->buildFromArray($class, $serialize);
+        $this->buildFrom($class, $serialize);
 
         return $class;
     }
@@ -175,7 +182,10 @@ class Generator
         }
 
         $stmts = [];
-        $stmts[] = new Node\Expr\Assign(new Node\Expr\Variable('record'), new Node\Expr\New_(new Node\Name('\\' . Record::class)));
+        $stmts[] = new Node\Stmt\Expression(
+            new Node\Expr\Assign(new Node\Expr\Variable('record'), new Node\Expr\New_(new Node\Name('\\' . Record::class))),
+            ['comments' => [new Doc('/** @var \PSX\Record\Record<mixed> $record */')]]
+        );
 
         foreach ($columns as $name => $column) {
             $stmts[] = new Node\Expr\MethodCall(new Node\Expr\Variable('record'), new Node\Identifier('put'), [
@@ -212,7 +222,7 @@ class Generator
         $class->addStmt($serialize);
     }
 
-    private function buildFromArray(\PhpParser\Builder\Class_ $class, array $columns): void
+    private function buildFrom(\PhpParser\Builder\Class_ $class, array $columns): void
     {
         if (empty($columns)) {
             return;
@@ -222,7 +232,6 @@ class Generator
         $stmts[] = new Node\Expr\Assign(new Node\Expr\Variable('row'), new Node\Expr\New_(new Node\Name('self')));
 
         foreach ($columns as $name => $column) {
-            $arg = null;
             $fetch = new Node\Expr\ArrayDimFetch(new Node\Expr\Variable('data'), new Node\Scalar\String_($column->getName()));
             if ($column->getType() instanceof Types\DateType) {
                 $arg = new Node\Expr\StaticCall(new Node\Name('\\' . LocalDate::class), new Node\Identifier('from'), [new Node\Arg($fetch)]);
@@ -230,12 +239,19 @@ class Generator
                 $arg = new Node\Expr\StaticCall(new Node\Name('\\' . LocalDateTime::class), new Node\Identifier('from'), [new Node\Arg($fetch)]);
             } elseif ($column->getType() instanceof Types\TimeType) {
                 $arg = new Node\Expr\StaticCall(new Node\Name('\\' . LocalTime::class), new Node\Identifier('from'), [new Node\Arg($fetch)]);
+            } else {
+                $arg = $fetch;
             }
 
-            if ($arg !== null) {
-                $arg = new Node\Expr\Ternary(new Node\Expr\Isset_([$fetch]), $arg, new Node\Expr\ConstFetch(new Node\Name('null')));
+            $validatorMethod = $this->getValidatorMethodForType($column);
+            if ($validatorMethod !== null) {
+                if ($validatorMethod[0] === '\\') {
+                    $arg = new Node\Expr\Ternary(new Node\Expr\BinaryOp\BooleanAnd(new Node\Expr\Isset_([$fetch]), new Node\Expr\Instanceof_($fetch, new Node\Name\FullyQualified(substr($validatorMethod, 1)))), $arg, new Node\Expr\ConstFetch(new Node\Name('null')));
+                } else {
+                    $arg = new Node\Expr\Ternary(new Node\Expr\BinaryOp\BooleanAnd(new Node\Expr\Isset_([$fetch]), new Node\Expr\FuncCall(new Node\Name($validatorMethod), [new Node\Arg($fetch)])), $arg, new Node\Expr\ConstFetch(new Node\Name('null')));
+                }
             } else {
-                $arg = new Node\Expr\BinaryOp\Coalesce($fetch, new Node\Expr\ConstFetch(new Node\Name('null')));
+                $arg = new Node\Expr\Ternary(new Node\Expr\Isset_([$fetch]), $arg, new Node\Expr\ConstFetch(new Node\Name('null')));
             }
 
             $stmts[] = new Node\Expr\Assign(new Node\Expr\PropertyFetch(new Node\Expr\Variable('row'), new Node\Identifier($name)), $arg);
@@ -665,10 +681,8 @@ class Generator
     {
         $type = $column->getType();
 
-        if ($type instanceof Types\ArrayType) {
-            return 'mixed';
-        } elseif ($type instanceof Types\BigIntType) {
-            return 'int';
+        if ($type instanceof Types\BigIntType) {
+            return 'string';
         } elseif ($type instanceof Types\BinaryType) {
             return 'mixed';
         } elseif ($type instanceof Types\BlobType) {
@@ -682,7 +696,7 @@ class Generator
         } elseif ($type instanceof Types\DateIntervalType) {
             return '\\' . Period::class;
         } elseif ($type instanceof Types\DecimalType) {
-            return 'float';
+            return 'string';
         } elseif ($type instanceof Types\FloatType) {
             return 'float';
         } elseif ($type instanceof Types\GuidType) {
@@ -690,8 +704,6 @@ class Generator
         } elseif ($type instanceof Types\IntegerType) {
             return 'int';
         } elseif ($type instanceof Types\JsonType) {
-            return 'mixed';
-        } elseif ($type instanceof Types\ObjectType) {
             return 'mixed';
         } elseif ($type instanceof Types\SimpleArrayType) {
             return 'string';
@@ -705,6 +717,49 @@ class Generator
             return '\\' . LocalTime::class;
         } else {
             return 'string';
+        }
+    }
+
+    private function getValidatorMethodForType(Column $column): ?string
+    {
+        $type = $column->getType();
+
+        if ($type instanceof Types\BigIntType) {
+            return 'is_string';
+        } elseif ($type instanceof Types\BinaryType) {
+            return null;
+        } elseif ($type instanceof Types\BlobType) {
+            return null;
+        } elseif ($type instanceof Types\BooleanType) {
+            return 'is_bool';
+        } elseif ($type instanceof Types\DateType) {
+            return '\\' . \DateTimeInterface::class;
+        } elseif ($type instanceof Types\DateTimeType) {
+            return '\\' . \DateTimeInterface::class;
+        } elseif ($type instanceof Types\DateIntervalType) {
+            return '\\' . \DateInterval::class;
+        } elseif ($type instanceof Types\DecimalType) {
+            return 'is_string';
+        } elseif ($type instanceof Types\FloatType) {
+            return 'is_float';
+        } elseif ($type instanceof Types\GuidType) {
+            return 'is_string';
+        } elseif ($type instanceof Types\IntegerType) {
+            return 'is_int';
+        } elseif ($type instanceof Types\JsonType) {
+            return null;
+        } elseif ($type instanceof Types\SimpleArrayType) {
+            return 'is_string';
+        } elseif ($type instanceof Types\SmallIntType) {
+            return 'is_int';
+        } elseif ($type instanceof Types\StringType) {
+            return 'is_string';
+        } elseif ($type instanceof Types\TextType) {
+            return 'is_string';
+        } elseif ($type instanceof Types\TimeType) {
+            return '\\' . \DateTimeInterface::class;
+        } else {
+            return 'is_string';
         }
     }
 

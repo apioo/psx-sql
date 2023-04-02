@@ -102,14 +102,14 @@ class GeneratorTest extends TableTestCase
     private function assertRecord(TableCommandTestRow $row)
     {
         $this->assertInstanceOf(TableCommandTestRow::class, $row);
-        $this->assertSame(68719476735, $row->getColBigint());
+        $this->assertSame('68719476735', $row->getColBigint());
         $this->assertSame('foo', stream_get_contents($row->getColBinary()));
         $this->assertSame('foobar', stream_get_contents($row->getColBlob()));
         $this->assertSame(true, $row->getColBoolean());
         $this->assertInstanceOf(LocalDate::class, $row->getColDate());
         $this->assertInstanceOf(LocalDateTime::class, $row->getColDatetime());
         $this->assertInstanceOf(LocalDateTime::class, $row->getColDatetimetz());
-        $this->assertSame(10.0, $row->getColDecimal());
+        $this->assertSame('10', $row->getColDecimal());
         $this->assertSame(10.37, $row->getColFloat());
         $this->assertSame('ebe865da-4982-4353-bc44-dcdf7239e386', $row->getColGuid());
         $this->assertSame(2147483647, $row->getColInteger());
