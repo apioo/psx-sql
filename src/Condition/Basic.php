@@ -21,6 +21,7 @@
 namespace PSX\Sql\Condition;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use PSX\Sql\ComparisonOperator;
 
 /**
  * Basic
@@ -31,12 +32,12 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
  */
 class Basic extends ExpressionAbstract
 {
-    private string $operator;
+    private ComparisonOperator $operator;
     private mixed $value;
 
-    public function __construct(string $column, string $operator, mixed $value, $conjunction = 'AND')
+    public function __construct(string $column, ComparisonOperator $operator, mixed $value)
     {
-        parent::__construct($column, $conjunction);
+        parent::__construct($column);
 
         $this->operator = $operator;
         $this->value = $value;
@@ -44,7 +45,7 @@ class Basic extends ExpressionAbstract
 
     public function getExpression(AbstractPlatform $platform): string
     {
-        return $this->column . ' ' . $this->operator . ' ?';
+        return $this->column . ' ' . $this->operator->toSql() . ' ?';
     }
 
     public function getValues(): array

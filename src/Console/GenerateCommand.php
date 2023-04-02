@@ -56,7 +56,7 @@ class GenerateCommand extends Command
             ->addOption('prefix', 'p', InputOption::VALUE_REQUIRED, 'Optional removes the provided prefix from the table name');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $target = $input->getArgument('target') ?: getcwd();
         if (!is_dir($target)) {

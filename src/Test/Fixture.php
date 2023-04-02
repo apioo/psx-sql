@@ -32,7 +32,7 @@ use Doctrine\DBAL\Platforms;
  */
 class Fixture
 {
-    public static function truncate(Connection $connection)
+    public static function truncate(Connection $connection): void
     {
         $tables   = $connection->createSchemaManager()->listTableNames();
         $platform = $connection->getDatabasePlatform();

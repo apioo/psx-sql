@@ -20,15 +20,29 @@
 
 namespace PSX\Sql;
 
+use PSX\Sql\Exception\OperatorException;
+
 /**
- * Sql
+ * OrderBy
  *
  * @author  Christoph Kappestein <christoph.kappestein@gmail.com>
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    https://phpsx.org
  */
-class Sql
+enum OrderBy
 {
-    public const SORT_ASC  = 0x0;
-    public const SORT_DESC = 0x1;
+    case ASC;
+    case DESC;
+
+    public function toSql(): string
+    {
+        switch ($this) {
+            case self::ASC:
+                return 'ASC';
+            case self::DESC:
+                return 'DESC';
+        }
+
+        throw new OperatorException('Invalid order by configured');
+    }
 }

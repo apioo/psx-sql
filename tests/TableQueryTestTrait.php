@@ -22,7 +22,7 @@ namespace PSX\Sql\Tests;
 
 use PSX\Sql\Condition;
 use PSX\Sql\Fields;
-use PSX\Sql\Sql;
+use PSX\Sql\OrderBy;
 use PSX\Sql\Tests\Generator\HandlerCommentRow;
 
 /**
@@ -147,7 +147,7 @@ trait TableQueryTestTrait
     public function testFindAllStartIndexAndCountDesc()
     {
         $table = $this->getTable();
-        $result = $table->findAll(startIndex: 2, count: 2, sortBy: 'id', sortOrder: Sql::SORT_DESC);
+        $result = $table->findAll(startIndex: 2, count: 2, sortBy: 'id', sortOrder: OrderBy::DESC);
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(2, count($result));
@@ -173,7 +173,7 @@ trait TableQueryTestTrait
     public function testFindAllStartIndexAndCountAsc()
     {
         $table = $this->getTable();
-        $result = $table->findAll(startIndex: 2, count: 2, sortBy: 'id', sortOrder: Sql::SORT_ASC);
+        $result = $table->findAll(startIndex: 2, count: 2, sortBy: 'id', sortOrder: OrderBy::ASC);
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(2, count($result));
@@ -199,7 +199,7 @@ trait TableQueryTestTrait
     public function testFindAllSortDesc()
     {
         $table = $this->getTable();
-        $result = $table->findAll(startIndex: 0, count: 2, sortBy: 'id', sortOrder: Sql::SORT_DESC);
+        $result = $table->findAll(startIndex: 0, count: 2, sortBy: 'id', sortOrder: OrderBy::DESC);
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(2, count($result));
@@ -234,7 +234,7 @@ trait TableQueryTestTrait
     public function testFindAllSortAsc()
     {
         $table = $this->getTable();
-        $result = $table->findAll(startIndex: 0, count: 2, sortBy: 'id', sortOrder: Sql::SORT_ASC);
+        $result = $table->findAll(startIndex: 0, count: 2, sortBy: 'id', sortOrder: OrderBy::ASC);
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(2, count($result));
@@ -260,8 +260,8 @@ trait TableQueryTestTrait
     public function testFindAllCondition()
     {
         $table = $this->getTable();
-        $con = new Condition(['userId', '=', 1]);
-        $result = $table->findAll(condition: $con, startIndex: 0, count: 16, sortBy: 'id', sortOrder: Sql::SORT_DESC);
+        $con = Condition::withAnd()->equals('userId', 1);
+        $result = $table->findAll(condition: $con, startIndex: 0, count: 16, sortBy: 'id', sortOrder: OrderBy::DESC);
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(2, count($result));
@@ -288,19 +288,19 @@ trait TableQueryTestTrait
     {
         $table = $this->getTable();
 
-        $con = new Condition();
-        $con->add('userId', '=', 1, 'AND');
-        $con->add('userId', '=', 3);
-        $result = $table->findAll(condition: $con, startIndex: 0, count: 16, sortBy: 'id', sortOrder: Sql::SORT_DESC);
+        $con = Condition::withAnd();
+        $con->equals('userId', 1);
+        $con->equals('userId', 3);
+        $result = $table->findAll(condition: $con, startIndex: 0, count: 16, sortBy: 'id', sortOrder: OrderBy::DESC);
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(0, count($result));
 
         // check and condition with result
-        $con = new Condition();
-        $con->add('userId', '=', 1, 'AND');
-        $con->add('title', '=', 'foo');
-        $result = $table->findAll(condition: $con, startIndex: 0, count: 16, sortBy: 'id', sortOrder: Sql::SORT_DESC);
+        $con = Condition::withAnd();
+        $con->equals('userId', 1);
+        $con->equals('title', 'foo');
+        $result = $table->findAll(condition: $con, startIndex: 0, count: 16, sortBy: 'id', sortOrder: OrderBy::DESC);
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(1, count($result));
@@ -321,10 +321,10 @@ trait TableQueryTestTrait
     {
         $table = $this->getTable();
 
-        $con = new Condition();
-        $con->add('userId', '=', 1, 'OR');
-        $con->add('userId', '=', 3);
-        $result = $table->findAll(condition: $con, startIndex: 0, count: 16, sortBy: 'id', sortOrder: Sql::SORT_DESC);
+        $con = Condition::withOr();
+        $con->equals('userId', 1);
+        $con->equals('userId', 3);
+        $result = $table->findAll(condition: $con, startIndex: 0, count: 16, sortBy: 'id', sortOrder: OrderBy::DESC);
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(3, count($result));
@@ -353,54 +353,10 @@ trait TableQueryTestTrait
         $this->assertEquals($expect, $result);
     }
 
-    public function testFindAllFieldWhitelist()
-    {
-        $table = $this->getTable();
-        $result = $table->findAll(startIndex: 0, count: 2, sortBy: 'id', sortOrder: Sql::SORT_DESC, fields: Fields::whitelist(['id', 'title']));
-
-        $this->assertEquals(true, is_array($result));
-        $this->assertEquals(2, count($result));
-
-        $expect = [
-            HandlerCommentRow::from([
-                'id' => 4,
-                'title' => 'blub',
-            ]),
-            HandlerCommentRow::from([
-                'id' => 3,
-                'title' => 'test',
-            ]),
-        ];
-
-        $this->assertEquals($expect, $result);
-    }
-
-    public function testFindAllFieldBlacklist()
-    {
-        $table = $this->getTable();
-        $result = $table->findAll(startIndex: 0, count: 2, sortBy: 'id', sortOrder: Sql::SORT_DESC, fields: Fields::blacklist(['id', 'title']));
-
-        $this->assertEquals(true, is_array($result));
-        $this->assertEquals(2, count($result));
-
-        $expect = [
-            HandlerCommentRow::from([
-                'userId' => 3,
-                'date' => new \DateTime('2013-04-29 16:56:32'),
-            ]),
-            HandlerCommentRow::from([
-                'userId' => 2,
-                'date' => new \DateTime('2013-04-29 16:56:32'),
-            ]),
-        ];
-
-        $this->assertEquals($expect, $result);
-    }
-
     public function testFindBy()
     {
         $table = $this->getTable();
-        $result = $table->findBy(condition: new Condition(['userId', '=', 1]));
+        $result = $table->findBy(condition: Condition::withAnd()->equals('userId', 1));
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(2, count($result));
@@ -417,28 +373,6 @@ trait TableQueryTestTrait
                 'userId' => 1,
                 'title' => 'foo',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
-            ]),
-        ];
-
-        $this->assertEquals($expect, $result);
-    }
-
-    public function testFindByFieldWhitelist()
-    {
-        $table = $this->getTable();
-        $result = $table->findBy(condition: new Condition(['userId', '=', 1]), fields: Fields::whitelist(['id', 'title']));
-
-        $this->assertEquals(true, is_array($result));
-        $this->assertEquals(2, count($result));
-
-        $expect = [
-            HandlerCommentRow::from([
-                'id' => 2,
-                'title' => 'bar',
-            ]),
-            HandlerCommentRow::from([
-                'id' => 1,
-                'title' => 'foo',
             ]),
         ];
 
@@ -448,7 +382,7 @@ trait TableQueryTestTrait
     public function testFindByStartIndexCountOrder()
     {
         $table = $this->getTable();
-        $result = $table->findBy(condition: new Condition(['userId', '=', 1]), startIndex: 0, count: 1, sortBy: 'id', sortOrder: Sql::SORT_ASC);
+        $result = $table->findBy(condition: Condition::withAnd()->equals('userId', 1), startIndex: 0, count: 1, sortBy: 'id', sortOrder: OrderBy::ASC);
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(1, count($result));
@@ -468,7 +402,7 @@ trait TableQueryTestTrait
     public function testFindOneBy()
     {
         $table = $this->getTable();
-        $row = $table->findOneBy(condition: new Condition(['id', '=', 1]));
+        $row = $table->findOneBy(condition: Condition::withAnd()->equals('id', 1));
 
         $expect = [
             HandlerCommentRow::from([
@@ -476,21 +410,6 @@ trait TableQueryTestTrait
                 'userId' => 1,
                 'title' => 'foo',
                 'date' => new \DateTime('2013-04-29 16:56:32'),
-            ]),
-        ];
-
-        $this->assertEquals($expect, [$row]);
-    }
-
-    public function testFindOneByFieldWhitelist()
-    {
-        $table = $this->getTable();
-        $row = $table->findOneBy(condition: new Condition(['id', '=', 1]), fields: Fields::whitelist(['id', 'title']));
-
-        $expect = [
-            HandlerCommentRow::from([
-                'id' => 1,
-                'title' => 'foo',
             ]),
         ];
 
@@ -526,9 +445,8 @@ trait TableQueryTestTrait
     {
         $table = $this->getTable();
 
-
         $this->assertEquals(4, $table->getCount());
-        $this->assertEquals(2, $table->getCount(new Condition(['userId', '=', 1])));
-        $this->assertEquals(1, $table->getCount(new Condition(['userId', '=', 3])));
+        $this->assertEquals(2, $table->getCount(Condition::withAnd()->equals('userId', 1)));
+        $this->assertEquals(1, $table->getCount(Condition::withAnd()->equals('userId', 3)));
     }
 }

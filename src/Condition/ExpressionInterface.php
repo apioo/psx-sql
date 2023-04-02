@@ -32,11 +32,6 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 interface ExpressionInterface
 {
     /**
-     * Returns the name of the column
-     */
-    public function getColumn(): string;
-
-    /**
      * Returns the SQL as string containing prepared statement placeholder
      */
     public function getExpression(AbstractPlatform $platform): string;

@@ -31,12 +31,12 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
  */
 class Raw extends ExpressionAbstract
 {
-    protected $expression;
-    protected $values;
+    protected string $expression;
+    protected array $values;
 
-    public function __construct($expression, array $values = array(), $conjunction = 'AND')
+    public function __construct(string $expression, array $values = [])
     {
-        parent::__construct('', $conjunction);
+        parent::__construct('');
 
         $this->expression = $expression;
         $this->values     = $values;

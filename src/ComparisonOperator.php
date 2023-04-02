@@ -18,37 +18,49 @@
  * limitations under the License.
  */
 
-namespace PSX\Sql\Condition;
+namespace PSX\Sql;
 
-use Doctrine\DBAL\Platforms\AbstractPlatform;
+use PSX\Sql\Exception\OperatorException;
 
 /**
- * In
+ * ComparisonOperator
  *
  * @author  Christoph Kappestein <christoph.kappestein@gmail.com>
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    https://phpsx.org
  */
-class In extends ExpressionAbstract
+enum ComparisonOperator
 {
-    private array $values;
+    case EQUALS;
+    case NOT_EQUALS;
+    case LIKE;
+    case NOT_LIKE;
+    case GREATER;
+    case GREATER_THAN;
+    case LESS;
+    case LESS_THAN;
 
-    public function __construct(string $column, array $values)
+    public function toSql(): string
     {
-        parent::__construct($column);
+        switch ($this) {
+            case self::EQUALS:
+                return '=';
+            case self::NOT_EQUALS:
+                return '!=';
+            case self::LIKE:
+                return 'LIKE';
+            case self::NOT_LIKE:
+                return 'NOT LIKE';
+            case self::GREATER:
+                return '>';
+            case self::GREATER_THAN:
+                return '>=';
+            case self::LESS:
+                return '<';
+            case self::LESS_THAN:
+                return '<=';
+        }
 
-        $this->values = $values;
-    }
-
-    public function getExpression(AbstractPlatform $platform): string
-    {
-        $values = implode(',', array_fill(0, count($this->values), '?'));
-
-        return $this->column . ' IN (' . $values . ')';
-    }
-
-    public function getValues(): array
-    {
-        return $this->values;
+        throw new OperatorException('Invalid operator configured');
     }
 }

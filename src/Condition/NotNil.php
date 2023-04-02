@@ -33,7 +33,7 @@ class NotNil extends ExpressionAbstract
 {
     public function getExpression(AbstractPlatform $platform): string
     {
-        return $platform->getIsNotNullExpression($this->column);
+        return $this->column . ' IS NOT NULL';
     }
 
     public function getValues(): array

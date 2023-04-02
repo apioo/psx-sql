@@ -21,6 +21,7 @@
 namespace PSX\Sql\Tests;
 
 use PHPUnit\Framework\TestCase;
+use PSX\Sql\ComparisonOperator;
 use PSX\Sql\Condition;
 
 /**
@@ -34,86 +35,69 @@ class ConditionTest extends TestCase
 {
     public function testCondition()
     {
-        $con = new Condition(array('id', '=', '1'));
+        $con = Condition::withAnd()
+            ->equals('id', '1');
 
         $this->assertEquals('WHERE (id = ?)', $con->getStatement());
-        $this->assertEquals(array('1'), $con->getValues());
+        $this->assertEquals(['1'], $con->getValues());
 
-        $con = new Condition();
-        $con->add('id', '=', '1');
+        $con = Condition::withAnd()
+            ->equals('id', '1');
 
         $this->assertEquals('WHERE (id = ?)', $con->getStatement());
-        $this->assertEquals(array('1'), $con->getValues());
+        $this->assertEquals(['1'], $con->getValues());
     }
 
     public function testConditionConstructor()
     {
-        $con = new Condition(['id', '=', '1', 'OR'], ['id', '=', '2']);
+        $con = Condition::withOr()
+            ->equals('id', '1')
+            ->equals('id', '2');
 
         $this->assertEquals('WHERE (id = ? OR id = ?)', $con->getStatement());
-        $this->assertEquals(array('1', '2'), $con->getValues());
+        $this->assertEquals(['1', '2'], $con->getValues());
 
 
-        $con = new Condition(['id', '=', '1', 'OR'], new Condition\Raw('(1 = 1 OR 2 = 2)'));
+        $con = Condition::withOr(
+            Condition::withAnd()->equals('id', '1'),
+            Condition::withOr()->raw('(1 = 1 OR 2 = 2)')
+        );
 
-        $this->assertEquals('WHERE (id = ? OR (1 = 1 OR 2 = 2))', $con->getStatement());
-        $this->assertEquals(array('1'), $con->getValues());
-    }
-
-    public function testConditionConstructorException()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Condition argument must be either an array or PSX\Sql\Condition\ExpressionInterface');
-
-        new Condition('foo');
+        $this->assertEquals('WHERE ((id = ?) OR ((1 = 1 OR 2 = 2)))', $con->getStatement());
+        $this->assertEquals(['1'], $con->getValues());
     }
 
     public function testConditionMultiple()
     {
-        $con = new Condition(array('id', '=', '1', 'OR'));
-        $con->add('id', '=', '2');
+        $con = Condition::withOr()
+            ->equals('id', '1')
+            ->equals('id', '2');
 
         $this->assertEquals('WHERE (id = ? OR id = ?)', $con->getStatement());
-        $this->assertEquals(array('1', '2'), $con->getValues());
+        $this->assertEquals(['1', '2'], $con->getValues());
 
-        $con2 = new Condition();
-        $con2->add('id', '=', '1');
-        $con2->add('id', '=', '2');
-        $con2->addExpression($con);
+        $con2 = Condition::withAnd();
+        $con2->equals('id', '1');
+        $con2->equals('id', '2');
+        $con2->add($con);
 
         $this->assertEquals('WHERE (id = ? AND id = ? AND (id = ? OR id = ?))', $con2->getStatement());
-        $this->assertEquals(array('1', '2', '1', '2'), $con2->getValues());
+        $this->assertEquals(['1', '2', '1', '2'], $con2->getValues());
     }
 
     public function testAdd()
     {
-        $con = new Condition();
-        $con->add('id', '=', '1');
-        $con->add('foo', 'IN', array(1, 2));
+        $con = Condition::withAnd();
+        $con->add(new Condition\Basic('id', ComparisonOperator::EQUALS, '1'));
+        $con->in('foo', [1, 2]);
 
         $this->assertEquals('WHERE (id = ? AND foo IN (?,?))', $con->getStatement());
-        $this->assertEquals(array('1', 1, 2), $con->getValues());
-    }
-
-    public function testAddInvalidOperator()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-
-        $con = new Condition();
-        $con->add('id', 'foo', '1');
-    }
-
-    public function testAddInvalidConjunction()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-
-        $con = new Condition();
-        $con->add('id', '=', '1', 'foo');
+        $this->assertEquals(['1', 1, 2], $con->getValues());
     }
 
     public function testEquals()
     {
-        $con = new Condition();
+        $con = Condition::withAnd();
         $con->equals('foo', 2);
 
         $this->assertEquals('WHERE (foo = ?)', $con->getStatement());
@@ -122,7 +106,7 @@ class ConditionTest extends TestCase
 
     public function testNotEquals()
     {
-        $con = new Condition();
+        $con = Condition::withAnd();
         $con->notEquals('foo', 2);
 
         $this->assertEquals('WHERE (foo != ?)', $con->getStatement());
@@ -131,7 +115,7 @@ class ConditionTest extends TestCase
 
     public function testGreater()
     {
-        $con = new Condition();
+        $con = Condition::withAnd();
         $con->greater('foo', 2);
 
         $this->assertEquals('WHERE (foo > ?)', $con->getStatement());
@@ -140,8 +124,8 @@ class ConditionTest extends TestCase
 
     public function testGreaterThen()
     {
-        $con = new Condition();
-        $con->greaterThen('foo', 2);
+        $con = Condition::withAnd();
+        $con->greaterThan('foo', 2);
 
         $this->assertEquals('WHERE (foo >= ?)', $con->getStatement());
         $this->assertEquals([2], $con->getValues());
@@ -149,8 +133,8 @@ class ConditionTest extends TestCase
 
     public function testLower()
     {
-        $con = new Condition();
-        $con->lower('foo', 2);
+        $con = Condition::withAnd();
+        $con->less('foo', 2);
 
         $this->assertEquals('WHERE (foo < ?)', $con->getStatement());
         $this->assertEquals([2], $con->getValues());
@@ -158,8 +142,8 @@ class ConditionTest extends TestCase
 
     public function testLowerThen()
     {
-        $con = new Condition();
-        $con->lowerThen('foo', 2);
+        $con = Condition::withAnd();
+        $con->lessThan('foo', 2);
 
         $this->assertEquals('WHERE (foo <= ?)', $con->getStatement());
         $this->assertEquals([2], $con->getValues());
@@ -167,7 +151,7 @@ class ConditionTest extends TestCase
 
     public function testLike()
     {
-        $con = new Condition();
+        $con = Condition::withAnd();
         $con->like('foo', 'bar');
 
         $this->assertEquals('WHERE (foo LIKE ?)', $con->getStatement());
@@ -176,7 +160,7 @@ class ConditionTest extends TestCase
 
     public function testNotLike()
     {
-        $con = new Condition();
+        $con = Condition::withAnd();
         $con->notLike('foo', 'bar');
 
         $this->assertEquals('WHERE (foo NOT LIKE ?)', $con->getStatement());
@@ -185,7 +169,7 @@ class ConditionTest extends TestCase
 
     public function testBetween()
     {
-        $con = new Condition();
+        $con = Condition::withAnd();
         $con->between('id', 8, 16);
 
         $this->assertEquals('WHERE (id BETWEEN ? AND ?)', $con->getStatement());
@@ -194,7 +178,7 @@ class ConditionTest extends TestCase
 
     public function testIn()
     {
-        $con = new Condition();
+        $con = Condition::withAnd();
         $con->in('id', [8, 16]);
 
         $this->assertEquals('WHERE (id IN (?,?))', $con->getStatement());
@@ -203,7 +187,7 @@ class ConditionTest extends TestCase
 
     public function testNil()
     {
-        $con = new Condition();
+        $con = Condition::withAnd();
         $con->nil('foo');
 
         $this->assertEquals('WHERE (foo IS NULL)', $con->getStatement());
@@ -212,7 +196,7 @@ class ConditionTest extends TestCase
 
     public function testNotNil()
     {
-        $con = new Condition();
+        $con = Condition::withAnd();
         $con->notNil('foo');
 
         $this->assertEquals('WHERE (foo IS NOT NULL)', $con->getStatement());
@@ -221,7 +205,7 @@ class ConditionTest extends TestCase
 
     public function testRaw()
     {
-        $con = new Condition();
+        $con = Condition::withAnd();
         $con->raw('foo IN (SELECT id FROM foo WHERE id = ?)', [1]);
 
         $this->assertEquals('WHERE (foo IN (SELECT id FROM foo WHERE id = ?))', $con->getStatement());
@@ -230,7 +214,7 @@ class ConditionTest extends TestCase
 
     public function testRegexp()
     {
-        $con = new Condition();
+        $con = Condition::withAnd();
         $con->regexp('foo', '[A-z]+');
 
         $this->assertEquals('WHERE (foo RLIKE ?)', $con->getStatement());
@@ -239,89 +223,50 @@ class ConditionTest extends TestCase
 
     public function testCount()
     {
-        $con = new Condition();
-        $con->add('id', '=', '1');
-        $con->add('id', '=', '2');
-        $con->add('id', '=', '3');
+        $con = Condition::withAnd();
+        $con->equals('id', '1');
+        $con->equals('id', '2');
+        $con->equals('id', '3');
 
         $this->assertEquals(3, count($con));
     }
 
     public function testMerge()
     {
-        $con_1 = new Condition(array('id', '=', '1'));
-        $con_2 = new Condition(array('id', '=', '2'));
+        $con_1 = Condition::withAnd()->equals('id', '1');
+        $con_2 = Condition::withAnd()->equals('id', '2');
 
         $this->assertEquals(true, $con_1->hasCondition());
 
         $con_1->merge($con_2);
 
         $this->assertEquals('WHERE (id = ? AND id = ?)', $con_1->getStatement());
-        $this->assertEquals(array('1', '2'), $con_1->getValues());
+        $this->assertEquals(['1', '2'], $con_1->getValues());
         $this->assertEquals(true, $con_1->hasCondition());
-    }
-
-    public function testGet()
-    {
-        $con = new Condition();
-        $con->add('title', '=', '2');
-
-        $titleExpression = $con->get('title');
-
-        $this->assertInstanceOf('PSX\Sql\Condition\ExpressionInterface', $titleExpression);
-        $this->assertEquals(['2'], $titleExpression->getValues());
-
-        $this->assertNull($con->get('foo'));
-    }
-
-    public function testRemove()
-    {
-        $con = new Condition();
-        $con->add('id', '=', '1');
-        $con->add('title', '=', '2');
-        $con->add('date', '=', '3');
-
-        $this->assertEquals(3, count($con));
-
-        $con->remove('title');
-
-        $this->assertEquals(2, count($con));
-    }
-
-    public function testRemoveInvalidColumn()
-    {
-        $con = new Condition();
-        $con->add('id', '=', '1');
-
-        $this->assertEquals(1, count($con));
-
-        $con->remove('title');
-
-        $this->assertEquals(1, count($con));
     }
 
     public function testRemoveAll()
     {
-        $con = new Condition(array('id', '=', '1'));
+        $con = Condition::withAnd()->equals('id', '1');
 
         $this->assertEquals('WHERE (id = ?)', $con->getStatement());
-        $this->assertEquals(array('1'), $con->getValues());
+        $this->assertEquals(['1'], $con->getValues());
         $this->assertEquals(true, $con->hasCondition());
 
         $con->removeAll();
 
         $this->assertEquals('WHERE 1 = 1', $con->getStatement());
-        $this->assertEquals(array(), $con->getValues());
+        $this->assertEquals([], $con->getValues());
         $this->assertEquals(false, $con->hasCondition());
     }
 
-    public function testGetStatment()
+    public function testGetStatement()
     {
-        $con = Condition::fromCriteria(array(
+        $con = Condition::fromCriteria([
             'foo' => 'bar',
-            'bar' => array(1, 2),
+            'bar' => [1, 2],
             'baz' => null,
-        ));
+        ]);
 
         $this->assertEquals('WHERE (foo = ? AND bar IN (?,?) AND baz IS NULL)', $con->getStatement());
         $this->assertEquals('WHERE (foo = ? AND bar IN (?,?) AND baz IS NULL)', $con->getStatement());
@@ -329,39 +274,26 @@ class ConditionTest extends TestCase
 
     public function testGetValues()
     {
-        $con = Condition::fromCriteria(array(
+        $con = Condition::fromCriteria([
             'foo' => 'bar',
-            'bar' => array(1, 2),
+            'bar' => [1, 2],
             'baz' => null,
-        ));
+        ]);
 
-        $this->assertEquals(array('bar', 1, 2), $con->getValues());
-    }
-
-    public function testGetArray()
-    {
-        $criteria = array(
-            'foo' => 'bar',
-            'bar' => array(1, 2),
-            'baz' => null,
-        );
-
-        $con = Condition::fromCriteria($criteria);
-
-        $this->assertEquals($criteria, $con->getArray());
+        $this->assertEquals(['bar', 1, 2], $con->getValues());
     }
 
     public function testFromCriteria()
     {
-        $con = Condition::fromCriteria(array(
+        $con = Condition::fromCriteria([
             'foo' => 'bar',
-            'bar' => array(1, 2),
+            'bar' => [1, 2],
             'baz' => null,
-        ));
+        ]);
 
         $result = $con->toArray();
 
-        $this->assertContainsOnlyInstancesOf('PSX\Sql\Condition\ExpressionInterface', $result);
+        $this->assertContainsOnlyInstancesOf(Condition\ExpressionInterface::class, $result);
         $this->assertEquals('WHERE (foo = ? AND bar IN (?,?) AND baz IS NULL)', $con->getStatement());
     }
 }

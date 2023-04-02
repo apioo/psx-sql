@@ -38,6 +38,7 @@ class TableManager implements TableManagerInterface
     public function __construct(Connection $connection)
     {
         $this->connection = $connection;
+        $this->container = [];
     }
 
     public function getConnection(): Connection

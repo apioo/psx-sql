@@ -187,29 +187,14 @@ abstract class TableAbstract implements TableInterface
      * @throws QueryException
      * @return array<T>
      */
-    protected function doFindAll(?Condition $condition = null, ?int $startIndex = null, ?int $count = null, ?string $sortBy = null, ?int $sortOrder = null, ?Fields $fields = null): array
+    protected function doFindAll(?Condition $condition = null, ?int $startIndex = null, ?int $count = null, ?string $sortBy = null, ?OrderBy $sortOrder = null): array
     {
         $startIndex = $startIndex !== null ? $startIndex : 0;
         $count = !empty($count) ? $count : $this->limit();
         $sortBy = $sortBy !== null ? $sortBy : $this->sortKey();
         $sortOrder = $sortOrder !== null ? $sortOrder : $this->sortOrder();
 
-        if ($fields !== null) {
-            $fieldsWhitelist = $fields->getWhitelist();
-            $fieldsBlacklist = $fields->getBlacklist();
-        } else {
-            $fieldsWhitelist = null;
-            $fieldsBlacklist = null;
-        }
-
         $columns = array_keys($this->getColumns());
-
-        if (!empty($fieldsWhitelist)) {
-            $columns = array_intersect($columns, $fieldsWhitelist);
-        } elseif (!empty($fieldsBlacklist)) {
-            $columns = array_diff($columns, $fieldsBlacklist);
-        }
-
         if (!in_array($sortBy, $columns)) {
             $sortBy = $this->getPrimaryKeys()[0] ?? null;
         }
@@ -237,18 +222,18 @@ abstract class TableAbstract implements TableInterface
      * @throws QueryException
      * @return array<T>
      */
-    protected function doFindBy(Condition $condition, ?int $startIndex = null, ?int $count = null, ?string $sortBy = null, ?int $sortOrder = null, ?Fields $fields = null): array
+    protected function doFindBy(Condition $condition, ?int $startIndex = null, ?int $count = null, ?string $sortBy = null, ?OrderBy $sortOrder = null): array
     {
-        return $this->doFindAll($condition, $startIndex, $count, $sortBy, $sortOrder, $fields);
+        return $this->doFindAll($condition, $startIndex, $count, $sortBy, $sortOrder);
     }
 
     /**
      * @throws QueryException
      * @return T
      */
-    protected function doFindOneBy(Condition $condition, ?Fields $fields = null): mixed
+    protected function doFindOneBy(Condition $condition): mixed
     {
-        $result = $this->doFindAll($condition, 0, 1, null, null, $fields);
+        $result = $this->doFindAll($condition, 0, 1);
         foreach ($result as $row) {
             return $row;
         }
@@ -262,7 +247,7 @@ abstract class TableAbstract implements TableInterface
      *
      * @throws DBALException
      */
-    protected function getQuery(string $table, array $fields, int $startIndex, int $count, ?string $sortBy, int $sortOrder, ?Condition $condition = null): array
+    protected function getQuery(string $table, array $fields, int $startIndex, int $count, ?string $sortBy, OrderBy $sortOrder, ?Condition $condition = null): array
     {
         $builder = $this->newQueryBuilder($table)
             ->select($fields)
@@ -270,7 +255,7 @@ abstract class TableAbstract implements TableInterface
             ->setMaxResults($count);
 
         if ($sortBy !== null) {
-            $builder->orderBy($sortBy, $sortOrder == Sql::SORT_ASC ? 'ASC' : 'DESC');
+            $builder->orderBy($sortBy, $sortOrder === OrderBy::ASC ? 'ASC' : 'DESC');
         }
 
         return $this->convertBuilder($builder, $condition);
@@ -286,7 +271,7 @@ abstract class TableAbstract implements TableInterface
     {
         try {
             $builder = $this->newQueryBuilder($table)
-                ->select($this->connection->getDatabasePlatform()->getCountExpression('*'));
+                ->select('COUNT(*) AS cnt');
 
             return $this->convertBuilder($builder, $condition);
         } catch (DBALException $e) {
@@ -331,9 +316,9 @@ abstract class TableAbstract implements TableInterface
         return $this->getPrimaryKeys()[0] ?? null;
     }
 
-    protected function sortOrder(): int
+    protected function sortOrder(): OrderBy
     {
-        return Sql::SORT_DESC;
+        return OrderBy::DESC;
     }
 
     protected function newQueryBuilder(string $table): QueryBuilder

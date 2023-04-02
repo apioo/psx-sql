@@ -33,9 +33,9 @@ class Regexp extends ExpressionAbstract
 {
     private string $regexp;
 
-    public function __construct(string $column, string $regexp, $conjunction = 'AND')
+    public function __construct(string $column, string $regexp)
     {
-        parent::__construct($column, $conjunction);
+        parent::__construct($column);
 
         $this->regexp = $regexp;
     }

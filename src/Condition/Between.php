@@ -34,9 +34,9 @@ class Between extends ExpressionAbstract
     private mixed $left;
     private mixed $right;
 
-    public function __construct(string $column, mixed $left, mixed $right, $conjunction = 'AND')
+    public function __construct(string $column, mixed $left, mixed $right)
     {
-        parent::__construct($column, $conjunction);
+        parent::__construct($column);
 
         $this->left = $left;
         $this->right = $right;
@@ -44,7 +44,7 @@ class Between extends ExpressionAbstract
 
     public function getExpression(AbstractPlatform $platform): string
     {
-        return $platform->getBetweenExpression($this->column, '?', '?');
+        return $this->column . ' BETWEEN ? AND ?';
     }
 
     public function getValues(): array

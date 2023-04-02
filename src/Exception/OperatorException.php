@@ -18,43 +18,15 @@
  * limitations under the License.
  */
 
-namespace PSX\Sql;
+namespace PSX\Sql\Exception;
 
 /**
- * Fields
+ * OperatorException
  *
  * @author  Christoph Kappestein <christoph.kappestein@gmail.com>
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    https://phpsx.org
  */
-class Fields
+class OperatorException extends \Exception
 {
-    private ?array $whitelist;
-    private ?array $blacklist;
-
-    private function __construct(?array $whitelist = null, ?array $blacklist = null)
-    {
-        $this->whitelist = $whitelist;
-        $this->blacklist = $blacklist;
-    }
-
-    public function getWhitelist(): ?array
-    {
-        return $this->whitelist;
-    }
-
-    public function getBlacklist(): ?array
-    {
-        return $this->blacklist;
-    }
-
-    public static function whitelist(array $fields): self
-    {
-        return new self($fields);
-    }
-
-    public static function blacklist(array $fields): self
-    {
-        return new self(null, $fields);
-    }
 }

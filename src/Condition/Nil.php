@@ -33,7 +33,7 @@ class Nil extends ExpressionAbstract
 {
     public function getExpression(AbstractPlatform $platform): string
     {
-        return $platform->getIsNullExpression($this->column);
+        return $this->column . ' IS NULL';
     }
 
     public function getValues(): array
