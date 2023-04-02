@@ -1,6 +1,6 @@
 {
   "name": "psx/sql",
-  "description": "Build complex data structures from relational databases",
+  "description": "Generate type-safe PHP classes from your database",
   "keywords": ["sql"],
   "homepage": "https://phpsx.org",
   "license": "Apache-2.0",
