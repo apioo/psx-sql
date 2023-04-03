@@ -53,7 +53,7 @@ abstract class TableAbstract implements TableInterface
 
     private TableManagerInterface $tableManager;
 
-    public function __construct(TableManager $tableManager)
+    public function __construct(TableManagerInterface $tableManager)
     {
         $this->connection   = $tableManager->getConnection();
         $this->tableManager = $tableManager;
