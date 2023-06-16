@@ -27,7 +27,6 @@ namespace PSX\Sql\Exception;
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    https://phpsx.org
  */
-class NoValueAvailable extends \Exception
+class NoValueAvailable extends \RuntimeException
 {
-
 }
