@@ -20,6 +20,7 @@
 
 namespace PSX\Sql;
 
+use Doctrine\DBAL\Connection;
 use PSX\Sql\Exception\InvalidTableException;
 
 /**
@@ -31,6 +32,8 @@ use PSX\Sql\Exception\InvalidTableException;
  */
 interface TableManagerInterface
 {
+    public function getConnection(): Connection;
+
     /**
      * Returns a table or view instance
      *
