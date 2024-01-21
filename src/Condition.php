@@ -74,7 +74,11 @@ class Condition extends ExpressionAbstract implements Countable
      */
     public function equals(string $column, mixed $value): self
     {
-        return $this->add(new Condition\Basic($column, ComparisonOperator::EQUALS, $value));
+        if ($value === null) {
+            return $this->add(new Condition\Nil($column));
+        } else {
+            return $this->add(new Condition\Basic($column, ComparisonOperator::EQUALS, $value));
+        }
     }
 
     /**
@@ -82,7 +86,11 @@ class Condition extends ExpressionAbstract implements Countable
      */
     public function notEquals(string $column, mixed $value): self
     {
-        return $this->add(new Condition\Basic($column, ComparisonOperator::NOT_EQUALS, $value));
+        if ($value === null) {
+            return $this->add(new Condition\NotNil($column));
+        } else {
+            return $this->add(new Condition\Basic($column, ComparisonOperator::NOT_EQUALS, $value));
+        }
     }
 
     /**
