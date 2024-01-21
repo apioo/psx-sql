@@ -188,7 +188,7 @@ abstract class TableAbstract implements TableInterface
     protected function doFindAll(?Condition $condition = null, ?int $startIndex = null, ?int $count = null, ?string $sortBy = null, ?OrderBy $sortOrder = null): array
     {
         $startIndex = $startIndex !== null ? $startIndex : 0;
-        $count = !empty($count) ? $count : $this->limit();
+        $count = $count !== null && $count > 0 ? $count : $this->limit();
         $sortBy = $sortBy !== null ? $sortBy : $this->sortKey();
         $sortOrder = $sortOrder !== null ? $sortOrder : $this->sortOrder();
 
