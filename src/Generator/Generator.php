@@ -641,13 +641,9 @@ class Generator
         return str_replace(' ', '', ucwords(str_replace('_', ' ', $name)));
     }
 
-    private function buildComment(array $tags, ?string $comment = null): string
+    private function buildComment(array $tags): string
     {
         $lines = [];
-        if (!empty($comment)) {
-            $lines[] = ' * ' . $comment;
-        }
-
         foreach ($tags as $key => $value) {
             if (is_array($value)) {
                 foreach ($value as $val) {
