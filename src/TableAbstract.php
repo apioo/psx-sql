@@ -475,22 +475,10 @@ abstract class TableAbstract implements TableInterface
      */
     protected function serializeFields(array $row): array
     {
-        $data    = [];
+        $data = [];
         $columns = $this->getColumns();
 
-        $builder = $this->newQueryBuilder($this->getName());
-        $parts   = $builder->getQueryPart('from');
-        $part    = reset($parts);
-        $alias   = $part['alias'];
-
         foreach ($columns as $name => $type) {
-            if (!empty($alias)) {
-                $pos = strpos($name, $alias . '.');
-                if ($pos !== false) {
-                    $name = substr($name, strlen($alias) + 1);
-                }
-            }
-
             if (isset($row[$name])) {
                 $data[$name] = $this->serializeType($row[$name], $type);
             }
