@@ -23,6 +23,7 @@ namespace PSX\Sql\Tests;
 use PSX\Sql\Condition;
 use PSX\Sql\Fields;
 use PSX\Sql\OrderBy;
+use PSX\Sql\Tests\Generator\HandlerCommentColumn;
 use PSX\Sql\Tests\Generator\HandlerCommentRow;
 
 /**
@@ -147,7 +148,7 @@ trait TableQueryTestTrait
     public function testFindAllStartIndexAndCountDesc()
     {
         $table = $this->getTable();
-        $result = $table->findAll(startIndex: 2, count: 2, sortBy: 'id', sortOrder: OrderBy::DESC);
+        $result = $table->findAll(startIndex: 2, count: 2, sortBy: HandlerCommentColumn::ID, sortOrder: OrderBy::DESC);
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(2, count($result));
@@ -173,7 +174,7 @@ trait TableQueryTestTrait
     public function testFindAllStartIndexAndCountAsc()
     {
         $table = $this->getTable();
-        $result = $table->findAll(startIndex: 2, count: 2, sortBy: 'id', sortOrder: OrderBy::ASC);
+        $result = $table->findAll(startIndex: 2, count: 2, sortBy: HandlerCommentColumn::ID, sortOrder: OrderBy::ASC);
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(2, count($result));
@@ -199,7 +200,7 @@ trait TableQueryTestTrait
     public function testFindAllSortDesc()
     {
         $table = $this->getTable();
-        $result = $table->findAll(startIndex: 0, count: 2, sortBy: 'id', sortOrder: OrderBy::DESC);
+        $result = $table->findAll(startIndex: 0, count: 2, sortBy: HandlerCommentColumn::ID, sortOrder: OrderBy::DESC);
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(2, count($result));
@@ -234,7 +235,7 @@ trait TableQueryTestTrait
     public function testFindAllSortAsc()
     {
         $table = $this->getTable();
-        $result = $table->findAll(startIndex: 0, count: 2, sortBy: 'id', sortOrder: OrderBy::ASC);
+        $result = $table->findAll(startIndex: 0, count: 2, sortBy: HandlerCommentColumn::ID, sortOrder: OrderBy::ASC);
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(2, count($result));
@@ -261,7 +262,7 @@ trait TableQueryTestTrait
     {
         $table = $this->getTable();
         $con = Condition::withAnd()->equals('userId', 1);
-        $result = $table->findAll(condition: $con, startIndex: 0, count: 16, sortBy: 'id', sortOrder: OrderBy::DESC);
+        $result = $table->findAll(condition: $con, startIndex: 0, count: 16, sortBy: HandlerCommentColumn::ID, sortOrder: OrderBy::DESC);
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(2, count($result));
@@ -291,7 +292,7 @@ trait TableQueryTestTrait
         $con = Condition::withAnd();
         $con->equals('userId', 1);
         $con->equals('userId', 3);
-        $result = $table->findAll(condition: $con, startIndex: 0, count: 16, sortBy: 'id', sortOrder: OrderBy::DESC);
+        $result = $table->findAll(condition: $con, startIndex: 0, count: 16, sortBy: HandlerCommentColumn::ID, sortOrder: OrderBy::DESC);
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(0, count($result));
@@ -300,7 +301,7 @@ trait TableQueryTestTrait
         $con = Condition::withAnd();
         $con->equals('userId', 1);
         $con->equals('title', 'foo');
-        $result = $table->findAll(condition: $con, startIndex: 0, count: 16, sortBy: 'id', sortOrder: OrderBy::DESC);
+        $result = $table->findAll(condition: $con, startIndex: 0, count: 16, sortBy: HandlerCommentColumn::ID, sortOrder: OrderBy::DESC);
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(1, count($result));
@@ -324,7 +325,7 @@ trait TableQueryTestTrait
         $con = Condition::withOr();
         $con->equals('userId', 1);
         $con->equals('userId', 3);
-        $result = $table->findAll(condition: $con, startIndex: 0, count: 16, sortBy: 'id', sortOrder: OrderBy::DESC);
+        $result = $table->findAll(condition: $con, startIndex: 0, count: 16, sortBy: HandlerCommentColumn::ID, sortOrder: OrderBy::DESC);
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(3, count($result));
@@ -382,7 +383,7 @@ trait TableQueryTestTrait
     public function testFindByStartIndexCountOrder()
     {
         $table = $this->getTable();
-        $result = $table->findBy(condition: Condition::withAnd()->equals('userId', 1), startIndex: 0, count: 1, sortBy: 'id', sortOrder: OrderBy::ASC);
+        $result = $table->findBy(condition: Condition::withAnd()->equals('userId', 1), startIndex: 0, count: 1, sortBy: HandlerCommentColumn::ID, sortOrder: OrderBy::ASC);
 
         $this->assertEquals(true, is_array($result));
         $this->assertEquals(1, count($result));

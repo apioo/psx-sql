@@ -20,6 +20,8 @@
 
 namespace PSX\Sql\Tests\Generator;
 
+use PhpParser\Error;
+use PhpParser\ParserFactory;
 use PSX\DateTime\Date;
 use PSX\DateTime\DateTime;
 use PSX\DateTime\LocalDate;
