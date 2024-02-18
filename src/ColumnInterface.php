@@ -21,7 +21,7 @@
 namespace PSX\Sql;
 
 /**
- * Represents a class which describes a table
+ * Represents a column
  *
  * @author  Christoph Kappestein <christoph.kappestein@gmail.com>
  * @license http://www.apache.org/licenses/LICENSE-2.0
