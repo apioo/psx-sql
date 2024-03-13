@@ -25,7 +25,6 @@ use PSX\DateTime\DateTime;
 use PSX\DateTime\LocalDate;
 use PSX\DateTime\LocalDateTime;
 use PSX\DateTime\LocalTime;
-use PSX\Record\Record;
 use PSX\Sql\Generator\Generator;
 use PSX\Sql\TableManager;
 use PSX\Sql\TableManagerInterface;

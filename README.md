@@ -24,7 +24,7 @@ console app or you can also do this programmatically through the `PSX\Sql\Genera
 
 use PSX\Sql\Generator\Generator;
 
-$connection   = null; // a doctrine DBAL connection
+$connection = null; // a doctrine DBAL connection
 $target = __DIR__;
 
 $generator = new Generator($connection, 'Acme\\Table');
@@ -58,7 +58,7 @@ $table->findAll();
 $table->findAll(startIndex: 0, count: 12);
 
 // orders the entries after the column "id" descending
-$table->findAll(startIndex: 0, count: 12, sortBy: 'id', sortOrder: OrderBy::DESC);
+$table->findAll(startIndex: 0, count: 12, sortBy: \PSX\Sql\Tests\Generator\SqlTableTestColumn::ID, sortOrder: OrderBy::DESC);
 
 // returns all rows which match the specified title
 $table->findByTitle('foo%');

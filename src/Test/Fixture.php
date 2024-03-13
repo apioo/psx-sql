@@ -67,6 +67,12 @@ class Fixture
     {
         foreach ($data as $tableName => $rows) {
             foreach ($rows as $row) {
+                foreach ($row as $key => $value) {
+                    if ($value instanceof ResolvableInterface) {
+                        $row[$key] = $value->resolve($connection);
+                    }
+                }
+
                 $connection->insert($tableName, $row);
             }
         }
