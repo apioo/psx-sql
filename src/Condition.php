@@ -272,7 +272,7 @@ class Condition extends ExpressionAbstract implements Countable
     /**
      * Returns the parameters as array
      *
-     * @return array<int, mixed>
+     * @return array<int<0, max>, mixed>
      */
     public function getValues(): array
     {
