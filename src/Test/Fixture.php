@@ -39,31 +39,31 @@ class Fixture
         $platform = $connection->getDatabasePlatform();
 
         if ($platform instanceof Platforms\MySQLPlatform) {
-            $connection->executeQuery('SET FOREIGN_KEY_CHECKS = 0');
+            $connection->executeStatement('SET FOREIGN_KEY_CHECKS = 0');
 
             foreach ($tables as $table) {
-                $connection->executeQuery('TRUNCATE ' . $table);
+                $connection->executeStatement('TRUNCATE ' . $table);
             }
 
-            $connection->executeQuery('SET FOREIGN_KEY_CHECKS = 1');
+            $connection->executeStatement('SET FOREIGN_KEY_CHECKS = 1');
         } elseif ($platform instanceof Platforms\PostgreSQLPlatform) {
-            $connection->executeQuery('SET session_replication_role = \'replica\'');
+            $connection->executeStatement('SET session_replication_role = \'replica\'');
 
             foreach ($tables as $table) {
-                $connection->executeQuery('TRUNCATE ' . $table . ' RESTART IDENTITY CASCADE');
+                $connection->executeStatement('TRUNCATE ' . $table . ' RESTART IDENTITY CASCADE');
             }
 
-            $connection->executeQuery('SET session_replication_role = \'origin\'');
+            $connection->executeStatement('SET session_replication_role = \'origin\'');
         } elseif ($platform instanceof Platforms\SqlitePlatform) {
             foreach ($tables as $table) {
-                $connection->executeQuery('DELETE FROM ' . $table . ' WHERE 1=1');
-                $connection->executeQuery('DELETE FROM sqlite_sequence WHERE name="' . $table . '"');
+                $connection->executeStatement('DELETE FROM ' . $table . ' WHERE 1=1');
+                $connection->executeStatement('DELETE FROM sqlite_sequence WHERE name="' . $table . '"');
             }
         } else {
             // for all other platforms we simply try to delete all data using
             // standard SQL ignoring potential foreign key problems
             foreach ($tables as $table) {
-                $connection->executeQuery('DELETE FROM ' . $table . ' WHERE 1=1');
+                $connection->executeStatement('DELETE FROM ' . $table . ' WHERE 1=1');
             }
         }
     }
