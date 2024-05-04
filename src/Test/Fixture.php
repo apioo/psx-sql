@@ -21,6 +21,7 @@
 namespace PSX\Sql\Test;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception\ConstraintViolationException;
 use Doctrine\DBAL\Platforms;
 
 /**
@@ -73,7 +74,11 @@ class Fixture
                     }
                 }
 
-                $connection->insert($tableName, $row);
+                try {
+                    $connection->insert($tableName, $row);
+                } catch (ConstraintViolationException $e) {
+                    throw new \RuntimeException('Could not insert row on table ' . $tableName . ' [' . json_encode($row) . '] because of: ' . $e->getMessage(), 0, $e);
+                }
             }
         }
     }
