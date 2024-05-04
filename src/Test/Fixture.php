@@ -47,9 +47,13 @@ class Fixture
 
             $connection->executeQuery('SET FOREIGN_KEY_CHECKS = 1');
         } elseif ($platform instanceof Platforms\PostgreSQLPlatform) {
+            $connection->executeQuery('SET session_replication_role = \'replica\'');
+
             foreach ($tables as $table) {
                 $connection->executeQuery('TRUNCATE ' . $table . ' RESTART IDENTITY CASCADE');
             }
+
+            $connection->executeQuery('SET session_replication_role = \'origin\'');
         } elseif ($platform instanceof Platforms\SqlitePlatform) {
             foreach ($tables as $table) {
                 $connection->executeQuery('DELETE FROM ' . $table . ' WHERE 1=1');
