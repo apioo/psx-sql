@@ -23,32 +23,18 @@ namespace PSX\Sql\Condition;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 
 /**
- * In
+ * NotIn
  *
  * @author  Christoph Kappestein <christoph.kappestein@gmail.com>
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    https://phpsx.org
  */
-class In extends ExpressionAbstract
+class NotIn extends In
 {
-    protected array $values;
-
-    public function __construct(string $column, array $values)
-    {
-        parent::__construct($column);
-
-        $this->values = $values;
-    }
-
     public function getExpression(AbstractPlatform $platform): string
     {
         $values = implode(',', array_fill(0, count($this->values), '?'));
 
-        return $this->column . ' IN (' . $values . ')';
-    }
-
-    public function getValues(): array
-    {
-        return $this->values;
+        return $this->column . ' NOT IN (' . $values . ')';
     }
 }

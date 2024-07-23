@@ -202,6 +202,15 @@ CODE;
         $this->assertEquals([8, 16], $con->getValues());
     }
 
+    public function testNotIn()
+    {
+        $con = Condition::withAnd();
+        $con->notIn('id', [8, 16]);
+
+        $this->assertEquals('WHERE (id NOT IN (?,?))', $con->getStatement());
+        $this->assertEquals([8, 16], $con->getValues());
+    }
+
     public function testNil()
     {
         $con = Condition::withAnd();
@@ -217,6 +226,16 @@ CODE;
         $con->notNil('foo');
 
         $this->assertEquals('WHERE (foo IS NOT NULL)', $con->getStatement());
+        $this->assertEquals([], $con->getValues());
+    }
+
+    public function testInverse()
+    {
+        $con = Condition::withAnd();
+        $con->notNil('foo');
+        $con->setInverse(true);
+
+        $this->assertEquals('WHERE NOT (foo IS NOT NULL)', $con->getStatement());
         $this->assertEquals([], $con->getValues());
     }
 

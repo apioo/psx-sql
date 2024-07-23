@@ -158,6 +158,14 @@ class Condition extends ExpressionAbstract implements Countable
     }
 
     /**
+     * Asserts that the column is in the array of values
+     */
+    public function notIn(string $column, array $values): self
+    {
+        return $this->add(new Condition\NotIn($column, $values));
+    }
+
+    /**
      * Asserts that the column is null
      */
     public function nil(string $column): self
@@ -266,7 +274,7 @@ class Condition extends ExpressionAbstract implements Countable
 
         $con = implode(' ' . $this->operator->toSql() . ' ', $parts);
 
-        return ($this->inverse ? '!' : '') . '(' . $con . ')';
+        return ($this->inverse ? 'NOT ' : '') . '(' . $con . ')';
     }
 
     /**
