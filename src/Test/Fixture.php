@@ -3,7 +3,7 @@
  * PSX is an open source PHP framework to develop RESTful APIs.
  * For the current version and information visit <https://phpsx.org>
  *
- * Copyright 2010-2023 Christoph Kappestein <christoph.kappestein@gmail.com>
+ * Copyright (c) Christoph Kappestein <christoph.kappestein@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 namespace PSX\Sql\Test;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception\ConstraintViolationException;
 use Doctrine\DBAL\Platforms;
 
 /**
@@ -38,27 +39,31 @@ class Fixture
         $platform = $connection->getDatabasePlatform();
 
         if ($platform instanceof Platforms\MySQLPlatform) {
-            $connection->executeQuery('SET FOREIGN_KEY_CHECKS = 0');
+            $connection->executeStatement('SET FOREIGN_KEY_CHECKS = 0');
 
             foreach ($tables as $table) {
-                $connection->executeQuery('TRUNCATE ' . $table);
+                $connection->executeStatement('TRUNCATE ' . $table);
             }
 
-            $connection->executeQuery('SET FOREIGN_KEY_CHECKS = 1');
+            $connection->executeStatement('SET FOREIGN_KEY_CHECKS = 1');
         } elseif ($platform instanceof Platforms\PostgreSQLPlatform) {
+            $connection->executeStatement('SET session_replication_role = \'replica\'');
+
             foreach ($tables as $table) {
-                $connection->executeQuery('TRUNCATE ' . $table . ' RESTART IDENTITY CASCADE');
+                $connection->executeStatement('TRUNCATE ' . $table . ' RESTART IDENTITY CASCADE');
             }
+
+            $connection->executeStatement('SET session_replication_role = \'origin\'');
         } elseif ($platform instanceof Platforms\SqlitePlatform) {
             foreach ($tables as $table) {
-                $connection->executeQuery('DELETE FROM ' . $table . ' WHERE 1=1');
-                $connection->executeQuery('DELETE FROM sqlite_sequence WHERE name="' . $table . '"');
+                $connection->executeStatement('DELETE FROM ' . $table . ' WHERE 1=1');
+                $connection->executeStatement('DELETE FROM sqlite_sequence WHERE name="' . $table . '"');
             }
         } else {
             // for all other platforms we simply try to delete all data using
             // standard SQL ignoring potential foreign key problems
             foreach ($tables as $table) {
-                $connection->executeQuery('DELETE FROM ' . $table . ' WHERE 1=1');
+                $connection->executeStatement('DELETE FROM ' . $table . ' WHERE 1=1');
             }
         }
     }
@@ -73,7 +78,10 @@ class Fixture
                     }
                 }
 
-                $connection->insert($tableName, $row);
+                try {
+                    $connection->insert($tableName, $row);
+                } catch (ConstraintViolationException $e) {
+                }
             }
         }
     }

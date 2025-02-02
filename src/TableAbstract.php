@@ -3,7 +3,7 @@
  * PSX is an open source PHP framework to develop RESTful APIs.
  * For the current version and information visit <https://phpsx.org>
  *
- * Copyright 2010-2023 Christoph Kappestein <christoph.kappestein@gmail.com>
+ * Copyright (c) Christoph Kappestein <christoph.kappestein@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,11 +24,9 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\Exception as DBALDriverException;
 use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\Query\QueryBuilder;
-use PSX\DateTime\Duration;
 use PSX\DateTime\LocalDate;
 use PSX\DateTime\LocalDateTime;
 use PSX\DateTime\LocalTime;
-use PSX\DateTime\Period;
 use PSX\Record\RecordInterface;
 use PSX\Sql\Exception\ManipulationException;
 use PSX\Sql\Exception\NoFieldsAvailableException;
@@ -150,7 +148,7 @@ abstract class TableAbstract implements TableInterface
             } elseif ($value === '') {
                 return new \stdClass();
             } elseif (is_resource($value)) {
-                $value = stream_get_contents($value);
+                $value = (string) stream_get_contents($value);
             }
 
             return json_decode($value);

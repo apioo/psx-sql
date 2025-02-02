@@ -18,29 +18,23 @@
  * limitations under the License.
  */
 
-namespace PSX\Sql;
+namespace PSX\Sql\Condition;
 
-use Doctrine\DBAL\Connection;
-use PSX\Sql\Exception\InvalidTableException;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 
 /**
- * TableManagerInterface
+ * NotIn
  *
  * @author  Christoph Kappestein <christoph.kappestein@gmail.com>
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    https://phpsx.org
  */
-interface TableManagerInterface
+class NotIn extends In
 {
-    public function getConnection(): Connection;
+    public function getExpression(AbstractPlatform $platform): string
+    {
+        $values = implode(',', array_fill(0, count($this->values), '?'));
 
-    /**
-     * Returns a table or view instance
-     *
-     * @template T of ViewInterface
-     * @psalm-param class-string<T> $tableClass
-     * @return T
-     * @throws InvalidTableException
-     */
-    public function getTable(string $tableClass): ViewInterface;
+        return $this->column . ' NOT IN (' . $values . ')';
+    }
 }

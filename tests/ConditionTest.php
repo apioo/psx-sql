@@ -3,7 +3,7 @@
  * PSX is an open source PHP framework to develop RESTful APIs.
  * For the current version and information visit <https://phpsx.org>
  *
- * Copyright 2010-2023 Christoph Kappestein <christoph.kappestein@gmail.com>
+ * Copyright (c) Christoph Kappestein <christoph.kappestein@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@
 
 namespace PSX\Sql\Tests;
 
-use PhpParser\ParserFactory;
 use PHPUnit\Framework\TestCase;
 use PSX\Sql\ComparisonOperator;
 use PSX\Sql\Condition;
@@ -36,22 +35,6 @@ class ConditionTest extends TestCase
 {
     public function testCondition()
     {
-
-        $code = <<<'CODE'
-<?php
-
-function test($foo)
-{
-    return $this->colBigint ?? throw new \RuntimeException('foo');
-}
-CODE;
-
-        $parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7);
-        $ast = $parser->parse($code);
-
-
-
-
         $con = Condition::withAnd()
             ->equals('id', '1');
 
@@ -202,6 +185,15 @@ CODE;
         $this->assertEquals([8, 16], $con->getValues());
     }
 
+    public function testNotIn()
+    {
+        $con = Condition::withAnd();
+        $con->notIn('id', [8, 16]);
+
+        $this->assertEquals('WHERE (id NOT IN (?,?))', $con->getStatement());
+        $this->assertEquals([8, 16], $con->getValues());
+    }
+
     public function testNil()
     {
         $con = Condition::withAnd();
@@ -217,6 +209,16 @@ CODE;
         $con->notNil('foo');
 
         $this->assertEquals('WHERE (foo IS NOT NULL)', $con->getStatement());
+        $this->assertEquals([], $con->getValues());
+    }
+
+    public function testInverse()
+    {
+        $con = Condition::withAnd();
+        $con->notNil('foo');
+        $con->setInverse(true);
+
+        $this->assertEquals('WHERE NOT (foo IS NOT NULL)', $con->getStatement());
         $this->assertEquals([], $con->getValues());
     }
 

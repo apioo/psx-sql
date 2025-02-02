@@ -3,7 +3,7 @@
  * PSX is an open source PHP framework to develop RESTful APIs.
  * For the current version and information visit <https://phpsx.org>
  *
- * Copyright 2010-2023 Christoph Kappestein <christoph.kappestein@gmail.com>
+ * Copyright (c) Christoph Kappestein <christoph.kappestein@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -158,6 +158,14 @@ class Condition extends ExpressionAbstract implements Countable
     }
 
     /**
+     * Asserts that the column is in the array of values
+     */
+    public function notIn(string $column, array $values): self
+    {
+        return $this->add(new Condition\NotIn($column, $values));
+    }
+
+    /**
      * Asserts that the column is null
      */
     public function nil(string $column): self
@@ -266,13 +274,13 @@ class Condition extends ExpressionAbstract implements Countable
 
         $con = implode(' ' . $this->operator->toSql() . ' ', $parts);
 
-        return ($this->inverse ? '!' : '') . '(' . $con . ')';
+        return ($this->inverse ? 'NOT ' : '') . '(' . $con . ')';
     }
 
     /**
      * Returns the parameters as array
      *
-     * @return array<int, mixed>
+     * @return array<int<0, max>, mixed>
      */
     public function getValues(): array
     {
