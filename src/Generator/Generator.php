@@ -25,11 +25,11 @@ use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types;
-use PhpParser\Builder;
+use PhpParser\Builder\Class_;
 use PhpParser\BuilderFactory;
 use PhpParser\Comment\Doc;
+use PhpParser\Modifiers;
 use PhpParser\Node;
-use PhpParser\Node\Stmt\Class_;
 use PhpParser\PrettyPrinter;
 use PSX\DateTime\LocalDate;
 use PSX\DateTime\LocalDateTime;
@@ -99,7 +99,7 @@ class Generator
         }
     }
 
-    private function generateModel(string $className, Table $table): Builder\Class_
+    private function generateModel(string $className, Table $table): Class_
     {
         $class = $this->factory->class($className);
         $class->implement('\\JsonSerializable', '\\' . RecordableInterface::class);
@@ -118,7 +118,7 @@ class Generator
             if ($type === 'mixed') {
                 $prop->setType($type);
             } else {
-                $prop->setType(new Node\NullableType($type));
+                $prop->setType('?' . $type);
             }
             $prop->setDefault(null);
             $class->addStmt($prop);
@@ -127,7 +127,7 @@ class Generator
             $param = $this->factory->param($name);
             if (!empty($type)) {
                 if ($type !== 'mixed') {
-                    $param->setType($isNullable ? new Node\NullableType($type) : $type);
+                    $param->setType($isNullable ? '?' . $type : $type);
                 } else {
                     $param->setType($type);
                 }
@@ -147,7 +147,7 @@ class Generator
             $getter = $this->factory->method('get' . ucfirst($name));
             if (!empty($type)) {
                 if ($type !== 'mixed') {
-                    $getter->setReturnType($isNullable ? new Node\NullableType($type) : $type);
+                    $getter->setReturnType($isNullable ? '?' . $type : $type);
                 } else {
                     $getter->setReturnType($type);
                 }
@@ -175,7 +175,7 @@ class Generator
         return $class;
     }
 
-    private function buildToRecord(\PhpParser\Builder\Class_ $class, array $columns): void
+    private function buildToRecord(Class_ $class, array $columns): void
     {
         if (empty($columns)) {
             return;
@@ -188,10 +188,10 @@ class Generator
         );
 
         foreach ($columns as $name => $column) {
-            $stmts[] = new Node\Expr\MethodCall(new Node\Expr\Variable('record'), new Node\Identifier('put'), [
+            $stmts[] = new Node\Stmt\Expression(new Node\Expr\MethodCall(new Node\Expr\Variable('record'), new Node\Identifier('put'), [
                 new Node\Arg(new Node\Scalar\String_($column->getName())),
                 new Node\Arg(new Node\Expr\PropertyFetch(new Node\Expr\Variable('this'), $name)),
-            ]);
+            ]));
         }
 
         $stmts[] = new Node\Stmt\Return_(new Node\Expr\Variable('record'));
@@ -204,7 +204,7 @@ class Generator
         $class->addStmt($toRecord);
     }
 
-    private function buildJsonSerialize(\PhpParser\Builder\Class_ $class): void
+    private function buildJsonSerialize(Class_ $class): void
     {
         $toRecord = new Node\Expr\MethodCall(
             new Node\Expr\MethodCall(
@@ -222,14 +222,14 @@ class Generator
         $class->addStmt($serialize);
     }
 
-    private function buildFrom(\PhpParser\Builder\Class_ $class, array $columns): void
+    private function buildFrom(Class_ $class, array $columns): void
     {
         if (empty($columns)) {
             return;
         }
 
         $stmts = [];
-        $stmts[] = new Node\Expr\Assign(new Node\Expr\Variable('row'), new Node\Expr\New_(new Node\Name('self')));
+        $stmts[] = new Node\Stmt\Expression(new Node\Expr\Assign(new Node\Expr\Variable('row'), new Node\Expr\New_(new Node\Name('self'))));
 
         foreach ($columns as $name => $column) {
             $fetch = new Node\Expr\ArrayDimFetch(new Node\Expr\Variable('data'), new Node\Scalar\String_($column->getName()));
@@ -254,7 +254,7 @@ class Generator
                 $arg = new Node\Expr\Ternary(new Node\Expr\Isset_([$fetch]), $arg, new Node\Expr\ConstFetch(new Node\Name('null')));
             }
 
-            $stmts[] = new Node\Expr\Assign(new Node\Expr\PropertyFetch(new Node\Expr\Variable('row'), new Node\Identifier($name)), $arg);
+            $stmts[] = new Node\Stmt\Expression(new Node\Expr\Assign(new Node\Expr\PropertyFetch(new Node\Expr\Variable('row'), new Node\Identifier($name)), $arg));
         }
 
         $stmts[] = new Node\Stmt\Return_(new Node\Expr\Variable('row'));
@@ -272,7 +272,7 @@ class Generator
         $class->addStmt($fromArray);
     }
 
-    private function generateRepository(string $className, string $rowClass, Table $table): Builder\Class_
+    private function generateRepository(string $className, string $rowClass, Table $table): Class_
     {
         if ($this->namespace !== null) {
             $rowClass = '\\' . $this->namespace . '\\' . $rowClass;
@@ -285,7 +285,7 @@ class Generator
         $class->setDocComment($this->buildComment(['extends' => '\\' . TableAbstract::class . '<' . $rowClass . '>']));
 
         $this->buildConstants($class, $table);
-        $this->buildGetName($class, $table);
+        $this->buildGetName($class);
         $this->buildGetColumns($class, $table);
         $this->buildFindAll($class, $rowClass);
         $this->buildFindBy($class, $rowClass);
@@ -296,32 +296,32 @@ class Generator
             $this->buildFindByForColumn($class, $column, $rowClass);
             $this->buildFindOneByForColumn($class, $column, $rowClass);
             $this->buildUpdateByForColumn($class, $column, $rowClass);
-            $this->buildDeleteByForColumn($class, $column, $rowClass);
+            $this->buildDeleteByForColumn($class, $column);
         }
 
         $this->buildCreate($class, $rowClass);
         $this->buildUpdate($class, $rowClass);
         $this->buildUpdateBy($class, $rowClass);
         $this->buildDelete($class, $rowClass);
-        $this->buildDeleteBy($class, $rowClass);
+        $this->buildDeleteBy($class);
         $this->buildNewRecord($class, $rowClass);
 
         return $class;
     }
 
-    private function buildConstants(Builder\Class_ $class, Table $table): void
+    private function buildConstants(Class_ $class, Table $table): void
     {
         $constName = 'NAME';
-        $class->addStmt(new Node\Stmt\ClassConst([new Node\Const_($constName, new Node\Scalar\String_($table->getName()))], Class_::MODIFIER_PUBLIC));
+        $class->addStmt(new Node\Stmt\ClassConst([new Node\Const_($constName, new Node\Scalar\String_($table->getName()))], Modifiers::PUBLIC));
 
         $columns = $table->getColumns();
         foreach ($columns as $column) {
             $constName = 'COLUMN_' . strtoupper($column->getName());
-            $class->addStmt(new Node\Stmt\ClassConst([new Node\Const_($constName, new Node\Scalar\String_($column->getName()))], Class_::MODIFIER_PUBLIC));
+            $class->addStmt(new Node\Stmt\ClassConst([new Node\Const_($constName, new Node\Scalar\String_($column->getName()))], Modifiers::PUBLIC));
         }
     }
 
-    private function buildGetName(Builder\Class_ $class, Table $table): void
+    private function buildGetName(Class_ $class): void
     {
         $method = $this->factory->method('getName');
         $method->makePublic();
@@ -330,7 +330,7 @@ class Generator
         $class->addStmt($method);
     }
 
-    private function buildGetColumns(Builder\Class_ $class, Table $table): void
+    private function buildGetColumns(Class_ $class, Table $table): void
     {
         $primaryIndex = $table->getPrimaryKey();
 
@@ -352,7 +352,7 @@ class Generator
         $class->addStmt($method);
     }
 
-    private function buildFind(Builder\Class_ $class, Table $table, string $rowClass): void
+    private function buildFind(Class_ $class, Table $table, string $rowClass): void
     {
         $primaryIndex = $table->getPrimaryKey();
         if (!$primaryIndex instanceof Index) {
@@ -365,7 +365,7 @@ class Generator
 
         $method = $this->factory->method('find');
         $method->makePublic();
-        $method->setReturnType(new Node\NullableType($rowClass));
+        $method->setReturnType('?' . $rowClass);
         $method->setDocComment($this->buildComment(['throws' => '\\' . QueryException::class]));
 
         foreach ($primaryIndex->getColumns() as $primaryColumn) {
@@ -387,7 +387,7 @@ class Generator
         $class->addStmt($method);
     }
 
-    private function buildFindAll(Builder\Class_ $class, string $rowClass): void
+    private function buildFindAll(Class_ $class, string $rowClass): void
     {
         $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('doFindAll'), [
             new Node\Arg(new Node\Expr\Variable('condition')),
@@ -410,7 +410,7 @@ class Generator
         $class->addStmt($method);
     }
 
-    private function buildFindBy(Builder\Class_ $class, string $rowClass): void
+    private function buildFindBy(Class_ $class, string $rowClass): void
     {
         $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('doFindBy'), [
             new Node\Arg(new Node\Expr\Variable('condition')),
@@ -433,7 +433,7 @@ class Generator
         $class->addStmt($method);
     }
 
-    private function buildFindOneBy(Builder\Class_ $class, string $rowClass): void
+    private function buildFindOneBy(Class_ $class, string $rowClass): void
     {
         $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('doFindOneBy'), [
             new Node\Arg(new Node\Expr\Variable('condition')),
@@ -441,14 +441,14 @@ class Generator
 
         $method = $this->factory->method('findOneBy');
         $method->makePublic();
-        $method->setReturnType(new Node\NullableType($rowClass));
+        $method->setReturnType('?' . $rowClass);
         $method->setDocComment($this->buildComment(['throws' => '\\' . QueryException::class]));
         $method->addParam(new Node\Param(new Node\Expr\Variable('condition'), null, new Node\Name('\\' . Condition::class)));
         $method->addStmt(new Node\Stmt\Return_($methodCall));
         $class->addStmt($method);
     }
 
-    private function buildFindByForColumn(Builder\Class_ $class, Column $column, string $rowClass): void
+    private function buildFindByForColumn(Class_ $class, Column $column, string $rowClass): void
     {
         $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('doFindBy'), [
             new Node\Arg(new Node\Expr\Variable('condition')),
@@ -478,7 +478,7 @@ class Generator
         $class->addStmt($method);
     }
 
-    private function buildFindOneByForColumn(Builder\Class_ $class, Column $column, string $rowClass): void
+    private function buildFindOneByForColumn(Class_ $class, Column $column, string $rowClass): void
     {
         $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('doFindOneBy'), [
             new Node\Arg(new Node\Expr\Variable('condition')),
@@ -488,7 +488,7 @@ class Generator
 
         $method = $this->factory->method('findOneBy' . ucfirst($this->normalizeName($column->getName())));
         $method->makePublic();
-        $method->setReturnType(new Node\NullableType($rowClass));
+        $method->setReturnType('?' . $rowClass);
         $method->setDocComment($this->buildComment(['throws' => '\\' . QueryException::class]));
         $method->addParam(new Node\Param(new Node\Expr\Variable('value'), null, new Node\Identifier($type)));
         $method->addStmt(new Node\Stmt\Expression(new Node\Expr\Assign(new Node\Expr\Variable('condition'), new Node\Expr\StaticCall(new Node\Name('\\' . Condition::class), new Node\Identifier('withAnd')))));
@@ -500,7 +500,7 @@ class Generator
         $class->addStmt($method);
     }
 
-    private function buildUpdateByForColumn(Builder\Class_ $class, Column $column, string $rowClass): void
+    private function buildUpdateByForColumn(Class_ $class, Column $column, string $rowClass): void
     {
         $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('doUpdateBy'), [
             new Node\Arg(new Node\Expr\Variable('condition')),
@@ -524,7 +524,7 @@ class Generator
         $class->addStmt($method);
     }
 
-    private function buildDeleteByForColumn(Builder\Class_ $class, Column $column, string $rowClass): void
+    private function buildDeleteByForColumn(Class_ $class, Column $column): void
     {
         $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('doDeleteBy'), [
             new Node\Arg(new Node\Expr\Variable('condition')),
@@ -546,7 +546,7 @@ class Generator
         $class->addStmt($method);
     }
 
-    private function buildCreate(Builder\Class_ $class, string $rowClass): void
+    private function buildCreate(Class_ $class, string $rowClass): void
     {
         $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('doCreate'), [
             new Node\Arg(new Node\Expr\MethodCall(new Node\Expr\Variable('record'), new Node\Identifier('toRecord'))),
@@ -561,7 +561,7 @@ class Generator
         $class->addStmt($method);
     }
 
-    private function buildUpdate(Builder\Class_ $class, string $rowClass): void
+    private function buildUpdate(Class_ $class, string $rowClass): void
     {
         $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('doUpdate'), [
             new Node\Arg(new Node\Expr\MethodCall(new Node\Expr\Variable('record'), new Node\Identifier('toRecord'))),
@@ -576,7 +576,7 @@ class Generator
         $class->addStmt($method);
     }
 
-    private function buildUpdateBy(Builder\Class_ $class, string $rowClass): void
+    private function buildUpdateBy(Class_ $class, string $rowClass): void
     {
         $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('doUpdateBy'), [
             new Node\Arg(new Node\Expr\Variable('condition')),
@@ -593,7 +593,7 @@ class Generator
         $class->addStmt($method);
     }
 
-    private function buildDelete(Builder\Class_ $class, string $rowClass): void
+    private function buildDelete(Class_ $class, string $rowClass): void
     {
         $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('doDelete'), [
             new Node\Arg(new Node\Expr\MethodCall(new Node\Expr\Variable('record'), new Node\Identifier('toRecord'))),
@@ -608,7 +608,7 @@ class Generator
         $class->addStmt($method);
     }
 
-    private function buildDeleteBy(Builder\Class_ $class, string $rowClass): void
+    private function buildDeleteBy(Class_ $class): void
     {
         $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('doDeleteBy'), [
             new Node\Arg(new Node\Expr\Variable('condition')),
@@ -623,13 +623,13 @@ class Generator
         $class->addStmt($method);
     }
 
-    private function buildNewRecord(Builder\Class_ $class, string $rowClass): void
+    private function buildNewRecord(Class_ $class, string $rowClass): void
     {
         $method = $this->factory->method('newRecord');
         $method->makeProtected();
         $method->setReturnType(new Node\Name($rowClass));
         $method->setDocComment($this->buildComment(['param' => 'array<string, mixed> $row']));
-        $method->addParam(new Node\Param(new Node\Expr\Variable('row'), null, 'array'));
+        $method->addParam(new Node\Param(new Node\Expr\Variable('row'), null, new Node\Name('array')));
         $method->addStmt(new Node\Stmt\Return_(new Node\Expr\StaticCall(new Node\Name($rowClass), new Node\Identifier('from'), [
             new Node\Arg(new Node\Expr\Variable('row'))
         ])));
@@ -661,7 +661,7 @@ class Generator
         return '/**' . "\n" . implode("\n", $lines) . "\n" . ' */';
     }
 
-    private function prettyPrint(Builder\Class_ $class): string
+    private function prettyPrint(Class_ $class): string
     {
         if ($this->namespace !== null) {
             $namespace = $this->factory->namespace($this->namespace);

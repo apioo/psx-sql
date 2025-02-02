@@ -58,7 +58,7 @@ class GenerateCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $target = $input->getArgument('target') ?: getcwd();
+        $target = (string) ($input->getArgument('target') ?: getcwd());
         if (!is_dir($target)) {
             throw new \RuntimeException('Target is not a directory');
         }
