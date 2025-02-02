@@ -26,6 +26,8 @@ use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types;
 use PhpParser\Builder\Class_;
+use PhpParser\Builder\Declaration;
+use PhpParser\Builder\Enum_;
 use PhpParser\BuilderFactory;
 use PhpParser\Comment\Doc;
 use PhpParser\Modifiers;
@@ -638,7 +640,7 @@ class Generator
         $class->addStmt($method);
     }
 
-    private function generateColumn(string $className, string $repositoryClass, Table $table): Builder\Enum_
+    private function generateColumn(string $className, string $repositoryClass, Table $table): Enum_
     {
         $tableClass = $this->namespace !== null ? '\\' . $this->namespace . '\\' . $repositoryClass : '\\' . $repositoryClass;
 
@@ -682,15 +684,15 @@ class Generator
         return '/**' . "\n" . implode("\n", $lines) . "\n" . ' */';
     }
 
-    private function prettyPrint(Class_ $class): string
+    private function prettyPrint(Declaration $declaration): string
     {
         if ($this->namespace !== null) {
             $namespace = $this->factory->namespace($this->namespace);
-            $namespace->addStmt($class);
+            $namespace->addStmt($declaration);
 
             return $this->printer->prettyPrint([$namespace->getNode()]);
         } else {
-            return $this->printer->prettyPrint([$class->getNode()]);
+            return $this->printer->prettyPrint([$declaration->getNode()]);
         }
     }
 
