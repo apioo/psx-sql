@@ -648,10 +648,15 @@ class Generator
         $enum->implement('\\' . ColumnInterface::class);
         $enum->setScalarType('string');
 
+        $reserved = ['CLASS'];
         $columns = $table->getColumns();
         foreach ($columns as $column) {
             $caseName = strtoupper($column->getName());
             $constName = 'COLUMN_' . strtoupper($column->getName());
+
+            if (in_array($caseName, $reserved)) {
+                $caseName .= '_';
+            }
 
             $enum->addStmt(new Node\Stmt\EnumCase(new Node\Identifier($caseName), new Node\Expr\ClassConstFetch(new Node\Name($tableClass), new Node\Identifier($constName))));
         }
