@@ -26,6 +26,8 @@ use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types;
 use PhpParser\Builder\Class_;
+use PhpParser\Builder\Declaration;
+use PhpParser\Builder\Enum_;
 use PhpParser\BuilderFactory;
 use PhpParser\Comment\Doc;
 use PhpParser\Modifiers;
@@ -38,6 +40,7 @@ use PSX\DateTime\Period;
 use PSX\Record\Record;
 use PSX\Record\RecordableInterface;
 use PSX\Record\RecordInterface;
+use PSX\Sql\ColumnInterface;
 use PSX\Sql\Condition;
 use PSX\Sql\Exception\GeneratorException;
 use PSX\Sql\Exception\ManipulationException;
@@ -90,12 +93,16 @@ class Generator
 
             $modelClassName = $this->normalizeName($tableName) . 'Row';
             $repositoryClassName = $this->normalizeName($tableName) . 'Table';
+            $columnClassName = $this->normalizeName($tableName) . 'Column';
 
             $class = $this->generateModel($modelClassName, $table);
             yield $modelClassName => $this->prettyPrint($class);
 
-            $class = $this->generateRepository($repositoryClassName, $modelClassName, $table);
+            $class = $this->generateRepository($repositoryClassName, $modelClassName, $columnClassName, $table);
             yield $repositoryClassName => $this->prettyPrint($class);
+
+            $class = $this->generateColumn($columnClassName, $repositoryClassName, $table);
+            yield $columnClassName => $this->prettyPrint($class);
         }
     }
 
@@ -272,13 +279,10 @@ class Generator
         $class->addStmt($fromArray);
     }
 
-    private function generateRepository(string $className, string $rowClass, Table $table): Class_
+    private function generateRepository(string $className, string $rowClass, string $columnClass, Table $table): Class_
     {
-        if ($this->namespace !== null) {
-            $rowClass = '\\' . $this->namespace . '\\' . $rowClass;
-        } else {
-            $rowClass = '\\' . $rowClass;
-        }
+        $rowClass = $this->namespace !== null ? '\\' . $this->namespace . '\\' . $rowClass : '\\' . $rowClass;
+        $columnClass = $this->namespace !== null ? '\\' . $this->namespace . '\\' . $columnClass : '\\' . $columnClass;
 
         $class = $this->factory->class($className);
         $class->extend('\\' . TableAbstract::class);
@@ -287,13 +291,13 @@ class Generator
         $this->buildConstants($class, $table);
         $this->buildGetName($class);
         $this->buildGetColumns($class, $table);
-        $this->buildFindAll($class, $rowClass);
-        $this->buildFindBy($class, $rowClass);
+        $this->buildFindAll($class, $rowClass, $columnClass);
+        $this->buildFindBy($class, $rowClass, $columnClass);
         $this->buildFindOneBy($class, $rowClass);
         $this->buildFind($class, $table, $rowClass);
 
         foreach ($table->getColumns() as $column) {
-            $this->buildFindByForColumn($class, $column, $rowClass);
+            $this->buildFindByForColumn($class, $column, $rowClass, $columnClass);
             $this->buildFindOneByForColumn($class, $column, $rowClass);
             $this->buildUpdateByForColumn($class, $column, $rowClass);
             $this->buildDeleteByForColumn($class, $column);
@@ -387,7 +391,7 @@ class Generator
         $class->addStmt($method);
     }
 
-    private function buildFindAll(Class_ $class, string $rowClass): void
+    private function buildFindAll(Class_ $class, string $rowClass, string $columnClass): void
     {
         $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('doFindAll'), [
             new Node\Arg(new Node\Expr\Variable('condition')),
@@ -404,13 +408,13 @@ class Generator
         $method->addParam(new Node\Param(new Node\Expr\Variable('condition'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Name('\\' . Condition::class))));
         $method->addParam(new Node\Param(new Node\Expr\Variable('startIndex'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('int'))));
         $method->addParam(new Node\Param(new Node\Expr\Variable('count'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('int'))));
-        $method->addParam(new Node\Param(new Node\Expr\Variable('sortBy'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('string'))));
+        $method->addParam(new Node\Param(new Node\Expr\Variable('sortBy'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Name($columnClass))));
         $method->addParam(new Node\Param(new Node\Expr\Variable('sortOrder'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Name('\\' . OrderBy::class))));
         $method->addStmt(new Node\Stmt\Return_($methodCall));
         $class->addStmt($method);
     }
 
-    private function buildFindBy(Class_ $class, string $rowClass): void
+    private function buildFindBy(Class_ $class, string $rowClass, string $columnClass): void
     {
         $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('doFindBy'), [
             new Node\Arg(new Node\Expr\Variable('condition')),
@@ -427,7 +431,7 @@ class Generator
         $method->addParam(new Node\Param(new Node\Expr\Variable('condition'), null, new Node\Name('\\' . Condition::class)));
         $method->addParam(new Node\Param(new Node\Expr\Variable('startIndex'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('int'))));
         $method->addParam(new Node\Param(new Node\Expr\Variable('count'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('int'))));
-        $method->addParam(new Node\Param(new Node\Expr\Variable('sortBy'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('string'))));
+        $method->addParam(new Node\Param(new Node\Expr\Variable('sortBy'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Name($columnClass))));
         $method->addParam(new Node\Param(new Node\Expr\Variable('sortOrder'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Name('\\' . OrderBy::class))));
         $method->addStmt(new Node\Stmt\Return_($methodCall));
         $class->addStmt($method);
@@ -448,7 +452,7 @@ class Generator
         $class->addStmt($method);
     }
 
-    private function buildFindByForColumn(Class_ $class, Column $column, string $rowClass): void
+    private function buildFindByForColumn(Class_ $class, Column $column, string $rowClass, string $columnClass): void
     {
         $methodCall = new Node\Expr\MethodCall(new Node\Expr\Variable('this'), new Node\Identifier('doFindBy'), [
             new Node\Arg(new Node\Expr\Variable('condition')),
@@ -467,7 +471,7 @@ class Generator
         $method->addParam(new Node\Param(new Node\Expr\Variable('value'), null, new Node\Identifier($type)));
         $method->addParam(new Node\Param(new Node\Expr\Variable('startIndex'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('int'))));
         $method->addParam(new Node\Param(new Node\Expr\Variable('count'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('int'))));
-        $method->addParam(new Node\Param(new Node\Expr\Variable('sortBy'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Identifier('string'))));
+        $method->addParam(new Node\Param(new Node\Expr\Variable('sortBy'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Name($columnClass))));
         $method->addParam(new Node\Param(new Node\Expr\Variable('sortOrder'), new Node\Expr\ConstFetch(new Node\Name('null')), new Node\NullableType(new Node\Name('\\' . OrderBy::class))));
         $method->addStmt(new Node\Stmt\Expression(new Node\Expr\Assign(new Node\Expr\Variable('condition'), new Node\Expr\StaticCall(new Node\Name('\\' . Condition::class), new Node\Identifier('withAnd')))));
         $method->addStmt(new Node\Stmt\Expression(new Node\Expr\MethodCall(new Node\Expr\Variable('condition'), new Node\Identifier($this->getOperatorForColumn($column)), [
@@ -636,6 +640,25 @@ class Generator
         $class->addStmt($method);
     }
 
+    private function generateColumn(string $className, string $repositoryClass, Table $table): Enum_
+    {
+        $tableClass = $this->namespace !== null ? '\\' . $this->namespace . '\\' . $repositoryClass : '\\' . $repositoryClass;
+
+        $enum = $this->factory->enum($className);
+        $enum->implement('\\' . ColumnInterface::class);
+        $enum->setScalarType('string');
+
+        $columns = $table->getColumns();
+        foreach ($columns as $column) {
+            $caseName = strtoupper($column->getName());
+            $constName = 'COLUMN_' . strtoupper($column->getName());
+
+            $enum->addStmt(new Node\Stmt\EnumCase(new Node\Identifier($caseName), new Node\Expr\ClassConstFetch(new Node\Name($tableClass), new Node\Identifier($constName))));
+        }
+
+        return $enum;
+    }
+
     private function normalizeName(string $name): string
     {
         return str_replace(' ', '', ucwords(str_replace('_', ' ', $name)));
@@ -661,15 +684,15 @@ class Generator
         return '/**' . "\n" . implode("\n", $lines) . "\n" . ' */';
     }
 
-    private function prettyPrint(Class_ $class): string
+    private function prettyPrint(Declaration $declaration): string
     {
         if ($this->namespace !== null) {
             $namespace = $this->factory->namespace($this->namespace);
-            $namespace->addStmt($class);
+            $namespace->addStmt($declaration);
 
             return $this->printer->prettyPrint([$namespace->getNode()]);
         } else {
-            return $this->printer->prettyPrint([$class->getNode()]);
+            return $this->printer->prettyPrint([$declaration->getNode()]);
         }
     }
 

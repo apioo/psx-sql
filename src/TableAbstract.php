@@ -183,7 +183,7 @@ abstract class TableAbstract implements TableInterface
      * @throws QueryException
      * @return array<T>
      */
-    protected function doFindAll(?Condition $condition = null, ?int $startIndex = null, ?int $count = null, ?string $sortBy = null, ?OrderBy $sortOrder = null): array
+    protected function doFindAll(?Condition $condition = null, ?int $startIndex = null, ?int $count = null, string|ColumnInterface|null $sortBy = null, ?OrderBy $sortOrder = null): array
     {
         $startIndex = $startIndex !== null ? $startIndex : 0;
         $count = $count !== null && $count > 0 ? $count : $this->limit();
@@ -191,7 +191,10 @@ abstract class TableAbstract implements TableInterface
         $sortOrder = $sortOrder !== null ? $sortOrder : $this->sortOrder();
 
         $columns = array_keys($this->getColumns());
-        if (!in_array($sortBy, $columns)) {
+
+        if ($sortBy instanceof ColumnInterface) {
+            $sortBy = $sortBy->value;
+        } elseif (!in_array($sortBy, $columns)) {
             $sortBy = $this->getPrimaryKeys()[0] ?? null;
         }
 
@@ -218,7 +221,7 @@ abstract class TableAbstract implements TableInterface
      * @throws QueryException
      * @return array<T>
      */
-    protected function doFindBy(Condition $condition, ?int $startIndex = null, ?int $count = null, ?string $sortBy = null, ?OrderBy $sortOrder = null): array
+    protected function doFindBy(Condition $condition, ?int $startIndex = null, ?int $count = null, string|ColumnInterface|null $sortBy = null, ?OrderBy $sortOrder = null): array
     {
         return $this->doFindAll($condition, $startIndex, $count, $sortBy, $sortOrder);
     }
