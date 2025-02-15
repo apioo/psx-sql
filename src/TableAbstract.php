@@ -280,9 +280,8 @@ abstract class TableAbstract implements TableInterface
 
     /**
      * @throws DBALException
-     * @throws DBALDriverException
      */
-    protected function project(string $sql, array $params = [], array $columns = null): array
+    protected function project(string $sql, array $params = [], ?array $columns = null): array
     {
         $result  = [];
         $columns = $columns === null ? $this->getColumns() : $columns;
