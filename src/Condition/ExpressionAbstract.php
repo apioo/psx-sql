@@ -36,7 +36,7 @@ abstract class ExpressionAbstract implements ExpressionInterface
     public function __construct(string|ColumnInterface $column)
     {
         if ($column instanceof ColumnInterface) {
-            $column = $column->value;
+            $column = is_string($column->value) ? $column->value : throw new \RuntimeException('Provided an invalid backed column value, got int must be string');
         }
 
         $this->column = $column;
