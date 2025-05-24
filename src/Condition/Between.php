@@ -21,6 +21,7 @@
 namespace PSX\Sql\Condition;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use PSX\Sql\ColumnInterface;
 
 /**
  * Between
@@ -34,7 +35,7 @@ class Between extends ExpressionAbstract
     private mixed $left;
     private mixed $right;
 
-    public function __construct(string $column, mixed $left, mixed $right)
+    public function __construct(string|ColumnInterface $column, mixed $left, mixed $right)
     {
         parent::__construct($column);
 

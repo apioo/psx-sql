@@ -72,7 +72,7 @@ class Condition extends ExpressionAbstract implements Countable
     /**
      * Asserts that the column is equals to the value
      */
-    public function equals(string $column, mixed $value): self
+    public function equals(string|ColumnInterface $column, mixed $value): self
     {
         if ($value === null) {
             return $this->add(new Condition\Nil($column));
@@ -84,7 +84,7 @@ class Condition extends ExpressionAbstract implements Countable
     /**
      * Asserts that the column is not equal to the value
      */
-    public function notEquals(string $column, mixed $value): self
+    public function notEquals(string|ColumnInterface $column, mixed $value): self
     {
         if ($value === null) {
             return $this->add(new Condition\NotNil($column));
@@ -96,7 +96,7 @@ class Condition extends ExpressionAbstract implements Countable
     /**
      * Asserts that the column is greater then the value
      */
-    public function greater(string $column, mixed $value): self
+    public function greater(string|ColumnInterface $column, mixed $value): self
     {
         return $this->add(new Condition\Basic($column, ComparisonOperator::GREATER, $value));
     }
@@ -104,7 +104,7 @@ class Condition extends ExpressionAbstract implements Countable
     /**
      * Asserts that the column is greater or equal to the value
      */
-    public function greaterThan(string $column, mixed $value): self
+    public function greaterThan(string|ColumnInterface $column, mixed $value): self
     {
         return $this->add(new Condition\Basic($column, ComparisonOperator::GREATER_THAN, $value));
     }
@@ -112,7 +112,7 @@ class Condition extends ExpressionAbstract implements Countable
     /**
      * Asserts that the column is lower then the value
      */
-    public function less(string $column, mixed $value): self
+    public function less(string|ColumnInterface $column, mixed $value): self
     {
         return $this->add(new Condition\Basic($column, ComparisonOperator::LESS, $value));
     }
@@ -120,7 +120,7 @@ class Condition extends ExpressionAbstract implements Countable
     /**
      * Asserts that the column is lower or equal to the value
      */
-    public function lessThan(string $column, mixed $value): self
+    public function lessThan(string|ColumnInterface $column, mixed $value): self
     {
         return $this->add(new Condition\Basic($column, ComparisonOperator::LESS_THAN, $value));
     }
@@ -128,7 +128,7 @@ class Condition extends ExpressionAbstract implements Countable
     /**
      * Asserts that the column is like the value
      */
-    public function like(string $column, mixed $value): self
+    public function like(string|ColumnInterface $column, mixed $value): self
     {
         return $this->add(new Condition\Basic($column, ComparisonOperator::LIKE, $value));
     }
@@ -136,7 +136,7 @@ class Condition extends ExpressionAbstract implements Countable
     /**
      * Asserts that the column is not like the value
      */
-    public function notLike(string $column, mixed $value): self
+    public function notLike(string|ColumnInterface $column, mixed $value): self
     {
         return $this->add(new Condition\Basic($column, ComparisonOperator::NOT_LIKE, $value));
     }
@@ -144,7 +144,7 @@ class Condition extends ExpressionAbstract implements Countable
     /**
      * Asserts that the column is between the left and right value
      */
-    public function between(string $column, mixed $left, mixed $right): self
+    public function between(string|ColumnInterface $column, mixed $left, mixed $right): self
     {
         return $this->add(new Condition\Between($column, $left, $right));
     }
@@ -152,7 +152,7 @@ class Condition extends ExpressionAbstract implements Countable
     /**
      * Asserts that the column is in the array of values
      */
-    public function in(string $column, array $values): self
+    public function in(string|ColumnInterface $column, array $values): self
     {
         return $this->add(new Condition\In($column, $values));
     }
@@ -160,7 +160,7 @@ class Condition extends ExpressionAbstract implements Countable
     /**
      * Asserts that the column is in the array of values
      */
-    public function notIn(string $column, array $values): self
+    public function notIn(string|ColumnInterface $column, array $values): self
     {
         return $this->add(new Condition\NotIn($column, $values));
     }
@@ -168,7 +168,7 @@ class Condition extends ExpressionAbstract implements Countable
     /**
      * Asserts that the column is null
      */
-    public function nil(string $column): self
+    public function nil(string|ColumnInterface $column): self
     {
         return $this->add(new Condition\Nil($column));
     }
@@ -176,7 +176,7 @@ class Condition extends ExpressionAbstract implements Countable
     /**
      * Asserts that the column is not null
      */
-    public function notNil(string $column): self
+    public function notNil(string|ColumnInterface $column): self
     {
         return $this->add(new Condition\NotNil($column));
     }
@@ -192,7 +192,7 @@ class Condition extends ExpressionAbstract implements Countable
     /**
      * Asserts that the column matches the provided regular expression
      */
-    public function regexp(string $column, string $regexp): self
+    public function regexp(string|ColumnInterface $column, string $regexp): self
     {
         return $this->add(new Condition\Regexp($column, $regexp));
     }

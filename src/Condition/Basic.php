@@ -21,6 +21,7 @@
 namespace PSX\Sql\Condition;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use PSX\Sql\ColumnInterface;
 use PSX\Sql\ComparisonOperator;
 
 /**
@@ -35,7 +36,7 @@ class Basic extends ExpressionAbstract
     private ComparisonOperator $operator;
     private mixed $value;
 
-    public function __construct(string $column, ComparisonOperator $operator, mixed $value)
+    public function __construct(string|ColumnInterface $column, ComparisonOperator $operator, mixed $value)
     {
         parent::__construct($column);
 

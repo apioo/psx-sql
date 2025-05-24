@@ -21,6 +21,7 @@
 namespace PSX\Sql\Condition;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use PSX\Sql\ColumnInterface;
 
 /**
  * In
@@ -33,7 +34,7 @@ class In extends ExpressionAbstract
 {
     protected array $values;
 
-    public function __construct(string $column, array $values)
+    public function __construct(string|ColumnInterface $column, array $values)
     {
         parent::__construct($column);
 

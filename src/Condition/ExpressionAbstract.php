@@ -20,6 +20,8 @@
 
 namespace PSX\Sql\Condition;
 
+use PSX\Sql\ColumnInterface;
+
 /**
  * ExpressionAbstract
  *
@@ -31,8 +33,12 @@ abstract class ExpressionAbstract implements ExpressionInterface
 {
     protected string $column;
 
-    public function __construct(string $column)
+    public function __construct(string|ColumnInterface $column)
     {
+        if ($column instanceof ColumnInterface) {
+            $column = $column->value;
+        }
+
         $this->column = $column;
     }
 }

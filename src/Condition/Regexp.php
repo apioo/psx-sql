@@ -21,6 +21,7 @@
 namespace PSX\Sql\Condition;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use PSX\Sql\ColumnInterface;
 
 /**
  * Regexp
@@ -33,7 +34,7 @@ class Regexp extends ExpressionAbstract
 {
     private string $regexp;
 
-    public function __construct(string $column, string $regexp)
+    public function __construct(string|ColumnInterface $column, string $regexp)
     {
         parent::__construct($column);
 
