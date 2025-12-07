@@ -38,7 +38,7 @@ interface TableManagerInterface
      * Returns a table or view instance
      *
      * @template T of ViewInterface
-     * @psalm-param class-string<T> $tableClass
+     * @param class-string<T> $tableClass
      * @return T
      * @throws InvalidTableException
      */

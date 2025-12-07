@@ -20,6 +20,8 @@
 
 namespace PSX\Sql;
 
+use PSX\Sql\Exception\InvalidTableException;
+
 /**
  * ViewTrait
  *
@@ -33,6 +35,7 @@ trait ViewTrait
      * @template T of ViewInterface
      * @param class-string<T> $tableName
      * @return T
+     * @throws InvalidTableException
      */
     protected function getTable(string $tableName): ViewInterface
     {
