@@ -37,7 +37,7 @@ trait ViewTrait
 {
     /**
      * @template T of ViewInterface
-     * @psalm-param class-string<T> $tableName
+     * @param class-string<T> $tableName
      * @return T
      */
     protected function getTable(string $tableName): ViewInterface
