@@ -20,12 +20,6 @@
 
 namespace PSX\Sql;
 
-use PSX\Sql\Exception\BuilderException;
-use PSX\Sql\Provider\ProviderCollectionInterface;
-use PSX\Sql\Provider\ProviderColumnInterface;
-use PSX\Sql\Provider\ProviderEntityInterface;
-use PSX\Sql\Provider\ProviderValueInterface;
-
 /**
  * ViewTrait
  *
