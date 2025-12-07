@@ -343,8 +343,8 @@ class Generator
             $columnType = $this->getType($column, $primaryIndex?->getColumns());
 
             $constName = 'COLUMN_' . strtoupper($column->getName());
-            $items[] = new Node\Expr\ArrayItem(
-                new Node\Scalar\LNumber($columnType, ['kind' => Node\Scalar\LNumber::KIND_HEX]),
+            $items[] = new Node\ArrayItem(
+                new Node\Scalar\Int_($columnType, ['kind' => Node\Scalar\Int_::KIND_HEX]),
                 new Node\Expr\ClassConstFetch(new Node\Name('self'), $constName)
             );
         }
