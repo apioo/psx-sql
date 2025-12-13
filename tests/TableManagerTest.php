@@ -21,14 +21,9 @@
 namespace PSX\Sql\Tests;
 
 use Doctrine\DBAL\Connection;
-use PHPUnit\Framework\TestCase;
-use PSX\Sql\Exception\InvalidTableException;
-use PSX\Sql\Table\Reader;
 use PSX\Sql\TableInterface;
 use PSX\Sql\TableManager;
-use PSX\Sql\Test\DatabaseTestCaseTrait;
 use PSX\Sql\Tests\Generator\HandlerCommentTable;
-use stdClass;
 
 /**
  * TableManagerTest
