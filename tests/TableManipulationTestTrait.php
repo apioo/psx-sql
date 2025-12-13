@@ -21,10 +21,7 @@
 namespace PSX\Sql\Tests;
 
 use DateTime;
-use PSX\DateTime\LocalDate;
 use PSX\DateTime\LocalDateTime;
-use PSX\DateTime\Tests\LocalDateTimeTest;
-use PSX\Record\RecordInterface;
 use PSX\Sql\Exception\NoFieldsAvailableException;
 use PSX\Sql\Tests\Generator\HandlerCommentRow;
 
@@ -37,7 +34,7 @@ use PSX\Sql\Tests\Generator\HandlerCommentRow;
  */
 trait TableManipulationTestTrait
 {
-    public function testCreate()
+    public function testCreate(): void
     {
         $table = $this->getTable();
 
@@ -121,7 +118,7 @@ trait TableManipulationTestTrait
         $this->expectException(NoFieldsAvailableException::class);
 
         $table = $this->getTable();
-        $table->update(new HandlerCommentRow(['foo' => 'bar']));
+        $table->update(HandlerCommentRow::from(['foo' => 'bar']));
     }
 
     public function testDeleteNoPrimaryKey()
@@ -129,6 +126,6 @@ trait TableManipulationTestTrait
         $this->expectException(NoFieldsAvailableException::class);
 
         $table = $this->getTable();
-        $table->delete(new HandlerCommentRow(['foo' => 'bar']));
+        $table->delete(HandlerCommentRow::from(['foo' => 'bar']));
     }
 }

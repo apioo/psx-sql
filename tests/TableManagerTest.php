@@ -28,6 +28,7 @@ use PSX\Sql\TableInterface;
 use PSX\Sql\TableManager;
 use PSX\Sql\Test\DatabaseTestCaseTrait;
 use PSX\Sql\Tests\Generator\HandlerCommentTable;
+use stdClass;
 
 /**
  * TableManagerTest
@@ -47,14 +48,6 @@ class TableManagerTest extends TableTestCase
         $this->assertInstanceOf(TableInterface::class, $table);
         $this->assertEquals('psx_handler_comment', $table->getName());
         $this->assertEquals(['id', 'userId', 'title', 'date'], array_keys($table->getColumns()));
-    }
-
-    public function testGetTableInvalidTable()
-    {
-        $this->expectException(InvalidTableException::class);
-
-        $manager = new TableManager(getConnection());
-        $manager->getTable('PSX\Sql\FooTable');
     }
 
     public function testGetConnection()

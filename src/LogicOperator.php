@@ -36,13 +36,9 @@ enum LogicOperator
 
     public function toSql(): string
     {
-        switch ($this) {
-            case self::AND:
-                return 'AND';
-            case self::OR:
-                return 'OR';
-        }
-
-        throw new OperatorException('Invalid operator configured');
+        return match ($this) {
+            self::AND => 'AND',
+            self::OR => 'OR',
+        };
     }
 }

@@ -36,13 +36,9 @@ enum OrderBy
 
     public function toSql(): string
     {
-        switch ($this) {
-            case self::ASC:
-                return 'ASC';
-            case self::DESC:
-                return 'DESC';
-        }
-
-        throw new OperatorException('Invalid order by configured');
+        return match ($this) {
+            self::ASC => 'ASC',
+            self::DESC => 'DESC',
+        };
     }
 }

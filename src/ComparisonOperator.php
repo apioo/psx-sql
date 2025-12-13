@@ -42,25 +42,15 @@ enum ComparisonOperator
 
     public function toSql(): string
     {
-        switch ($this) {
-            case self::EQUALS:
-                return '=';
-            case self::NOT_EQUALS:
-                return '!=';
-            case self::LIKE:
-                return 'LIKE';
-            case self::NOT_LIKE:
-                return 'NOT LIKE';
-            case self::GREATER:
-                return '>';
-            case self::GREATER_THAN:
-                return '>=';
-            case self::LESS:
-                return '<';
-            case self::LESS_THAN:
-                return '<=';
-        }
-
-        throw new OperatorException('Invalid operator configured');
+        return match ($this) {
+            self::EQUALS => '=',
+            self::NOT_EQUALS => '!=',
+            self::LIKE => 'LIKE',
+            self::NOT_LIKE => 'NOT LIKE',
+            self::GREATER => '>',
+            self::GREATER_THAN => '>=',
+            self::LESS => '<',
+            self::LESS_THAN => '<=',
+        };
     }
 }

@@ -122,14 +122,14 @@ class GeneratorTest extends TableTestCase
     private function newRecord(): TableCommandTestRow
     {
         $row = new TableCommandTestRow();
-        $row->setColBigint(68719476735);
+        $row->setColBigint('68719476735');
         $row->setColBinary('foo');
         $row->setColBlob('foobar');
         $row->setColBoolean(true);
         $row->setColDate(LocalDate::now());
         $row->setColDatetime(LocalDateTime::now());
         $row->setColDatetimetz(LocalDateTime::now());
-        $row->setColDecimal(10.0);
+        $row->setColDecimal('10.0');
         $row->setColFloat(10.37);
         $row->setColGuid('ebe865da-4982-4353-bc44-dcdf7239e386');
         $row->setColInteger(2147483647);

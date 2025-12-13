@@ -40,7 +40,7 @@ use PSX\Sql\Exception\QueryException;
  * @author  Christoph Kappestein <christoph.kappestein@gmail.com>
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    https://phpsx.org
- * @template T
+ * @template TRow
  */
 abstract class TableAbstract implements TableInterface
 {
@@ -181,7 +181,7 @@ abstract class TableAbstract implements TableInterface
 
     /**
      * @throws QueryException
-     * @return array<T>
+     * @return array<TRow>
      */
     protected function doFindAll(?Condition $condition = null, ?int $startIndex = null, ?int $count = null, string|ColumnInterface|null $sortBy = null, ?OrderBy $sortOrder = null): array
     {
@@ -219,7 +219,7 @@ abstract class TableAbstract implements TableInterface
 
     /**
      * @throws QueryException
-     * @return array<T>
+     * @return array<TRow>
      */
     protected function doFindBy(Condition $condition, ?int $startIndex = null, ?int $count = null, string|ColumnInterface|null $sortBy = null, ?OrderBy $sortOrder = null): array
     {
@@ -228,7 +228,7 @@ abstract class TableAbstract implements TableInterface
 
     /**
      * @throws QueryException
-     * @return T
+     * @return TRow
      */
     protected function doFindOneBy(Condition $condition): mixed
     {

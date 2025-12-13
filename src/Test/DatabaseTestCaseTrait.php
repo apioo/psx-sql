@@ -33,7 +33,7 @@ trait DatabaseTestCaseTrait
 {
     protected Connection $connection;
 
-    protected function setUpFixture()
+    protected function setUpFixture(): void
     {
         $this->connection = $this->getConnection();
 
