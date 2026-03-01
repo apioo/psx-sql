@@ -1,0 +1,88 @@
+<?php
+/*
+ * PSX is an open source PHP framework to develop RESTful APIs.
+ * For the current version and information visit <https://phpsx.org>
+ *
+ * Copyright 2010-2023 Christoph Kappestein <christoph.kappestein@gmail.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+namespace PSX\Sql\Filter;
+
+use PSX\Sql\ColumnInterface;
+use PSX\Sql\Condition;
+use PSX\Sql\Filter\Node\AndNode;
+use PSX\Sql\Filter\Node\ConditionNode;
+use PSX\Sql\Filter\Node\NotNode;
+use PSX\Sql\Filter\Node\OrNode;
+use PSX\Sql\TableInterface;
+
+/**
+ * Builder
+ *
+ * @author  Christoph Kappestein <christoph.kappestein@gmail.com>
+ * @license http://www.apache.org/licenses/LICENSE-2.0
+ * @link    https://phpsx.org
+ */
+class Builder
+{
+    public function build(TableInterface $table, ColumnInterface $defaultColumn, string $search): Condition
+    {
+        $parser = new Parser(new Lexer($search));
+        $ast = $parser->parse();
+
+        $condition = Condition::withAnd();
+        $this->recBuild($ast, $table, $defaultColumn->value, $condition);
+
+        return $condition;
+    }
+
+    private function recBuild(Node\Node $node, TableInterface $table, string $defaultColumn, Condition $condition): void
+    {
+        if ($node instanceof AndNode) {
+            $andCondition = Condition::withAnd();
+            $this->recBuild($node->left, $table, $defaultColumn, $andCondition);
+            $this->recBuild($node->right, $table, $defaultColumn, $andCondition);
+            $condition->add($andCondition);
+        } elseif ($node instanceof OrNode) {
+            $orCondition = Condition::withOr();
+            $this->recBuild($node->left, $table, $defaultColumn, $orCondition);
+            $this->recBuild($node->right, $table, $defaultColumn, $orCondition);
+            $condition->add($orCondition);
+        } elseif ($node instanceof NotNode) {
+            $andCondition = Condition::withAnd();
+            $andCondition->setInverse(true);
+            $this->recBuild($node->operand, $table, $defaultColumn, $andCondition);
+            $condition->add($andCondition);
+        } elseif ($node instanceof ConditionNode) {
+            $field = $node->field;
+            if ($field === '_default') {
+                $field = $defaultColumn;
+            }
+
+            $column = $table->getColumns()[$field] ?? null;
+            if ($column === null) {
+                return;
+            }
+
+            if (($column & TableInterface::TYPE_VARCHAR) === TableInterface::TYPE_VARCHAR) {
+                $condition->like($field, $node->value);
+            } elseif (($column & TableInterface::TYPE_TEXT) === TableInterface::TYPE_TEXT) {
+                $condition->like($field, $node->value);
+            } else {
+                $condition->equals($field, $node->value);
+            }
+        }
+    }
+}

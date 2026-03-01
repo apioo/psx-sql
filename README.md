@@ -378,3 +378,19 @@ enum SqlTableTestColumn : string implements \PSX\Sql\ColumnInterface
     case DATE = \PSX\Sql\Tests\Generator\SqlTableTestTable::COLUMN_DATE;
 }
 ```
+
+## Filter
+
+To filter collections this library provider also a filter builder which builds a condition
+based on a custom query language. This is similar to i.e. the GitHub or Jira query language
+and gives your users the option to create more complex filters. The following shows how you
+can parse a query:
+
+```php
+
+$search = 'title:"my query" AND id:2';
+
+$builder = new Builder();
+$condition = $builder->build($table, SqlTableTestColumn::TITLE, $search);
+
+```
