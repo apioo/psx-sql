@@ -83,7 +83,7 @@ class Builder
                     $condition->less($field, $node->value);
                 }
             } elseif ($this->isOfType($column, [TableInterface::TYPE_VARCHAR, TableInterface::TYPE_TEXT, TableInterface::TYPE_JSON])) {
-                $condition->like($field, $node->value);
+                $condition->like($field, '%' . $node->value . '%');
             } else {
                 $condition->equals($field, $node->value);
             }
