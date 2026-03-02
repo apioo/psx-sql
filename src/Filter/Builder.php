@@ -37,33 +37,33 @@ use PSX\Sql\TableInterface;
  */
 class Builder
 {
-    public function build(TableInterface $table, ColumnInterface $defaultColumn, string $search): Condition
+    public function build(TableInterface $table, ColumnInterface $defaultColumn, string $search, ?string $alias = null): Condition
     {
         $parser = new Parser(new Lexer($search));
         $ast = $parser->parse();
 
         $condition = Condition::withAnd();
-        $this->recBuild($ast, $table, $defaultColumn->value, $condition);
+        $this->recBuild($ast, $table, $defaultColumn->value, $condition, $alias);
 
         return $condition;
     }
 
-    private function recBuild(Node\Node $node, TableInterface $table, string $defaultColumn, Condition $condition): void
+    private function recBuild(Node\Node $node, TableInterface $table, string $defaultColumn, Condition $condition, ?string $alias): void
     {
         if ($node instanceof AndNode) {
             $andCondition = Condition::withAnd();
-            $this->recBuild($node->left, $table, $defaultColumn, $andCondition);
-            $this->recBuild($node->right, $table, $defaultColumn, $andCondition);
+            $this->recBuild($node->left, $table, $defaultColumn, $andCondition, $alias);
+            $this->recBuild($node->right, $table, $defaultColumn, $andCondition, $alias);
             $condition->add($andCondition);
         } elseif ($node instanceof OrNode) {
             $orCondition = Condition::withOr();
-            $this->recBuild($node->left, $table, $defaultColumn, $orCondition);
-            $this->recBuild($node->right, $table, $defaultColumn, $orCondition);
+            $this->recBuild($node->left, $table, $defaultColumn, $orCondition, $alias);
+            $this->recBuild($node->right, $table, $defaultColumn, $orCondition, $alias);
             $condition->add($orCondition);
         } elseif ($node instanceof NotNode) {
             $andCondition = Condition::withAnd();
             $andCondition->setInverse(true);
-            $this->recBuild($node->operand, $table, $defaultColumn, $andCondition);
+            $this->recBuild($node->operand, $table, $defaultColumn, $andCondition, $alias);
             $condition->add($andCondition);
         } elseif ($node instanceof ComparisonNode) {
             $field = $node->field;
@@ -76,16 +76,17 @@ class Builder
                 return;
             }
 
+            $columnAlias = $this->getAlias($alias);
             if (in_array($node->operator, ['>', '<']) && $this->isOfType($column, [TableInterface::TYPE_SMALLINT, TableInterface::TYPE_INT, TableInterface::TYPE_BIGINT, TableInterface::TYPE_DECIMAL, TableInterface::TYPE_FLOAT, TableInterface::TYPE_DATE, TableInterface::TYPE_DATETIME])) {
                 if ($node->operator === '>') {
-                    $condition->greater($field, $node->value);
+                    $condition->greater($columnAlias . $field, $node->value);
                 } elseif ($node->operator === '<') {
-                    $condition->less($field, $node->value);
+                    $condition->less($columnAlias . $field, $node->value);
                 }
             } elseif ($this->isOfType($column, [TableInterface::TYPE_VARCHAR, TableInterface::TYPE_TEXT, TableInterface::TYPE_JSON])) {
-                $condition->like($field, '%' . $node->value . '%');
+                $condition->like($columnAlias . $field, '%' . $node->value . '%');
             } else {
-                $condition->equals($field, $node->value);
+                $condition->equals($columnAlias . $field, $node->value);
             }
         }
     }
@@ -99,5 +100,10 @@ class Builder
         }
 
         return false;
+    }
+
+    private function getAlias(?string $alias): string
+    {
+        return $alias !== null ? $alias . '.' : '';
     }
 }
