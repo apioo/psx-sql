@@ -29,8 +29,6 @@ namespace PSX\Sql\Filter;
  */
 class Token
 {
-    public const T_EOF = 'T_EOF';
-
     public function __construct(public string $type, public ?string $value = null)
     {
     }

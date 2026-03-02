@@ -78,6 +78,11 @@ class BuilderTest extends TableTestCase
             ['(id:open AND priority:high) OR (userId:octocat AND NOT title:"wontfix")', 'WHERE (((id = ?) OR (userId = ? AND NOT (title LIKE ?))))', ['open', 'octocat', 'wontfix']],
             ['NOT (title:"Bug" AND (userId:octocat OR userId:hubot))', 'WHERE (NOT ((title LIKE ? AND (userId = ? OR userId = ?))))', ['Bug', 'octocat', 'hubot']],
             ['id:1 AND  userId:2', 'WHERE ((id = ? AND userId = ?))', ['1', '2']],
+            ['id > 18', 'WHERE (id > ?)', ['18']],
+            ['id < 65', 'WHERE (id < ?)', ['65']],
+            ['id > 18 AND title:active', 'WHERE ((id > ? AND title LIKE ?))', ['18', 'active']],
+            ['NOT id < 100', 'WHERE (NOT (id < ?))', ['100']],
+            ['(id > 90 AND title:pro) OR vip', 'WHERE (((id > ? AND title LIKE ?) OR title LIKE ?))', ['90', 'pro', 'vip']],
         ];
     }
 }

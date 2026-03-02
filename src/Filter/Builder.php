@@ -23,7 +23,7 @@ namespace PSX\Sql\Filter;
 use PSX\Sql\ColumnInterface;
 use PSX\Sql\Condition;
 use PSX\Sql\Filter\Node\AndNode;
-use PSX\Sql\Filter\Node\ConditionNode;
+use PSX\Sql\Filter\Node\ComparisonNode;
 use PSX\Sql\Filter\Node\NotNode;
 use PSX\Sql\Filter\Node\OrNode;
 use PSX\Sql\TableInterface;
@@ -65,7 +65,7 @@ class Builder
             $andCondition->setInverse(true);
             $this->recBuild($node->operand, $table, $defaultColumn, $andCondition);
             $condition->add($andCondition);
-        } elseif ($node instanceof ConditionNode) {
+        } elseif ($node instanceof ComparisonNode) {
             $field = $node->field;
             if ($field === '_default') {
                 $field = $defaultColumn;
@@ -76,13 +76,28 @@ class Builder
                 return;
             }
 
-            if (($column & TableInterface::TYPE_VARCHAR) === TableInterface::TYPE_VARCHAR) {
-                $condition->like($field, $node->value);
-            } elseif (($column & TableInterface::TYPE_TEXT) === TableInterface::TYPE_TEXT) {
+            if (in_array($node->operator, ['>', '<']) && $this->isOfType($column, [TableInterface::TYPE_SMALLINT, TableInterface::TYPE_INT, TableInterface::TYPE_BIGINT, TableInterface::TYPE_DECIMAL, TableInterface::TYPE_FLOAT, TableInterface::TYPE_DATE, TableInterface::TYPE_DATETIME])) {
+                if ($node->operator === '>') {
+                    $condition->greater($field, $node->value);
+                } elseif ($node->operator === '<') {
+                    $condition->less($field, $node->value);
+                }
+            } elseif ($this->isOfType($column, [TableInterface::TYPE_VARCHAR, TableInterface::TYPE_TEXT, TableInterface::TYPE_JSON])) {
                 $condition->like($field, $node->value);
             } else {
                 $condition->equals($field, $node->value);
             }
         }
+    }
+
+    private function isOfType(int $column, array $types): bool
+    {
+        foreach ($types as $type) {
+            if (($column & $type) === $type) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

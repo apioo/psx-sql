@@ -20,7 +20,7 @@
 
 namespace PSX\Sql\Filter;
 
-use RuntimeException;
+use PSX\Sql\Exception\FilterLexerException;
 
 /**
  * Lexer
@@ -33,12 +33,19 @@ class Lexer
 {
     public const T_IDENTIFIER = 'T_IDENTIFIER';
     public const T_STRING     = 'T_STRING';
-    public const T_COLON      = 'T_COLON';
+    public const T_NUMBER     = 'T_NUMBER';
+
+    public const T_EQ         = 'T_EQ';      // :
+    public const T_GT         = 'T_GT';      // >
+    public const T_LT         = 'T_LT';      // <
+
     public const T_AND        = 'T_AND';
     public const T_OR         = 'T_OR';
     public const T_NOT        = 'T_NOT';
+
     public const T_LPAREN     = 'T_LPAREN';
     public const T_RPAREN     = 'T_RPAREN';
+
     public const T_EOF        = 'T_EOF';
 
     private string $input;
@@ -51,6 +58,9 @@ class Lexer
         $this->length = strlen($input);
     }
 
+    /**
+     * @throws FilterLexerException
+     */
     public function nextToken(): Token
     {
         $this->skipWhitespace();
@@ -73,60 +83,81 @@ class Lexer
 
         if ($char === ':') {
             $this->pos++;
-            return new Token(self::T_COLON);
+            return new Token(self::T_EQ);
+        }
+
+        if ($char === '>') {
+            $this->pos++;
+            return new Token(self::T_GT);
+        }
+
+        if ($char === '<') {
+            $this->pos++;
+            return new Token(self::T_LT);
         }
 
         if ($char === '"') {
             return $this->readString();
         }
 
-        if (preg_match('/[a-zA-Z0-9_\-\.]/', $char)) {
+        if (ctype_digit($char)) {
+            return $this->readNumber();
+        }
+
+        if (preg_match('/[a-zA-Z_]/', $char)) {
             return $this->readIdentifier();
         }
 
-        throw new RuntimeException('Unexpected character: ' . $char);
+        throw new FilterLexerException('Unexpected character: ' . $char);
     }
 
+    /**
+     * @throws FilterLexerException
+     */
     public function peekToken(): Token
     {
-        $currentPos = $this->pos;
+        $current = $this->pos;
         $token = $this->nextToken();
-        $this->pos = $currentPos;
-
+        $this->pos = $current;
         return $token;
     }
 
     private function skipWhitespace(): void
     {
-        while (
-            $this->pos < $this->length &&
-            ctype_space($this->input[$this->pos])
-        ) {
+        while ($this->pos < $this->length && ctype_space($this->input[$this->pos])) {
             $this->pos++;
         }
     }
 
     private function readString(): Token
     {
-        $this->pos++; // skip opening quote
+        $this->pos++;
         $start = $this->pos;
 
-        while (
-            $this->pos < $this->length &&
-            $this->input[$this->pos] !== '"'
-        ) {
+        while ($this->pos < $this->length && $this->input[$this->pos] !== '"') {
+            $this->pos++;
+        }
+
+        if ($this->pos >= $this->length) {
+            throw new FilterLexerException('Unterminated string');
+        }
+
+        $value = substr($this->input, $start, $this->pos - $start);
+        $this->pos++;
+
+        return new Token(self::T_STRING, $value);
+    }
+
+    private function readNumber(): Token
+    {
+        $start = $this->pos;
+
+        while ($this->pos < $this->length && ctype_digit($this->input[$this->pos])) {
             $this->pos++;
         }
 
         $value = substr($this->input, $start, $this->pos - $start);
-
-        if ($this->pos >= $this->length) {
-            throw new RuntimeException('Unterminated string literal');
-        }
-
-        $this->pos++; // skip closing quote
-
-        return new Token(self::T_STRING, $value);
+        return new Token(self::T_NUMBER, $value);
     }
 
     private function readIdentifier(): Token

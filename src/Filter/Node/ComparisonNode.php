@@ -21,15 +21,17 @@
 namespace PSX\Sql\Filter\Node;
 
 /**
- * ConditionNode
+ * ComparisonNode
  *
  * @author  Christoph Kappestein <christoph.kappestein@gmail.com>
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    https://phpsx.org
  */
-class ConditionNode extends Node
+class ComparisonNode extends Node
 {
-    public function __construct(public string $field, public string $value)
-    {
-    }
+    public function __construct(
+        public string $field,
+        public string $operator, // =, >, <
+        public string $value
+    ) {}
 }

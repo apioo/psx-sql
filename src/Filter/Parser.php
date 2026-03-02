@@ -20,12 +20,13 @@
 
 namespace PSX\Sql\Filter;
 
+use PSX\Sql\Exception\FilterLexerException;
+use PSX\Sql\Exception\FilterParserException;
 use PSX\Sql\Filter\Node\AndNode;
-use PSX\Sql\Filter\Node\ConditionNode;
+use PSX\Sql\Filter\Node\ComparisonNode;
 use PSX\Sql\Filter\Node\Node;
 use PSX\Sql\Filter\Node\NotNode;
 use PSX\Sql\Filter\Node\OrNode;
-use RuntimeException;
 
 /**
  * Parser
@@ -39,36 +40,46 @@ class Parser
     private Lexer $lexer;
     private Token $currentToken;
 
+    /**
+     * @throws FilterLexerException
+     */
     public function __construct(Lexer $lexer)
     {
         $this->lexer = $lexer;
         $this->currentToken = $lexer->nextToken();
     }
 
+    /**
+     * @throws FilterParserException
+     */
     public function parse(): Node
     {
         $node = $this->parseOr();
 
         if ($this->currentToken->type !== Lexer::T_EOF) {
-            throw new RuntimeException(
-                "Unexpected token {$this->currentToken->type}"
-            );
+            throw new FilterParserException('Unexpected token: ' . $this->currentToken->type);
         }
 
         return $node;
     }
 
+    /**
+     * @throws FilterLexerException
+     * @throws FilterParserException
+     */
     private function eat(string $type): void
     {
         if ($this->currentToken->type === $type) {
             $this->currentToken = $this->lexer->nextToken();
         } else {
-            throw new RuntimeException(
-                "Expected {$type}, got {$this->currentToken->type}"
-            );
+            throw new FilterParserException('Expected ' . $type . ', got ' . $this->currentToken->type);
         }
     }
 
+    /**
+     * @throws FilterLexerException
+     * @throws FilterParserException
+     */
     private function parseOr(): Node
     {
         $node = $this->parseAnd();
@@ -84,6 +95,10 @@ class Parser
         return $node;
     }
 
+    /**
+     * @throws FilterLexerException
+     * @throws FilterParserException
+     */
     private function parseAnd(): Node
     {
         $node = $this->parseNot();
@@ -99,6 +114,10 @@ class Parser
         return $node;
     }
 
+    /**
+     * @throws FilterLexerException
+     * @throws FilterParserException
+     */
     private function parseNot(): Node
     {
         if ($this->currentToken->type === Lexer::T_NOT) {
@@ -112,6 +131,10 @@ class Parser
         return $this->parsePrimary();
     }
 
+    /**
+     * @throws FilterLexerException
+     * @throws FilterParserException
+     */
     private function parsePrimary(): Node
     {
         if ($this->currentToken->type === Lexer::T_LPAREN) {
@@ -124,44 +147,64 @@ class Parser
         if ($this->currentToken->type === Lexer::T_IDENTIFIER) {
             $next = $this->lexer->peekToken();
 
-            if ($next->type === Lexer::T_COLON) {
-                return $this->parseCondition();
+            if (in_array($next->type, [
+                Lexer::T_EQ,
+                Lexer::T_GT,
+                Lexer::T_LT
+            ])) {
+                return $this->parseComparison();
             }
 
-            // Bare identifier
+            // bare value
             $value = $this->currentToken->value;
             $this->eat(Lexer::T_IDENTIFIER);
 
-            return new ConditionNode('_default', $value);
+            return new ComparisonNode('_default', '=', $value);
         }
 
         if ($this->currentToken->type === Lexer::T_STRING) {
             $value = $this->currentToken->value;
             $this->eat(Lexer::T_STRING);
 
-            return new ConditionNode('_default', $value);
+            return new ComparisonNode('_default', '=', $value);
         }
 
-        throw new RuntimeException(
-            "Unexpected token {$this->currentToken->type}"
-        );
+        throw new FilterParserException('Unexpected token ' . $this->currentToken->type);
     }
 
-    private function parseCondition(): Node
+    /**
+     * @throws FilterLexerException
+     * @throws FilterParserException
+     */
+    private function parseComparison(): Node
     {
         $field = $this->currentToken->value;
         $this->eat(Lexer::T_IDENTIFIER);
 
-        $this->eat(Lexer::T_COLON);
+        $operatorToken = $this->currentToken;
+
+        if (!in_array($operatorToken->type, [Lexer::T_EQ, Lexer::T_GT, Lexer::T_LT])) {
+            throw new FilterParserException('Expected comparison operator');
+        }
+
+        $this->eat($operatorToken->type);
 
         $value = $this->currentToken->value;
 
         if ($this->currentToken->type === Lexer::T_STRING) {
             $this->eat(Lexer::T_STRING);
+        } elseif ($this->currentToken->type === Lexer::T_NUMBER) {
+            $this->eat(Lexer::T_NUMBER);
         } else {
             $this->eat(Lexer::T_IDENTIFIER);
         }
 
-        return new ConditionNode($field, $value);
+        $operator = match ($operatorToken->type) {
+            Lexer::T_EQ => '=',
+            Lexer::T_GT => '>',
+            Lexer::T_LT => '<',
+        };
+
+        return new ComparisonNode($field, $operator, $value);
     }
 }
