@@ -27,6 +27,6 @@ namespace PSX\Sql\Exception;
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * @link    https://phpsx.org
  */
-class InvalidTableException extends \Exception
+class InvalidTableException extends SqlException
 {
 }
