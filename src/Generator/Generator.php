@@ -272,6 +272,7 @@ class Generator
         $fromArray = $this->factory->method('from');
         $fromArray->makeStatic();
         $fromArray->makePublic();
+        $fromArray->setDocComment($this->buildComment(['param' => 'array<string, mixed>|\\' . \ArrayAccess::class . '<string, mixed> $data']));
         $fromArray->addParam($param);
         $fromArray->setReturnType('self');
         $fromArray->addStmts($stmts);
