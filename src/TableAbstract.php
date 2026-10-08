@@ -163,7 +163,7 @@ abstract class TableAbstract implements TableInterface
     /**
      * Returns a string representation which can be stored in the database
      */
-    protected function serializeType(mixed $value, int $type): string
+    protected function serializeType(mixed $value, int $type): mixed
     {
         if ($value instanceof LocalDate) {
             $value = $value->toDateTime();
